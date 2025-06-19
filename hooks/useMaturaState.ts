@@ -30,6 +30,17 @@ export function useMaturaState() {
   }, [])
 
   const addMessage = useCallback((content: string, role: 'user' | 'assistant' | 'system', phase?: string) => {
+    console.log('💾 [STATE-DEBUG] ===== Adding Message to State =====')
+    console.log('💾 [STATE-DEBUG] Content:', content)
+    console.log('💾 [STATE-DEBUG] Role:', role)
+    console.log('💾 [STATE-DEBUG] Phase:', phase)
+    console.log('💾 [STATE-DEBUG] Current conversations count:', state.conversations.length)
+    
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
+      console.error('❌ [STATE-DEBUG] Invalid message content:', content)
+      return
+    }
+    
     const message: Message = {
       id: generateId(),
       content,
@@ -38,11 +49,26 @@ export function useMaturaState() {
       phase,
     }
     
-    setState(prev => ({
-      ...prev,
-      conversations: [...prev.conversations, message]
-    }))
-  }, [])
+    console.log('💾 [STATE-DEBUG] Generated message:', message)
+    
+    setState(prev => {
+      const newConversations = [...prev.conversations, message]
+      console.log('💾 [STATE-DEBUG] New conversations count:', newConversations.length)
+      console.log('💾 [STATE-DEBUG] Updated conversations:', newConversations.map(m => ({
+        id: m.id,
+        role: m.role,
+        content: m.content.substring(0, 50) + (m.content.length > 50 ? '...' : ''),
+        phase: m.phase
+      })))
+      
+      return {
+        ...prev,
+        conversations: newConversations
+      }
+    })
+    
+    console.log('💾 [STATE-DEBUG] ===== Message Added to State =====')
+  }, [state.conversations.length])
 
   const nextPhase = useCallback(() => {
     batchUpdateState(prev => ({

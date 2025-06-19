@@ -37,6 +37,17 @@ export default function FreeTalk() {
     }
   }, [state.conversations])
 
+  // Debug: Monitor conversations changes
+  useEffect(() => {
+    console.log('🔄 [FREETALK-DEBUG] ===== Conversations State Changed =====')
+    console.log('🔄 [FREETALK-DEBUG] Total conversations:', state.conversations.length)
+    console.log('🔄 [FREETALK-DEBUG] Conversations details:')
+    state.conversations.forEach((msg, index) => {
+      console.log(`🔄 [FREETALK-DEBUG] ${index + 1}. ${msg.role}: ${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}`)
+    })
+    console.log('🔄 [FREETALK-DEBUG] ===== State Change Complete =====')
+  }, [state.conversations])
+
   const handleSend = async () => {
     if (!input.trim() || chatOptimized.isLoading) {
       console.log('[FreeTalk] Ignoring send - input empty or loading:', { 
@@ -57,8 +68,30 @@ export default function FreeTalk() {
       'FreeTalk',
       {
         onNewMessage: (response) => {
-          actions.addMessage(response, 'assistant', 'FreeTalk')
-          console.log('[FreeTalk] Received AI response, length:', response.length)
+          console.log('📥 [FREETALK-DEBUG] ===== Message Reception =====')
+          console.log('📥 [FREETALK-DEBUG] Received response:', response)
+          console.log('📥 [FREETALK-DEBUG] Response type:', typeof response)
+          console.log('📥 [FREETALK-DEBUG] Response length:', response?.length || 0)
+          console.log('📥 [FREETALK-DEBUG] Is valid string:', typeof response === 'string' && response.trim().length > 0)
+          
+          if (!response || typeof response !== 'string' || response.trim().length === 0) {
+            console.error('❌ [FREETALK-DEBUG] Invalid response received in FreeTalk!')
+            console.error('❌ [FREETALK-DEBUG] Response value:', response)
+            return
+          }
+          
+          console.log('📥 [FREETALK-DEBUG] Calling actions.addMessage...')
+          console.log('📥 [FREETALK-DEBUG] Current conversations count:', state.conversations?.length || 0)
+          
+          try {
+            actions.addMessage(response, 'assistant', 'FreeTalk')
+            console.log('📥 [FREETALK-DEBUG] actions.addMessage called successfully')
+            console.log('📥 [FREETALK-DEBUG] New conversations count should be:', (state.conversations?.length || 0) + 1)
+          } catch (addError) {
+            console.error('❌ [FREETALK-DEBUG] Error calling actions.addMessage:', addError)
+          }
+          
+          console.log('📥 [FREETALK-DEBUG] ===== Message Reception Complete =====')
         },
         onError: (error) => {
           console.error('[FreeTalk] Chat error:', error)
@@ -112,13 +145,33 @@ export default function FreeTalk() {
 
         {/* チャット領域 */}
         <div className="h-[500px] overflow-y-auto p-6 bg-gray-50">
+          {/* Debug information */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-2 mb-4 text-xs font-mono">
+              <div>🔍 [UI-DEBUG] Conversations count: {state.conversations.length}</div>
+              <div>🔍 [UI-DEBUG] Loading: {chatOptimized.isLoading ? 'Yes' : 'No'}</div>
+              <div>🔍 [UI-DEBUG] Error: {chatOptimized.error || 'None'}</div>
+              {state.conversations.length > 0 && (
+                <div>🔍 [UI-DEBUG] Last message: {state.conversations[state.conversations.length - 1]?.role} - {state.conversations[state.conversations.length - 1]?.content.substring(0, 30)}...</div>
+              )}
+            </div>
+          )}
+          
           {state.conversations.length === 0 ? (
             <WelcomeMessage />
           ) : (
             <div className="space-y-4">
-              {state.conversations.map((message) => (
-                <ChatMessage key={message.id} message={message} />
-              ))}
+              {state.conversations.map((message, index) => {
+                console.log(`🎨 [UI-DEBUG] Rendering message ${index + 1}/${state.conversations.length}:`, {
+                  id: message.id,
+                  role: message.role,
+                  content: message.content.substring(0, 50) + '...',
+                  phase: message.phase
+                })
+                return (
+                  <ChatMessage key={message.id} message={message} />
+                )
+              })}
             </div>
           )}
           

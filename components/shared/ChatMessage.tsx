@@ -12,8 +12,22 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, isTyping = false, className }: ChatMessageProps) {
+  console.log('🎨 [CHATMESSAGE-DEBUG] Rendering message:', {
+    id: message.id,
+    role: message.role,
+    contentLength: message.content?.length || 0,
+    content: message.content?.substring(0, 30) + (message.content?.length > 30 ? '...' : ''),
+    phase: message.phase,
+    timestamp: message.timestamp
+  })
+  
   const isUser = message.role === 'user'
   const isSystem = message.role === 'system'
+  
+  if (!message.content) {
+    console.error('❌ [CHATMESSAGE-DEBUG] Message has no content!', message)
+    return null
+  }
 
   if (isSystem) {
     return (

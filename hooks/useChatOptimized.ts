@@ -129,16 +129,45 @@ export function useChatOptimized() {
       }
 
       const aiResponse = data.message
-      console.log('🎉 [FETCH-DEBUG] Successfully received AI response!')
-      console.log('🎉 [FETCH-DEBUG] Response length:', aiResponse?.length || 0)
+      console.log('🎉 [RESPONSE-DEBUG] ===== OpenAI Response Analysis =====')
+      console.log('🎉 [RESPONSE-DEBUG] Raw data:', data)
+      console.log('🎉 [RESPONSE-DEBUG] Message content:', aiResponse)
+      console.log('🎉 [RESPONSE-DEBUG] Message type:', typeof aiResponse)
+      console.log('🎉 [RESPONSE-DEBUG] Message length:', aiResponse?.length || 0)
+      console.log('🎉 [RESPONSE-DEBUG] Is string:', typeof aiResponse === 'string')
+      console.log('🎉 [RESPONSE-DEBUG] Is truthy:', !!aiResponse)
+      
+      // Validate response content
+      if (!aiResponse || typeof aiResponse !== 'string' || aiResponse.trim().length === 0) {
+        console.error('❌ [RESPONSE-DEBUG] Invalid or empty response detected!')
+        console.error('❌ [RESPONSE-DEBUG] aiResponse value:', aiResponse)
+        console.error('❌ [RESPONSE-DEBUG] Full data object:', JSON.stringify(data, null, 2))
+        
+        const errorMessage = 'OpenAIから無効な応答を受け取りました。もう一度お試しください。'
+        setError(errorMessage)
+        options?.onError?.(errorMessage)
+        return null
+      }
       
       // Clear any previous errors since we got a successful response
       setError(null)
       
-      // Notify about the new message
-      options?.onNewMessage?.(aiResponse)
+      console.log('🎉 [RESPONSE-DEBUG] Calling onNewMessage with:', aiResponse)
+      console.log('🎉 [RESPONSE-DEBUG] onNewMessage function exists:', !!options?.onNewMessage)
       
-      console.log('🎉 [FETCH-DEBUG] Message handler called successfully')
+      // Notify about the new message
+      if (options?.onNewMessage) {
+        try {
+          options.onNewMessage(aiResponse)
+          console.log('🎉 [RESPONSE-DEBUG] onNewMessage called successfully')
+        } catch (callbackError) {
+          console.error('❌ [RESPONSE-DEBUG] Error in onNewMessage callback:', callbackError)
+        }
+      } else {
+        console.warn('⚠️ [RESPONSE-DEBUG] No onNewMessage callback provided!')
+      }
+      
+      console.log('🎉 [RESPONSE-DEBUG] ===== Response Analysis Complete =====')
       return aiResponse
     } catch (err) {
       console.error('💥 [FETCH-DEBUG] Error caught in fetch operation!')
