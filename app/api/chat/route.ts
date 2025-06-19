@@ -80,6 +80,9 @@ export async function POST(request: NextRequest) {
   try {
     // Get abort signal from request
     const signal = request.signal
+    
+    // Log request start
+    console.log('[/api/chat] Request started at:', new Date().toISOString())
     // Get client IP for rate limiting
     const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
     
@@ -161,18 +164,22 @@ export async function POST(request: NextRequest) {
     }
 
     // OpenAI APIを呼び出し（abort signalを渡す）
+    console.log('[/api/chat] Calling OpenAI API with phase:', phase)
     const aiResponse = await chatWithOpenAI(chatMessages, phase, signal)
+    console.log('[/api/chat] OpenAI API response received, length:', aiResponse?.length || 0)
 
     if (!aiResponse) {
+      console.error('[/api/chat] No response from OpenAI API')
       return NextResponse.json(
-        { error: 'Failed to get AI response' },
+        { error: 'AIからの応答を取得できませんでした' },
         { status: 500 }
       )
     }
 
     const responseTime = Date.now() - startTime
+    console.log('[/api/chat] Request completed successfully in', responseTime, 'ms')
     
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: aiResponse,
         phase,
@@ -183,9 +190,15 @@ export async function POST(request: NextRequest) {
         headers: {
           'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
           'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
         }
       }
     )
+    
+    console.log('[/api/chat] status:', response.status)
+    return response
 
   } catch (error) {
     const responseTime = Date.now() - startTime
@@ -201,9 +214,10 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       // Network timeout error or user cancellation
       if (error.name === 'AbortError' || error.message.includes('aborted')) {
-        console.error('[chat-api] Request was aborted/cancelled')
+        console.error('[chat-api] Request was aborted/cancelled. Reason:', error.message)
+        console.error('[chat-api] Request was running for:', Date.now() - startTime, 'ms')
         return NextResponse.json(
-          { error: 'リクエストがキャンセルされました' },
+          { error: 'リクエストがタイムアウトまたはキャンセルされました。もう一度お試しください。' },
           { status: 499 }
         )
       }

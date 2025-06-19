@@ -49,6 +49,7 @@ export function useChatOptimized() {
     }, timeoutMs)
 
     try {
+      console.log('[useChatOptimized] Starting fetch to /api/chat, phase:', phase)
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -64,14 +65,24 @@ export function useChatOptimized() {
         }),
         signal: controller.signal,
       })
+      
+      console.log('[useChatOptimized] Fetch completed, status:', response.status)
 
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[useChatOptimized] HTTP error:', response.status, errorText)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('[useChatOptimized] Response data received:', {
+        hasMessage: !!data.message,
+        messageLength: data.message?.length || 0,
+        hasError: !!data.error
+      })
       
       if (data.error) {
+        console.error('[useChatOptimized] API returned error:', data.error)
         throw new Error(data.error)
       }
 
@@ -82,10 +93,10 @@ export function useChatOptimized() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          const errorMessage = 'リクエストがタイムアウトしました。もう一度お試しください。'
+          const errorMessage = 'OpenAIに接続できませんでした。もう一度お試しください。'
           setError(errorMessage)
           options?.onError?.(errorMessage)
-          console.error('[useChatOptimized] Structured data request aborted:', err)
+          console.error('[useChatOptimized] Request aborted:', err)
           return null
         }
         
@@ -167,10 +178,10 @@ export function useChatOptimized() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          const errorMessage = 'リクエストがタイムアウトしました。もう一度お試しください。'
+          const errorMessage = 'OpenAIに接続できませんでした。もう一度お試しください。'
           setError(errorMessage)
           options?.onError?.(errorMessage)
-          console.error('[useChatOptimized] Structured data request aborted:', err)
+          console.error('[useChatOptimized] Request aborted:', err)
           return null
         }
         

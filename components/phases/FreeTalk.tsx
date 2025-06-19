@@ -44,7 +44,7 @@ export default function FreeTalk() {
     actions.addMessage(sanitizedInput, 'user', 'FreeTalk')
     setInput('')
 
-    // AI応答を取得
+    // AI応答を取得（デフォルトの90秒タイムアウトを使用）
     await chatOptimized.sendMessage(
       sanitizedInput,
       state.conversations,
@@ -52,11 +52,19 @@ export default function FreeTalk() {
       {
         onNewMessage: (response) => {
           actions.addMessage(response, 'assistant', 'FreeTalk')
+          console.log('[FreeTalk] Received AI response, length:', response.length)
         },
         onError: (error) => {
-          console.error('Chat error:', error)
-        },
-        timeout: 30000 // 30 second timeout
+          console.error('[FreeTalk] Chat error:', error)
+          // より分かりやすいエラー表示
+          if (error.includes('タイムアウト')) {
+            console.error('[FreeTalk] Request timed out')
+          } else if (error.includes('キャンセル')) {
+            console.error('[FreeTalk] Request was cancelled')
+          } else {
+            console.error('[FreeTalk] OpenAI connection failed:', error)
+          }
+        }
       }
     )
   }
