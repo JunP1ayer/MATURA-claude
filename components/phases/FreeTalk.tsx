@@ -49,6 +49,10 @@ export default function FreeTalk() {
   }, [state.conversations])
 
   const handleSend = async () => {
+    console.log('🎬 [FREETALK-DEBUG] ===== SEND INITIATED =====')
+    console.log('🎬 [FREETALK-DEBUG] Input:', input)
+    console.log('🎬 [FREETALK-DEBUG] Current conversations before send:', state.conversations.length)
+    
     if (!input.trim() || chatOptimized.isLoading) {
       console.log('[FreeTalk] Ignoring send - input empty or loading:', { 
         isEmpty: !input.trim(), 
@@ -58,13 +62,34 @@ export default function FreeTalk() {
     }
 
     const sanitizedInput = sanitizeInput(input)
+    console.log('🎬 [FREETALK-DEBUG] Sanitized input:', sanitizedInput)
+    
+    // Add user message
+    console.log('🎬 [FREETALK-DEBUG] Adding user message to state...')
     actions.addMessage(sanitizedInput, 'user', 'FreeTalk')
+    console.log('🎬 [FREETALK-DEBUG] User message added, conversations count should be:', state.conversations.length + 1)
+    
     setInput('')
 
+    // Create updated conversations array manually since state might not be updated yet
+    const updatedConversations = [
+      ...state.conversations,
+      {
+        id: `temp-${Date.now()}`,
+        content: sanitizedInput,
+        role: 'user' as const,
+        timestamp: new Date(),
+        phase: 'FreeTalk'
+      }
+    ]
+    
+    console.log('🎬 [FREETALK-DEBUG] Using updated conversations for API call:', updatedConversations.length)
+
     // AI応答を取得（デフォルトの90秒タイムアウトを使用）
-    await chatOptimized.sendMessage(
+    console.log('🎬 [FREETALK-DEBUG] Calling chatOptimized.sendMessage...')
+    const result = await chatOptimized.sendMessage(
       sanitizedInput,
-      state.conversations,
+      updatedConversations,
       'FreeTalk',
       {
         onNewMessage: (response) => {
@@ -106,6 +131,10 @@ export default function FreeTalk() {
         }
       }
     )
+    
+    console.log('🎬 [FREETALK-DEBUG] sendMessage completed, result:', result)
+    console.log('🎬 [FREETALK-DEBUG] Final conversations count:', state.conversations.length)
+    console.log('🎬 [FREETALK-DEBUG] ===== SEND COMPLETE =====')
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
