@@ -38,7 +38,13 @@ export default function FreeTalk() {
   }, [state.conversations])
 
   const handleSend = async () => {
-    if (!input.trim() || chatOptimized.isLoading) return
+    if (!input.trim() || chatOptimized.isLoading) {
+      console.log('[FreeTalk] Ignoring send - input empty or loading:', { 
+        isEmpty: !input.trim(), 
+        isLoading: chatOptimized.isLoading 
+      })
+      return
+    }
 
     const sanitizedInput = sanitizeInput(input)
     actions.addMessage(sanitizedInput, 'user', 'FreeTalk')

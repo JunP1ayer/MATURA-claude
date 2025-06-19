@@ -28,10 +28,10 @@ export function useChatOptimized() {
     phase: string,
     options?: ChatOptions
   ): Promise<string | null> => {
-    // Only cancel if there's an active request and we're loading
-    if (isLoading && abortControllerRef.current) {
-      console.log('[useChatOptimized] Cancelling previous request')
-      cancelRequest()
+    // Prevent multiple simultaneous requests
+    if (isLoading) {
+      console.log('[useChatOptimized] Request already in progress, ignoring new request')
+      return null
     }
 
     setIsLoading(true)
@@ -41,10 +41,11 @@ export function useChatOptimized() {
     const controller = new AbortController()
     abortControllerRef.current = controller
 
-    // Increase default timeout to 90 seconds to match OpenAI timeout
-    const timeoutMs = options?.timeout || 90000
+    // Use a more reasonable timeout - 60 seconds
+    const timeoutMs = options?.timeout || 60000
     const timeoutId = setTimeout(() => {
       console.error('[useChatOptimized] Request timed out after', timeoutMs, 'ms')
+      console.error('[useChatOptimized] Aborting request due to timeout')
       controller.abort()
     }, timeoutMs)
 
@@ -93,10 +94,20 @@ export function useChatOptimized() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          const errorMessage = 'OpenAIに接続できませんでした。もう一度お試しください。'
+          console.error('[useChatOptimized] Request was aborted. Details:', {
+            name: err.name,
+            message: err.message,
+            stack: err.stack,
+            timeElapsed: 'tracking not implemented'
+          })
+          
+          // Check if this was a timeout or manual abort
+          const errorMessage = err.message.includes('timeout') || err.message.includes('Timeout')
+            ? 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
+            : 'リクエストがキャンセルされました。もう一度お試しください。'
+            
           setError(errorMessage)
           options?.onError?.(errorMessage)
-          console.error('[useChatOptimized] Request aborted:', err)
           return null
         }
         
@@ -123,10 +134,10 @@ export function useChatOptimized() {
     phase: string,
     options?: ChatOptions
   ): Promise<any> => {
-    // Only cancel if there's an active request and we're loading
-    if (isLoading && abortControllerRef.current) {
-      console.log('[useChatOptimized] Cancelling previous structured data request')
-      cancelRequest()
+    // Prevent multiple simultaneous requests
+    if (isLoading) {
+      console.log('[useChatOptimized] Structured data request already in progress, ignoring new request')
+      return null
     }
 
     setIsLoading(true)
@@ -136,10 +147,11 @@ export function useChatOptimized() {
     const controller = new AbortController()
     abortControllerRef.current = controller
 
-    // Increase default timeout to 90 seconds to match OpenAI timeout
-    const timeoutMs = options?.timeout || 90000
+    // Use a more reasonable timeout - 60 seconds
+    const timeoutMs = options?.timeout || 60000
     const timeoutId = setTimeout(() => {
       console.error('[useChatOptimized] Request timed out after', timeoutMs, 'ms')
+      console.error('[useChatOptimized] Aborting request due to timeout')
       controller.abort()
     }, timeoutMs)
 
@@ -178,10 +190,20 @@ export function useChatOptimized() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          const errorMessage = 'OpenAIに接続できませんでした。もう一度お試しください。'
+          console.error('[useChatOptimized] Request was aborted. Details:', {
+            name: err.name,
+            message: err.message,
+            stack: err.stack,
+            timeElapsed: 'tracking not implemented'
+          })
+          
+          // Check if this was a timeout or manual abort
+          const errorMessage = err.message.includes('timeout') || err.message.includes('Timeout')
+            ? 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
+            : 'リクエストがキャンセルされました。もう一度お試しください。'
+            
           setError(errorMessage)
           options?.onError?.(errorMessage)
-          console.error('[useChatOptimized] Request aborted:', err)
           return null
         }
         
