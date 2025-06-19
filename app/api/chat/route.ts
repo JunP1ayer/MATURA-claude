@@ -120,47 +120,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Parse and validate request body with enhanced error handling
-    // 【Ultra Think】: Robust JSON parsing is critical for conversation continuity
-    let rawBody: string | null = null
+    // 🔥 DANGEROUS FIX: Use Next.js proper JSON parsing
+    console.log('🔥 [ULTRA-FIX] Using Next.js request.json() method...')
+    
     try {
-      // First, let's get the raw text to understand what we're receiving
+      // Use Next.js built-in JSON parsing instead of text()
+      body = await request.json()
+      console.log('🔥 [ULTRA-FIX] JSON parsed successfully with request.json()')
+      console.log('🔥 [ULTRA-FIX] Body contents:', JSON.stringify(body, null, 2))
+      console.log('🔥 [ULTRA-FIX] Message from UI:', body?.message)
+      console.log('🔥 [ULTRA-FIX] Phase:', body?.phase)
+      console.log('🔥 [ULTRA-FIX] Messages count:', body?.messages?.length || 0)
+    } catch (jsonError) {
+      console.error('❌ [ULTRA-FIX] request.json() failed:', jsonError)
+      console.error('❌ [ULTRA-FIX] Attempting fallback to request.text()...')
+      
+      // Fallback to text method if JSON parsing fails
       const textBody = await request.text()
-      rawBody = textBody
-      console.log('[DEBUG] Raw request body received (length:', textBody.length, '):', textBody.substring(0, 200))
+      console.log('🔥 [ULTRA-FIX] Text body fallback:', textBody)
       
       if (!textBody || textBody.trim().length === 0) {
-        console.error('[DEBUG] Empty request body received')
+        console.error('❌ [ULTRA-FIX] Both JSON and text methods failed - empty body')
         return NextResponse.json(
           { error: 'Empty request body. Please check frontend request implementation.' },
           { status: 400 }
         )
       }
       
-      // Parse JSON with detailed error context
-      body = JSON.parse(textBody)
-      console.log('[DEBUG] Request body parsed successfully')
-      console.log('[DEBUG] Body contents:', JSON.stringify(body, null, 2))
-      console.log('[DEBUG] Message from UI:', body?.message)
-      console.log('[DEBUG] Phase:', body?.phase)
-      console.log('[DEBUG] Messages count:', body?.messages?.length || 0)
-    } catch (parseError) {
-      console.error('[DEBUG] === JSON PARSING ERROR ANALYSIS ===')
-      console.error('[DEBUG] Parse error:', parseError)
-      console.error('[DEBUG] Error message:', parseError instanceof Error ? parseError.message : 'Unknown error')
-      console.error('[DEBUG] Raw body length:', rawBody?.length || 0)
-      console.error('[DEBUG] Raw body preview:', rawBody?.substring(0, 500) || 'null')
-      console.error('[DEBUG] Body ends with:', rawBody?.slice(-50) || 'null')
-      console.error('[DEBUG] ==============================')
-      
-      return NextResponse.json(
-        { 
-          error: 'Invalid JSON in request body', 
-          details: parseError instanceof Error ? parseError.message : 'Unknown parsing error',
-          bodyLength: rawBody?.length || 0
-        },
-        { status: 400 }
-      )
+      try {
+        body = JSON.parse(textBody)
+        console.log('🔥 [ULTRA-FIX] Manual JSON parse successful')
+      } catch (parseError) {
+        console.error('❌ [ULTRA-FIX] Manual JSON parse failed:', parseError)
+        return NextResponse.json(
+          { error: 'Invalid JSON in request body' },
+          { status: 400 }
+        )
+      }
     }
 
     const validation = validateRequest(body)

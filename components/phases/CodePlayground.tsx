@@ -19,6 +19,7 @@ export default function CodePlayground() {
   const [userConsent, setUserConsent] = useState(false)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
   const [previewMode, setPreviewMode] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   // API利用コスト計算
   const estimatedCost = estimateAPICost(state.conversations.length, 'CodePlayground')
@@ -37,6 +38,7 @@ export default function CodePlayground() {
   }, [chatOptimized])
 
   const generateCode = async () => {
+    setIsGenerating(true)
     setProgress(0)
 
     // プログレスアニメーション
@@ -85,6 +87,7 @@ export default function CodePlayground() {
           onError: (error) => {
             console.error('Code generation error:', error)
             clearInterval(progressInterval)
+            setIsGenerating(false)
           }
         }
       )
@@ -116,6 +119,8 @@ export default function CodePlayground() {
       const fallbackCode = generateFallbackCode()
       setGeneratedCode(fallbackCode)
       actions.setGeneratedCode(fallbackCode)
+    } finally {
+      setIsGenerating(false)
     }
   }
 

@@ -24,32 +24,45 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
   const history = useMaturaHistory()
   const chat = useChatOptimized()
 
+  // Debug logging for context value changes
+  React.useEffect(() => {
+    console.log('🔄 [PROVIDER-DEBUG] MaturaProvider re-rendered')
+    console.log('🔄 [PROVIDER-DEBUG] Current state conversations:', maturaState.state.conversations.length)
+    console.log('🔄 [PROVIDER-DEBUG] addMessage function reference:', maturaState.addMessage)
+  }, [maturaState.state.conversations.length, maturaState.addMessage])
+
   // Memoize the context value to prevent unnecessary re-renders and stale closures
-  const value: MaturaContextType = useMemo(() => ({
-    state: maturaState.state,
-    actions: {
-      updateState: maturaState.updateState,
-      batchUpdateState: maturaState.batchUpdateState,
-      addMessage: maturaState.addMessage,
-      nextPhase: maturaState.nextPhase,
-      setLoading: maturaState.setLoading,
-      setError: maturaState.setError,
-      setInsights: maturaState.setInsights,
-      setSelectedUI: maturaState.setSelectedUI,
-      setUXDesign: maturaState.setUXDesign,
-      setGeneratedCode: maturaState.setGeneratedCode,
-      setReleaseInfo: maturaState.setReleaseInfo,
-      resetState: maturaState.resetState,
-      getCurrentPhaseData: maturaState.getCurrentPhaseData,
-      // Batch operations
-      setInsightAndNextPhase: maturaState.setInsightAndNextPhase,
-      setUIAndNextPhase: maturaState.setUIAndNextPhase,
-      setUXAndNextPhase: maturaState.setUXAndNextPhase,
-      setCodeAndNextPhase: maturaState.setCodeAndNextPhase,
-    },
-    history,
-    chat,
-  }), [
+  const value: MaturaContextType = useMemo(() => {
+    console.log('🔄 [PROVIDER-DEBUG] Creating new context value')
+    console.log('🔄 [PROVIDER-DEBUG] State conversations count:', maturaState.state.conversations.length)
+    console.log('🔄 [PROVIDER-DEBUG] addMessage function:', typeof maturaState.addMessage)
+    
+    return {
+      state: maturaState.state,
+      actions: {
+        updateState: maturaState.updateState,
+        batchUpdateState: maturaState.batchUpdateState,
+        addMessage: maturaState.addMessage,
+        nextPhase: maturaState.nextPhase,
+        setLoading: maturaState.setLoading,
+        setError: maturaState.setError,
+        setInsights: maturaState.setInsights,
+        setSelectedUI: maturaState.setSelectedUI,
+        setUXDesign: maturaState.setUXDesign,
+        setGeneratedCode: maturaState.setGeneratedCode,
+        setReleaseInfo: maturaState.setReleaseInfo,
+        resetState: maturaState.resetState,
+        getCurrentPhaseData: maturaState.getCurrentPhaseData,
+        // Batch operations
+        setInsightAndNextPhase: maturaState.setInsightAndNextPhase,
+        setUIAndNextPhase: maturaState.setUIAndNextPhase,
+        setUXAndNextPhase: maturaState.setUXAndNextPhase,
+        setCodeAndNextPhase: maturaState.setCodeAndNextPhase,
+      },
+      history,
+      chat,
+    }
+  }, [
     maturaState.state,
     maturaState.updateState,
     maturaState.batchUpdateState,

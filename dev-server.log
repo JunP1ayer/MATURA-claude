@@ -424,3 +424,390 @@ digest: "3477109634"
 [/api/chat] Final AI response content: こんにちは！素敵な一日をお過ごしでしょうか？何か私にお手伝いできることがありますか？
 [/api/chat] status: 200
  POST /api/chat 200 in 2615ms
+ GET / 200 in 114ms
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T10:59:58.975Z
+[DEBUG] Request URL: http://0.0.0.0:3001/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+  connection: 'keep-alive',
+  'content-length': '105',
+  'content-type': 'application/json',
+  host: 'localhost:3001',
+  origin: 'http://localhost:3001',
+  referer: 'http://localhost:3001/',
+  'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Microsoft Edge";v="132"',
+  'sec-ch-ua-mobile': '?0',
+  'sec-ch-ua-platform': '"Windows"',
+  'sec-fetch-dest': 'empty',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-site': 'same-origin',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3001',
+  'x-forwarded-port': '3001',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T10:59:58.977Z
+[DEBUG] Raw request body received (length: 85 ): {"message":"こんにちは","messages":[{"role":"user","content":"こんにちは"}],"phase":"FreeTalk"}
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "こんにちは",
+  "messages": [
+    {
+      "role": "user",
+      "content": "こんにちは"
+    }
+  ],
+  "phase": "FreeTalk"
+}
+[DEBUG] Message from UI: こんにちは
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 1
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 2
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+ POST /api/chat 200 in 36ms
+💥 [OPENAI-DEBUG] OpenAI API error occurred!
+💥 [OPENAI-DEBUG] Error type: object
+💥 [OPENAI-DEBUG] Error constructor: APIUserAbortError
+[chat-openai] OpenAI API error: APIUserAbortError: Request was aborted.
+    at OpenAI.makeRequest (file:///home/junp1ayer/matura-mvp/node_modules/openai/core.mjs:317:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async chatWithOpenAI (webpack-internal:///(rsc)/./lib/openai.ts:62:28)
+    at async POST (webpack-internal:///(rsc)/./app/api/chat/route.ts:241:28)
+    at async /home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55778
+    at async eO.execute (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46527)
+    at async eO.handle (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57112)
+    at async doRender (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1352:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1574:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1482:28)
+    at async DevServer.renderPageComponent (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1908:24)
+    at async DevServer.renderToResponseImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1946:32)
+    at async DevServer.pipeImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:921:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:817:17)
+    at async /home/junp1ayer/matura-mvp/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/junp1ayer/matura-mvp/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:350:24)
+    at async requestHandlerImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  status: undefined,
+  headers: undefined,
+  request_id: undefined,
+  error: undefined,
+  code: undefined,
+  param: undefined,
+  type: undefined
+}
+[chat-openai] Status: undefined
+[chat-openai] Type: undefined
+[chat-openai] Code: undefined
+[chat-api] Error: {
+  error: 'Request was aborted.',
+  name: 'Error',
+  stack: 'Error: Request was aborted.\n' +
+    '    at OpenAI.makeRequest (file:///home/junp1ayer/matura-mvp/node_modules/openai/core.mjs:317:23)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async chatWithOpenAI (webpack-internal:///(rsc)/./lib/openai.ts:62:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/chat/route.ts:241:28)\n' +
+    '    at async /home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55778\n' +
+    '    at async eO.execute (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46527)\n' +
+    '    at async eO.handle (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57112)\n' +
+    '    at async doRender (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1352:42)\n' +
+    '    at async cacheEntry.responseCache.get.routeKind (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1574:28)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1482:28)\n' +
+    '    at async DevServer.renderPageComponent (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1908:24)\n' +
+    '    at async DevServer.renderToResponseImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1946:32)\n' +
+    '    at async DevServer.pipeImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:921:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/next-server.js:272:17)\n' +
+    '    at async DevServer.handleRequestImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:817:17)\n' +
+    '    at async /home/junp1ayer/matura-mvp/node_modules/next/dist/server/dev/next-dev-server.js:339:20\n' +
+    '    at async Span.traceAsyncFn (/home/junp1ayer/matura-mvp/node_modules/next/dist/trace/trace.js:154:20)\n' +
+    '    at async DevServer.handleRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)\n' +
+    '    at async invokeRender (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:173:21)\n' +
+    '    at async handleRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:350:24)\n' +
+    '    at async requestHandlerImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:374:13)\n' +
+    '    at async Server.requestListener (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/start-server.js:141:13)',
+  body: '{\n' +
+    '  "message": "こんにちは",\n' +
+    '  "messages": [\n' +
+    '    {\n' +
+    '      "role": "user",\n' +
+    '      "content": "こんにちは"\n' +
+    '    }\n' +
+    '  ],\n' +
+    '  "phase": "FreeTalk"\n' +
+    '}',
+  responseTime: 19
+}
+[chat-api] Request was aborted/cancelled. Reason: Request was aborted.
+[chat-api] Request was running for: 19 ms
+ ✓ Compiled in 708ms (1278 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 164ms
+ ✓ Compiled in 288ms (1292 modules)
+ ✓ Compiled in 286ms (1292 modules)
+ ✓ Compiled in 367ms (1292 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 100ms
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 54ms
+ ✓ Compiled /api/chat in 329ms (670 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T11:26:24.002Z
+[DEBUG] Request URL: http://0.0.0.0:3001/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+  connection: 'keep-alive',
+  'content-length': '129',
+  'content-type': 'application/json',
+  host: 'localhost:3001',
+  origin: 'http://localhost:3001',
+  referer: 'http://localhost:3001/',
+  'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Microsoft Edge";v="132"',
+  'sec-ch-ua-mobile': '?0',
+  'sec-ch-ua-platform': '"Windows"',
+  'sec-fetch-dest': 'empty',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-site': 'same-origin',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3001',
+  'x-forwarded-port': '3001',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T11:26:24.003Z
+[DEBUG] Raw request body received (length: 0 ): 
+[DEBUG] Empty request body received
+ ✓ Compiled in 491ms (1292 modules)
+ ✓ Compiled in 332ms (1292 modules)
+ ✓ Compiled in 250ms (1292 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ ⨯ components/phases/FreeTalk.tsx (62:22) @ React
+ ⨯ ReferenceError: React is not defined
+    at FreeTalk (./components/phases/FreeTalk.tsx:83:24)
+digest: "490327739"
+[0m [90m 60 |[39m[0m
+[0m [90m 61 |[39m   [90m// 🔥 ULTRA FIX: useCallback to prevent stale closure[39m[0m
+[0m[31m[1m>[22m[39m[90m 62 |[39m   [36mconst[39m handleSend [33m=[39m [33mReact[39m[33m.[39museCallback([36masync[39m () [33m=>[39m {[0m
+[0m [90m    |[39m                      [31m[1m^[22m[39m[0m
+[0m [90m 63 |[39m     console[33m.[39mlog([32m'🎬 [FREETALK-DEBUG] ===== SEND INITIATED ====='[39m)[0m
+[0m [90m 64 |[39m     console[33m.[39mlog([32m'🎬 [FREETALK-DEBUG] Input:'[39m[33m,[39m input)[0m
+[0m [90m 65 |[39m     console[33m.[39mlog([32m'🎬 [FREETALK-DEBUG] Current conversations before send:'[39m[33m,[39m state[33m.[39mconversations[33m.[39mlength)[0m
+ GET / 200 in 99ms
+ ✓ Compiled in 221ms (1292 modules)
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 105ms
+ ✓ Compiled in 613ms (1278 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 115ms
+ ✓ Compiled in 228ms (1292 modules)
+ ✓ Compiled in 300ms (1292 modules)
+ ✓ Compiled in 211ms (1292 modules)
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 110ms
+ ✓ Compiled /api/chat in 235ms (670 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T11:34:16.599Z
+[DEBUG] Request URL: http://0.0.0.0:3001/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+  connection: 'keep-alive',
+  'content-length': '105',
+  'content-type': 'application/json',
+  host: 'localhost:3001',
+  origin: 'http://localhost:3001',
+  referer: 'http://localhost:3001/',
+  'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Microsoft Edge";v="132"',
+  'sec-ch-ua-mobile': '?0',
+  'sec-ch-ua-platform': '"Windows"',
+  'sec-fetch-dest': 'empty',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-site': 'same-origin',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3001',
+  'x-forwarded-port': '3001',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T11:34:16.600Z
+[DEBUG] Raw request body received (length: 0 ): 
+[DEBUG] Empty request body received
+ ✓ Compiled in 379ms (1278 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 132ms
+ ✓ Compiled in 148ms (655 modules)
+ ✓ Compiled in 415ms (1292 modules)
+ ✓ Compiled /_not-found in 462ms (1281 modules)
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 92ms
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET /_next/static/css/app/layout.css?v=1750333149754 404 in 29ms
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET /_next/static/chunks/app-pages-internals.js 404 in 36ms
+ GET /_next/static/chunks/main-app.js?v=1750333149754 404 in 46ms
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET /_next/static/chunks/app/page.js 404 in 28ms
+ ⨯ ./components/phases/FreeTalk.tsx
+Error: 
+  [31mx[0m Expected a semicolon
+     ,-[[36;1;4m/home/junp1ayer/matura-mvp/components/phases/FreeTalk.tsx[0m:161:1]
+ [2m161[0m |     console.log('🎬 [FREETALK-DEBUG] sendMessage completed, result:', result)
+ [2m162[0m |     console.log('🎬 [FREETALK-DEBUG] Final conversations count:', state.conversations.length)
+ [2m163[0m |     console.log('🎬 [FREETALK-DEBUG] ===== SEND COMPLETE =====')
+ [2m164[0m |   }, [input, state.conversations, chatOptimized.isLoading, actions.addMessage])
+     : [31;1m   ^[0m
+ [2m165[0m | 
+ [2m166[0m |   const handleKeyPress = (e: React.KeyboardEvent) => {
+ [2m167[0m |     if (e.key === 'Enter' && !e.shiftKey) {
+     `----
+
+  [31mx[0m Expression expected
+     ,-[[36;1;4m/home/junp1ayer/matura-mvp/components/phases/FreeTalk.tsx[0m:161:1]
+ [2m161[0m |     console.log('🎬 [FREETALK-DEBUG] sendMessage completed, result:', result)
+ [2m162[0m |     console.log('🎬 [FREETALK-DEBUG] Final conversations count:', state.conversations.length)
+ [2m163[0m |     console.log('🎬 [FREETALK-DEBUG] ===== SEND COMPLETE =====')
+ [2m164[0m |   }, [input, state.conversations, chatOptimized.isLoading, actions.addMessage])
+     : [31;1m   ^[0m
+ [2m165[0m | 
+ [2m166[0m |   const handleKeyPress = (e: React.KeyboardEvent) => {
+ [2m167[0m |     if (e.key === 'Enter' && !e.shiftKey) {
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/phases/FreeTalk.tsx
+./app/page.tsx
+ ⨯ ./components/phases/FreeTalk.tsx
+Error: 
+  [31mx[0m Expected ',', got ')'
+     ,-[[36;1;4m/home/junp1ayer/matura-mvp/components/phases/FreeTalk.tsx[0m:155:1]
+ [2m155[0m |             console.error('[FreeTalk] OpenAI connection failed:', error)
+ [2m156[0m |           }
+ [2m157[0m |         }
+ [2m158[0m |       )
+     : [31;1m      ^[0m
+ [2m159[0m |       
+ [2m160[0m |       console.log('🚨 [CRITICAL-DEBUG] sendMessage call completed')
+ [2m161[0m |       console.log('🚨 [CRITICAL-DEBUG] Result:', result)
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/phases/FreeTalk.tsx
+./app/page.tsx
+ ✓ Compiled in 405ms (1295 modules)
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET / 200 in 135ms
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET /_next/static/css/app/layout.css?v=1750333285429 404 in 29ms
+ GET /_next/static/chunks/main-app.js?v=1750333285429 404 in 29ms
+🔄 [PROVIDER-DEBUG] Creating new context value
+🔄 [PROVIDER-DEBUG] State conversations count: 0
+🔄 [PROVIDER-DEBUG] addMessage function: function
+ GET /_next/static/chunks/app-pages-internals.js 404 in 25ms
+ ✓ Compiled in 353ms (655 modules)
+ ✓ Compiled in 158ms (655 modules)
+ ✓ Compiled in 621ms (1278 modules)
+ ✓ Compiled in 173ms (1278 modules)
+ ✓ Compiled in 476ms (1278 modules)
+ ✓ Compiled in 583ms (1292 modules)
+ ✓ Compiled in 204ms (1278 modules)
+ ✓ Compiled in 237ms (1278 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/home/junp1ayer/matura-mvp/.next/cache/webpack/client-development/0.pack.gz_' -> '/home/junp1ayer/matura-mvp/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled in 523ms (1292 modules)
+ ✓ Compiled in 238ms (1292 modules)
+ ✓ Compiled in 295ms (1292 modules)
+ ✓ Compiled in 369ms (1292 modules)
+ ✓ Compiled in 357ms (1292 modules)
+ ✓ Compiled in 255ms (1292 modules)
+ ✓ Compiled in 440ms (1292 modules)
+ ✓ Compiled in 233ms (1292 modules)
+ ✓ Compiled in 213ms (1292 modules)
+ ✓ Compiled in 175ms (1278 modules)
+ ✓ Compiled in 147ms (1278 modules)
+ ✓ Compiled in 171ms (1278 modules)
+ ✓ Compiled in 162ms (1278 modules)
+ ✓ Compiled in 215ms (1278 modules)
+ ✓ Compiled in 156ms (1278 modules)
+ ✓ Compiled in 215ms (1278 modules)
+ ✓ Compiled in 487ms (1292 modules)
+ ✓ Compiled in 271ms (1292 modules)
+ ✓ Compiled in 236ms (1292 modules)
+ ✓ Compiled in 318ms (1292 modules)

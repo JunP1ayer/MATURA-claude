@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Send, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ChatMessage, { WelcomeMessage } from '@/components/shared/ChatMessage'
@@ -22,12 +22,12 @@ export default function FreeTalk() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [state.conversations, chatOptimized.isLoading])
 
-  // Cleanup on unmount
+  // Cleanup only on component unmount
   useEffect(() => {
     return () => {
       chatOptimized.cleanup()
     }
-  }, [chatOptimized])
+  }, [])
 
   // 5往復以上で次のフェーズボタンを表示
   useEffect(() => {
@@ -37,48 +37,14 @@ export default function FreeTalk() {
     }
   }, [state.conversations])
 
-  // Debug: Monitor conversations changes
-  useEffect(() => {
-    console.log('🔄 [FREETALK-DEBUG] ===== Conversations State Changed =====')
-    console.log('🔄 [FREETALK-DEBUG] Total conversations:', state.conversations.length)
-    console.log('🔄 [FREETALK-DEBUG] Raw conversations array:', state.conversations)
-    console.log('🔄 [FREETALK-DEBUG] Conversations details:')
-    state.conversations.forEach((msg, index) => {
-      console.log(`🔄 [FREETALK-DEBUG] ${index + 1}. ${msg.role}: ${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}`)
-      console.log(`🔄 [FREETALK-DEBUG]   - ID: ${msg.id}`)
-      console.log(`🔄 [FREETALK-DEBUG]   - Phase: ${msg.phase}`)
-      console.log(`🔄 [FREETALK-DEBUG]   - Timestamp: ${msg.timestamp}`)
-    })
-    
-    // Count by role
-    const userCount = state.conversations.filter(m => m.role === 'user').length
-    const assistantCount = state.conversations.filter(m => m.role === 'assistant').length
-    console.log('🔄 [FREETALK-DEBUG] User messages:', userCount)
-    console.log('🔄 [FREETALK-DEBUG] Assistant messages:', assistantCount)
-    console.log('🔄 [FREETALK-DEBUG] ===== State Change Complete =====')
-  }, [state.conversations])
 
-  const handleSend = async () => {
-    console.log('🎬 [FREETALK-DEBUG] ===== SEND INITIATED =====')
-    console.log('🎬 [FREETALK-DEBUG] Input:', input)
-    console.log('🎬 [FREETALK-DEBUG] Current conversations before send:', state.conversations.length)
-    
+  const handleSend = React.useCallback(async () => {
     if (!input.trim() || chatOptimized.isLoading) {
-      console.log('[FreeTalk] Ignoring send - input empty or loading:', { 
-        isEmpty: !input.trim(), 
-        isLoading: chatOptimized.isLoading 
-      })
       return
     }
 
     const sanitizedInput = sanitizeInput(input)
-    console.log('🎬 [FREETALK-DEBUG] Sanitized input:', sanitizedInput)
-    
-    // Add user message
-    console.log('🎬 [FREETALK-DEBUG] Adding user message to state...')
     actions.addMessage(sanitizedInput, 'user', 'FreeTalk')
-    console.log('🎬 [FREETALK-DEBUG] User message added, conversations count should be:', state.conversations.length + 1)
-    
     setInput('')
 
     // Create updated conversations array manually since state might not be updated yet
@@ -92,68 +58,30 @@ export default function FreeTalk() {
         phase: 'FreeTalk'
       }
     ]
-    
-    console.log('🎬 [FREETALK-DEBUG] Using updated conversations for API call:', updatedConversations.length)
 
-    // AI応答を取得（デフォルトの90秒タイムアウトを使用）
-    console.log('🎬 [FREETALK-DEBUG] Calling chatOptimized.sendMessage...')
-    const result = await chatOptimized.sendMessage(
-      sanitizedInput,
-      updatedConversations,
-      'FreeTalk',
-      {
-        onNewMessage: (response) => {
-          console.log('📥 [FREETALK-DEBUG] ===== Message Reception =====')
-          console.log('📥 [FREETALK-DEBUG] Received response:', response)
-          console.log('📥 [FREETALK-DEBUG] Response type:', typeof response)
-          console.log('📥 [FREETALK-DEBUG] Response length:', response?.length || 0)
-          console.log('📥 [FREETALK-DEBUG] Is valid string:', typeof response === 'string' && response.trim().length > 0)
-          
-          if (!response || typeof response !== 'string' || response.trim().length === 0) {
-            console.error('❌ [FREETALK-DEBUG] Invalid response received in FreeTalk!')
-            console.error('❌ [FREETALK-DEBUG] Response value:', response)
-            return
-          }
-          
-          console.log('📥 [FREETALK-DEBUG] Calling actions.addMessage...')
-          console.log('📥 [FREETALK-DEBUG] Current conversations count:', state.conversations?.length || 0)
-          console.log('📥 [FREETALK-DEBUG] actions.addMessage function:', typeof actions.addMessage)
-          console.log('📥 [FREETALK-DEBUG] actions object keys:', Object.keys(actions))
-          
-          try {
-            actions.addMessage(response, 'assistant', 'FreeTalk')
-            console.log('📥 [FREETALK-DEBUG] actions.addMessage called successfully')
-            console.log('📥 [FREETALK-DEBUG] New conversations count should be:', (state.conversations?.length || 0) + 1)
+    try {
+      const result = await chatOptimized.sendMessage(
+        sanitizedInput,
+        updatedConversations,
+        'FreeTalk',
+        {
+          onNewMessage: (response: string) => {
+            if (!response || typeof response !== 'string' || response.trim().length === 0) {
+              return
+            }
             
-            // Force a small delay to see if state updates asynchronously
-            setTimeout(() => {
-              console.log('📥 [FREETALK-DEBUG] [DELAYED CHECK] Conversations count after 100ms:', state.conversations?.length || 0)
-            }, 100)
-          } catch (addError) {
-            console.error('❌ [FREETALK-DEBUG] Error calling actions.addMessage:', addError)
-            console.error('❌ [FREETALK-DEBUG] Error details:', addError)
-          }
-          
-          console.log('📥 [FREETALK-DEBUG] ===== Message Reception Complete =====')
-        },
-        onError: (error) => {
-          console.error('[FreeTalk] Chat error:', error)
-          // より分かりやすいエラー表示
-          if (error.includes('タイムアウト')) {
-            console.error('[FreeTalk] Request timed out')
-          } else if (error.includes('キャンセル')) {
-            console.error('[FreeTalk] Request was cancelled')
-          } else {
-            console.error('[FreeTalk] OpenAI connection failed:', error)
+            actions.addMessage(response.trim(), 'assistant', 'FreeTalk')
+          },
+          onError: (error) => {
+            // Error handling without debug logs
           }
         }
-      }
-    )
-    
-    console.log('🎬 [FREETALK-DEBUG] sendMessage completed, result:', result)
-    console.log('🎬 [FREETALK-DEBUG] Final conversations count:', state.conversations.length)
-    console.log('🎬 [FREETALK-DEBUG] ===== SEND COMPLETE =====')
-  }
+      )
+      
+    } catch (sendError) {
+      // Error handled silently
+    }
+  }, [input, state.conversations, chatOptimized.isLoading, actions.addMessage])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -192,33 +120,14 @@ export default function FreeTalk() {
 
         {/* チャット領域 */}
         <div className="h-[500px] overflow-y-auto p-6 bg-gray-50">
-          {/* Debug information */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="bg-yellow-100 border-l-4 border-yellow-500 p-2 mb-4 text-xs font-mono">
-              <div>🔍 [UI-DEBUG] Conversations count: {state.conversations.length}</div>
-              <div>🔍 [UI-DEBUG] Loading: {chatOptimized.isLoading ? 'Yes' : 'No'}</div>
-              <div>🔍 [UI-DEBUG] Error: {chatOptimized.error || 'None'}</div>
-              {state.conversations.length > 0 && (
-                <div>🔍 [UI-DEBUG] Last message: {state.conversations[state.conversations.length - 1]?.role} - {state.conversations[state.conversations.length - 1]?.content.substring(0, 30)}...</div>
-              )}
-            </div>
-          )}
           
           {state.conversations.length === 0 ? (
             <WelcomeMessage />
           ) : (
             <div className="space-y-4">
-              {state.conversations.map((message, index) => {
-                console.log(`🎨 [UI-DEBUG] Rendering message ${index + 1}/${state.conversations.length}:`, {
-                  id: message.id,
-                  role: message.role,
-                  content: message.content.substring(0, 50) + '...',
-                  phase: message.phase
-                })
-                return (
-                  <ChatMessage key={message.id} message={message} />
-                )
-              })}
+              {state.conversations.map((message, index) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
             </div>
           )}
           

@@ -29,45 +29,55 @@ export function useMaturaState() {
     })
   }, [])
 
+  // 🔥 ULTRA FIX: Force state update with functional update pattern
   const addMessage = useCallback((content: string, role: 'user' | 'assistant' | 'system', phase?: string) => {
-    console.log('💾 [STATE-DEBUG] ===== Adding Message to State =====')
-    console.log('💾 [STATE-DEBUG] Content:', content)
-    console.log('💾 [STATE-DEBUG] Role:', role)
-    console.log('💾 [STATE-DEBUG] Phase:', phase)
+    console.log('🔥 [ULTRA-STATE] ===== FORCE ADDING MESSAGE =====')
+    console.log('🔥 [ULTRA-STATE] Content:', content)
+    console.log('🔥 [ULTRA-STATE] Role:', role)
+    console.log('🔥 [ULTRA-STATE] Phase:', phase)
     
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
-      console.error('❌ [STATE-DEBUG] Invalid message content:', content)
+      console.error('❌ [ULTRA-STATE] Invalid message content:', content)
       return
     }
     
     const message: Message = {
       id: generateId(),
-      content,
+      content: content.trim(),
       role,
       timestamp: new Date(),
       phase,
     }
     
-    console.log('💾 [STATE-DEBUG] Generated message:', message)
+    console.log('🔥 [ULTRA-STATE] Generated message object:', message)
     
-    setState(prev => {
-      console.log('💾 [STATE-DEBUG] Previous conversations count:', prev.conversations.length)
-      const newConversations = [...prev.conversations, message]
-      console.log('💾 [STATE-DEBUG] New conversations count:', newConversations.length)
-      console.log('💾 [STATE-DEBUG] Updated conversations:', newConversations.map(m => ({
-        id: m.id,
-        role: m.role,
-        content: m.content.substring(0, 50) + (m.content.length > 50 ? '...' : ''),
-        phase: m.phase
-      })))
+    // 🔥 ULTRA FIX: Use functional update pattern for immediate effect
+    setState(prevState => {
+      console.log('🔥 [ULTRA-STATE] Previous conversations count:', prevState.conversations.length)
       
-      return {
-        ...prev,
+      const newConversations = [...prevState.conversations, message]
+      const newState = {
+        ...prevState,
         conversations: newConversations
       }
+      
+      console.log('🔥 [ULTRA-STATE] New conversations count:', newState.conversations.length)
+      console.log('🔥 [ULTRA-STATE] Last message role:', newState.conversations[newState.conversations.length - 1]?.role)
+      console.log('🔥 [ULTRA-STATE] Last message content preview:', newState.conversations[newState.conversations.length - 1]?.content.substring(0, 50))
+      
+      // Immediate verification
+      if (newState.conversations.length <= prevState.conversations.length) {
+        console.error('❌ [ULTRA-STATE] STATE UPDATE FAILED! Count did not increase!')
+        console.error('❌ [ULTRA-STATE] Previous:', prevState.conversations.length)
+        console.error('❌ [ULTRA-STATE] New:', newState.conversations.length)
+      } else {
+        console.log('✅ [ULTRA-STATE] STATE UPDATE SUCCESSFUL!')
+      }
+      
+      return newState
     })
     
-    console.log('💾 [STATE-DEBUG] ===== Message Added to State =====')
+    console.log('🔥 [ULTRA-STATE] ===== FORCE MESSAGE ADDED =====')
   }, [])
 
   const nextPhase = useCallback(() => {
