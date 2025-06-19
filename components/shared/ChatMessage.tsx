@@ -12,13 +12,17 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, isTyping = false, className }: ChatMessageProps) {
-  console.log('🎨 [CHATMESSAGE-DEBUG] Rendering message:', {
+  // Enhanced debugging for render issues
+  console.log('🎨 [CHATMESSAGE-DEBUG] Rendering message:', message)
+  console.log('🎨 [CHATMESSAGE-DEBUG] Message details:', {
     id: message.id,
     role: message.role,
     contentLength: message.content?.length || 0,
     content: message.content?.substring(0, 30) + (message.content?.length > 30 ? '...' : ''),
+    contentType: typeof message.content,
     phase: message.phase,
-    timestamp: message.timestamp
+    timestamp: message.timestamp,
+    isContentEmpty: !message.content || message.content.trim().length === 0
   })
   
   const isUser = message.role === 'user'

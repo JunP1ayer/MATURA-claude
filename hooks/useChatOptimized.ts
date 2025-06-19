@@ -183,9 +183,11 @@ export function useChatOptimized() {
         throw new Error(data.error)
       }
 
-      const aiResponse = data.message
+      // Support both 'message' and 'response' fields for compatibility
+      const aiResponse = data.response || data.message
       console.log('🎉 [RESPONSE-DEBUG] ===== OpenAI Response Analysis =====')
       console.log('🎉 [RESPONSE-DEBUG] Raw data:', data)
+      console.log('🎉 [RESPONSE-DEBUG] API response field:', data.response)
       console.log('🎉 [RESPONSE-DEBUG] Message content:', aiResponse)
       console.log('🎉 [RESPONSE-DEBUG] Message type:', typeof aiResponse)
       console.log('🎉 [RESPONSE-DEBUG] Message length:', aiResponse?.length || 0)

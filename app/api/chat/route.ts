@@ -230,9 +230,13 @@ export async function POST(request: NextRequest) {
     const responseTime = Date.now() - startTime
     console.log('[/api/chat] Request completed successfully in', responseTime, 'ms')
     
+    // Log the final response content before returning
+    console.log('[/api/chat] Final AI response content:', aiResponse)
+    
     const response = NextResponse.json(
       {
-        message: aiResponse,
+        response: aiResponse, // Changed from 'message' to 'response' as per spec
+        message: aiResponse, // Keep 'message' for backward compatibility
         phase,
         timestamp: new Date().toISOString(),
         responseTime,

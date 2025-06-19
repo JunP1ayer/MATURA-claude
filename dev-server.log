@@ -361,3 +361,66 @@ digest: "3477109634"
 [/api/chat] Request completed successfully in 3399 ms
 [/api/chat] status: 200
  POST /api/chat 200 in 3547ms
+ GET / 200 in 101ms
+ ✓ Compiled in 424ms (1292 modules)
+ ✓ Compiled in 148ms (1278 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 112ms
+ ✓ Compiled in 605ms (1292 modules)
+ ✓ Compiled /api/chat in 180ms (670 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T10:53:18.931Z
+[DEBUG] Request URL: http://0.0.0.0:3001/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate',
+  'accept-language': '*',
+  connection: 'keep-alive',
+  'content-length': '105',
+  'content-type': 'application/json',
+  host: 'localhost:3001',
+  'sec-fetch-mode': 'cors',
+  'user-agent': 'node',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3001',
+  'x-forwarded-port': '3001',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T10:53:18.932Z
+[DEBUG] Raw request body received (length: 85 ): {"message":"こんにちは","messages":[{"role":"user","content":"こんにちは"}],"phase":"FreeTalk"}
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "こんにちは",
+  "messages": [
+    {
+      "role": "user",
+      "content": "こんにちは"
+    }
+  ],
+  "phase": "FreeTalk"
+}
+[DEBUG] Message from UI: こんにちは
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 1
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 2
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+🤖 [OPENAI-DEBUG] OpenAI API call completed successfully
+🤖 [OPENAI-DEBUG] Response choices: 1
+🤖 [OPENAI-DEBUG] First choice content length: 42
+[/api/chat] OpenAI API response received, length: 42
+[/api/chat] Request completed successfully in 2376 ms
+[/api/chat] Final AI response content: こんにちは！素敵な一日をお過ごしでしょうか？何か私にお手伝いできることがありますか？
+[/api/chat] status: 200
+ POST /api/chat 200 in 2615ms
