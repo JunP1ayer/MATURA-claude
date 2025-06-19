@@ -39,6 +39,11 @@ export interface GeneratedCode {
   javascript: string
   framework: string
   dependencies: string[]
+  // 新しいフィールド
+  fullHtml?: string
+  title?: string
+  description?: string
+  isComplete?: boolean
 }
 
 export interface ReleaseInfo {
@@ -52,6 +57,14 @@ export interface ReleaseInfo {
   }
 }
 
+export interface ExtractedStructure {
+  vision: string
+  target: string
+  features: string[]
+  uiStyle: 'modern' | 'classic' | 'playful' | 'minimal'
+  keywords: string[]
+}
+
 export interface MaturaState {
   currentPhase: number
   conversations: Message[]
@@ -62,6 +75,10 @@ export interface MaturaState {
   releaseInfo: ReleaseInfo | null
   isLoading: boolean
   error: string | null
+  // 新しいフィールド
+  messageCount: number
+  structureExtracted: boolean
+  extractedStructure: ExtractedStructure | null
 }
 
 export interface PhaseConfig {

@@ -3,9 +3,10 @@ import { Message } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
 interface ChatOptions {
-  onNewMessage?: (message: string) => void
+  onNewMessage?: (message: string, data?: any) => void
   onError?: (error: string) => void
   timeout?: number
+  requestStructureExtraction?: boolean
 }
 
 export function useChatOptimized() {
@@ -67,6 +68,7 @@ export function useChatOptimized() {
           content: m.content
         })),
         phase,
+        requestStructureExtraction: options?.requestStructureExtraction || false,
       }
       
       // Serialize request body
@@ -140,28 +142,16 @@ export function useChatOptimized() {
       // Notify about the new message
       if (options?.onNewMessage) {
         try {
-          console.log('🎉 [RESPONSE-DEBUG] About to call onNewMessage with:', aiResponse)
-          console.log('🎉 [RESPONSE-DEBUG] onNewMessage function type:', typeof options.onNewMessage)
-          console.log('🎉 [RESPONSE-DEBUG] onNewMessage function details:', options.onNewMessage.toString().substring(0, 200))
-          
-          options.onNewMessage(aiResponse)
-          console.log('🎉 [RESPONSE-DEBUG] onNewMessage called successfully')
+          // 構造抽出結果も一緒に渡す
+          options.onNewMessage(aiResponse, data)
           
           // Add a small delay to let any state updates complete
           await new Promise(resolve => setTimeout(resolve, 100))
-          console.log('🎉 [RESPONSE-DEBUG] Post-callback delay completed')
         } catch (callbackError) {
-          console.error('❌ [RESPONSE-DEBUG] Error in onNewMessage callback:', callbackError)
-          console.error('❌ [RESPONSE-DEBUG] Callback error stack:', callbackError instanceof Error ? callbackError.stack : 'No stack available')
+          // Error in callback
         }
-      } else {
-        console.warn('⚠️ [RESPONSE-DEBUG] No onNewMessage callback provided!')
       }
       
-      console.log('🎉 [RESPONSE-DEBUG] ===== Response Analysis Complete =====')
-      console.log('🎉 [RESPONSE-DEBUG] Returning aiResponse:', aiResponse)
-      console.log('🎉 [RESPONSE-DEBUG] Return value type:', typeof aiResponse)
-      console.log('🎉 [RESPONSE-DEBUG] Return value length:', aiResponse?.length || 0)
       return aiResponse
     } catch (err) {
       console.error('💥 [FETCH-DEBUG] Error caught in fetch operation!')

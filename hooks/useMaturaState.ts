@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { MaturaState, Message, Insight, UIDesign, UXDesign, GeneratedCode, ReleaseInfo } from '@/lib/types'
+import { MaturaState, Message, Insight, UIDesign, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
 const initialState: MaturaState = {
@@ -12,6 +12,10 @@ const initialState: MaturaState = {
   releaseInfo: null,
   isLoading: false,
   error: null,
+  // 新しいフィールド
+  messageCount: 0,
+  structureExtracted: false,
+  extractedStructure: null,
 }
 
 export function useMaturaState() {
@@ -58,7 +62,8 @@ export function useMaturaState() {
       const newConversations = [...prevState.conversations, message]
       const newState = {
         ...prevState,
-        conversations: newConversations
+        conversations: newConversations,
+        messageCount: newConversations.length
       }
       
       console.log('🔥 [ULTRA-STATE] New conversations count:', newState.conversations.length)
@@ -118,6 +123,32 @@ export function useMaturaState() {
 
   const resetState = useCallback(() => {
     setState(initialState)
+  }, [])
+
+  // 新しいアクション
+  const incrementMessageCount = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      messageCount: prev.messageCount + 1
+    }))
+  }, [])
+
+  const setExtractedStructure = useCallback((structure: ExtractedStructure) => {
+    setState(prev => ({
+      ...prev,
+      extractedStructure: structure,
+      structureExtracted: true
+    }))
+  }, [])
+
+  const resetChat = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      conversations: [],
+      messageCount: 0,
+      structureExtracted: false,
+      extractedStructure: null
+    }))
   }, [])
 
   // Batch operations for common workflows
@@ -222,6 +253,10 @@ export function useMaturaState() {
     setReleaseInfo,
     resetState,
     getCurrentPhaseData,
+    // 新しいアクション
+    incrementMessageCount,
+    setExtractedStructure,
+    resetChat,
     // Batch operations
     setInsightAndNextPhase,
     setUIAndNextPhase,

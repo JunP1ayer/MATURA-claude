@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, ArrowRight } from 'lucide-react'
+import { Send, ArrowRight, Sparkles, Wand2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ChatMessage, { WelcomeMessage } from '@/components/shared/ChatMessage'
 import PreviewButton from '@/components/shared/PreviewButton'
@@ -15,6 +15,9 @@ export default function FreeTalk() {
   const chatOptimized = useChatOptimized()
   const [input, setInput] = useState('')
   const [showContinueButton, setShowContinueButton] = useState(false)
+  const [showMagicButton, setShowMagicButton] = useState(false)
+  const [isExtracting, setIsExtracting] = useState(false)
+  const [typingDelay, setTypingDelay] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // 自動スクロール
@@ -37,6 +40,18 @@ export default function FreeTalk() {
     }
   }, [state.conversations])
 
+  // 🧠 ULTRA THINK: 10メッセージ以上でマジックボタンを表示
+  useEffect(() => {
+    const totalMessages = state.conversations.length
+    console.log('💫 [MAGIC-BUTTON] Total messages:', totalMessages)
+    console.log('💫 [MAGIC-BUTTON] Structure extracted:', state.structureExtracted)
+    
+    if (totalMessages >= 10 && !state.structureExtracted && !showMagicButton) {
+      console.log('✨ [MAGIC-BUTTON] Showing magic button!')
+      setShowMagicButton(true)
+    }
+  }, [state.conversations.length, state.structureExtracted, showMagicButton])
+
 
   const handleSend = React.useCallback(async () => {
     if (!input.trim() || chatOptimized.isLoading) {
@@ -46,6 +61,10 @@ export default function FreeTalk() {
     const sanitizedInput = sanitizeInput(input)
     actions.addMessage(sanitizedInput, 'user', 'FreeTalk')
     setInput('')
+
+    // 🧠 ULTRA THINK: 人間らしい遅延を追加
+    setTypingDelay(true)
+    setTimeout(() => setTypingDelay(false), 500)
 
     // Create updated conversations array manually since state might not be updated yet
     const updatedConversations = [
@@ -65,9 +84,17 @@ export default function FreeTalk() {
         updatedConversations,
         'FreeTalk',
         {
-          onNewMessage: (response: string) => {
+          // 構造抽出のリクエストを含める
+          requestStructureExtraction: updatedConversations.length >= 10 && !state.structureExtracted,
+          onNewMessage: (response: string, data?: any) => {
             if (!response || typeof response !== 'string' || response.trim().length === 0) {
               return
+            }
+            
+            // 構造抽出結果があれば保存
+            if (data?.extractedStructure) {
+              console.log('🎯 [STRUCTURE] Extracted structure received:', data.extractedStructure)
+              actions.setExtractedStructure(data.extractedStructure)
             }
             
             actions.addMessage(response.trim(), 'assistant', 'FreeTalk')
@@ -81,7 +108,7 @@ export default function FreeTalk() {
     } catch (sendError) {
       // Error handled silently
     }
-  }, [input, state.conversations, chatOptimized.isLoading, actions.addMessage])
+  }, [input, state.conversations, chatOptimized.isLoading, actions.addMessage, actions.setExtractedStructure, state.structureExtracted])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -93,6 +120,45 @@ export default function FreeTalk() {
   const handleContinue = () => {
     actions.nextPhase()
   }
+
+  // 🧠 ULTRA THINK: マジックボタンのハンドラー
+  const handleMagicButton = React.useCallback(async () => {
+    setIsExtracting(true)
+    setShowMagicButton(false)
+    
+    try {
+      // 構造抽出を強制実行
+      const result = await chatOptimized.sendMessage(
+        '🪄 アイデアの整理をお願いします', // マジック文言
+        state.conversations,
+        'FreeTalk',
+        {
+          requestStructureExtraction: true,
+          onNewMessage: (response: string, data?: any) => {
+            if (data?.extractedStructure) {
+              console.log('🎯 [MAGIC] Structure extracted:', data.extractedStructure)
+              actions.setExtractedStructure(data.extractedStructure)
+              
+              // 構造抽出後、次のフェーズに進む
+              setTimeout(() => {
+                actions.nextPhase()
+              }, 1500)
+            }
+            
+            // マジックレスポンスを追加
+            actions.addMessage('✨ アイデアが整理できました！次のステップに進みましょう', 'assistant', 'FreeTalk')
+          },
+          onError: (error) => {
+            console.error('Magic button error:', error)
+            setIsExtracting(false)
+          }
+        }
+      )
+    } catch (error) {
+      console.error('Magic button failed:', error)
+      setIsExtracting(false)
+    }
+  }, [state.conversations, chatOptimized, actions])
 
   return (
     <motion.div
@@ -131,11 +197,18 @@ export default function FreeTalk() {
             </div>
           )}
           
-          {/* ローディング */}
-          {chatOptimized.isLoading && (
+          {/* ローディング・タイピング */}
+          {(chatOptimized.isLoading || typingDelay) && (
             <div className="flex justify-start">
               <div className="bg-white rounded-2xl rounded-bl-md p-4 shadow-sm border border-gray-200">
-                <ThinkingSpinner />
+                {isExtracting ? (
+                  <div className="flex items-center gap-2">
+                    <Wand2 className="w-5 h-5 animate-spin text-purple-500" />
+                    <span className="text-sm text-purple-600">✨ アイデアを整理しています...</span>
+                  </div>
+                ) : (
+                  <ThinkingSpinner />
+                )}
               </div>
             </div>
           )}
@@ -181,9 +254,61 @@ export default function FreeTalk() {
             </button>
           </div>
           
+          {/* 🧠 ULTRA THINK: マジックボタン */}
+          <AnimatePresence>
+            {showMagicButton && !isExtracting && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                className="mt-6 text-center"
+              >
+                <motion.button
+                  onClick={handleMagicButton}
+                  disabled={isExtracting}
+                  className="relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  animate={{ 
+                    boxShadow: [
+                      "0 4px 20px rgba(147, 51, 234, 0.3)",
+                      "0 4px 20px rgba(236, 72, 153, 0.3)",
+                      "0 4px 20px rgba(239, 68, 68, 0.3)",
+                      "0 4px 20px rgba(147, 51, 234, 0.3)"
+                    ]
+                  }}
+                  transition={{ 
+                    boxShadow: { 
+                      duration: 2, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }
+                  }}
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  >
+                    ✨
+                  </motion.div>
+                  アイデアが形になってきた！作ってみる？
+                  <Sparkles className="w-6 h-6" />
+                </motion.button>
+                <motion.p 
+                  className="text-sm text-gray-600 mt-3 font-medium"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  🎨 会話から自動でアプリの設計を生成します
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
           {/* 次のフェーズボタン */}
           <AnimatePresence>
-            {showContinueButton && (
+            {showContinueButton && !showMagicButton && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

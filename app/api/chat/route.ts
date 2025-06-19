@@ -7,6 +7,7 @@ interface ChatRequest {
   messages?: Array<{ role: string; content: string }>
   phase: string
   isStructured?: boolean
+  requestStructureExtraction?: boolean
 }
 
 // Rate limiting (simple in-memory store for demo)
@@ -186,7 +187,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { message, messages = [], phase, isStructured = false } = body as ChatRequest
+    const { message, messages = [], phase, isStructured = false, requestStructureExtraction = false } = body as ChatRequest
 
     // メッセージの構築
     let chatMessages = []
@@ -228,6 +229,34 @@ export async function POST(request: NextRequest) {
     
     // Log the final response content before returning
     console.log('[/api/chat] Final AI response content:', aiResponse)
+
+    // 🧠 ULTRA THINK: 構造抽出機能 - 10メッセージ以上で自動実行
+    let extractedStructure = null
+    if (requestStructureExtraction && phase === 'FreeTalk' && messages.length >= 10) {
+      console.log('[/api/chat] ✨ Performing structure extraction for', messages.length, 'messages')
+      
+      try {
+        const structureExtractionPrompt = `会話履歴：${JSON.stringify(messages)}`
+        
+        const structureResponse = await chatWithOpenAI(
+          [{ role: 'user', content: structureExtractionPrompt }],
+          'StructureExtraction',
+          signal
+        )
+        
+        if (structureResponse) {
+          try {
+            extractedStructure = JSON.parse(structureResponse)
+            console.log('[/api/chat] ✅ Structure extraction successful:', extractedStructure)
+          } catch (parseError) {
+            console.error('[/api/chat] ❌ Structure extraction JSON parse failed:', parseError)
+            console.error('[/api/chat] Raw structure response:', structureResponse)
+          }
+        }
+      } catch (extractionError) {
+        console.error('[/api/chat] ❌ Structure extraction failed:', extractionError)
+      }
+    }
     
     const response = NextResponse.json(
       {
@@ -236,6 +265,9 @@ export async function POST(request: NextRequest) {
         phase,
         timestamp: new Date().toISOString(),
         responseTime,
+        // 構造抽出結果を含める
+        extractedStructure,
+        hasStructureExtraction: !!extractedStructure,
       },
       {
         headers: {

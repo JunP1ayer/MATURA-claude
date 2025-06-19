@@ -12,24 +12,10 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, isTyping = false, className }: ChatMessageProps) {
-  // Enhanced debugging for render issues
-  console.log('🎨 [CHATMESSAGE-DEBUG] Rendering message:', message)
-  console.log('🎨 [CHATMESSAGE-DEBUG] Message details:', {
-    id: message.id,
-    role: message.role,
-    contentLength: message.content?.length || 0,
-    content: message.content?.substring(0, 30) + (message.content?.length > 30 ? '...' : ''),
-    contentType: typeof message.content,
-    phase: message.phase,
-    timestamp: message.timestamp,
-    isContentEmpty: !message.content || message.content.trim().length === 0
-  })
-  
   const isUser = message.role === 'user'
   const isSystem = message.role === 'system'
   
   if (!message.content) {
-    console.error('❌ [CHATMESSAGE-DEBUG] Message has no content!', message)
     return null
   }
 
@@ -121,15 +107,33 @@ export function WelcomeMessage() {
       animate={{ opacity: 1, scale: 1 }}
       className="text-center py-8"
     >
-      <div className="w-16 h-16 bg-gradient-to-br from-matura-primary to-matura-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+      <motion.div 
+        className="w-16 h-16 bg-gradient-to-br from-matura-primary to-matura-secondary rounded-full flex items-center justify-center mx-auto mb-4"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          rotate: [0, 5, -5, 0]
+        }}
+        transition={{ 
+          duration: 2, 
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
         <Sparkles className="w-8 h-8 text-white" />
-      </div>
+      </motion.div>
       <h3 className="text-xl font-bold text-matura-dark mb-2">
-        MATURAへようこそ！
+        👋 MATURAへようこそ！
       </h3>
-      <p className="text-gray-600 max-w-md mx-auto">
-        どんなアプリやサービスを作りたいですか？あなたのアイデアを聞かせてください。一緒に素晴らしいものを作りましょう！
+      <p className="text-gray-600 max-w-md mx-auto leading-relaxed">
+        どんなアプリやサービスを作りたいですか？✨<br />
+        あなたのアイデアを聞かせてください！<br />
+        一緒に素晴らしいものを作りましょう 🚀
       </p>
+      <div className="flex justify-center gap-2 mt-4 text-2xl">
+        <span>💡</span>
+        <span>🎨</span>
+        <span>⚡</span>
+      </div>
     </motion.div>
   )
 }

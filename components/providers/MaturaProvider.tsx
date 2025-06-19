@@ -53,6 +53,10 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
         setReleaseInfo: maturaState.setReleaseInfo,
         resetState: maturaState.resetState,
         getCurrentPhaseData: maturaState.getCurrentPhaseData,
+        // 新しいアクション
+        incrementMessageCount: maturaState.incrementMessageCount,
+        setExtractedStructure: maturaState.setExtractedStructure,
+        resetChat: maturaState.resetChat,
         // Batch operations
         setInsightAndNextPhase: maturaState.setInsightAndNextPhase,
         setUIAndNextPhase: maturaState.setUIAndNextPhase,
@@ -77,6 +81,9 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
     maturaState.setReleaseInfo,
     maturaState.resetState,
     maturaState.getCurrentPhaseData,
+    maturaState.incrementMessageCount,
+    maturaState.setExtractedStructure,
+    maturaState.resetChat,
     maturaState.setInsightAndNextPhase,
     maturaState.setUIAndNextPhase,
     maturaState.setUXAndNextPhase,
