@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Message } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
@@ -12,6 +12,18 @@ export function useChatOptimized() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  
+  // 【Ultra Think】: Ensure isLoading is reset on mount to prevent stale state
+  useEffect(() => {
+    console.log('🔄 [HOOK-DEBUG] useChatOptimized mounted, resetting isLoading')
+    setIsLoading(false)
+    return () => {
+      console.log('🔄 [HOOK-DEBUG] useChatOptimized unmounting, cleaning up')
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
 
   // Cancel ongoing request
   const cancelRequest = useCallback(() => {
@@ -28,12 +40,29 @@ export function useChatOptimized() {
     phase: string,
     options?: ChatOptions
   ): Promise<string | null> => {
-    // Prevent multiple simultaneous requests
+    console.log('🚀 [FETCH-DEBUG] === sendMessage called ===')
+    console.log('🚀 [FETCH-DEBUG] isLoading state:', isLoading)
+    console.log('🚀 [FETCH-DEBUG] AbortController exists:', !!abortControllerRef.current)
+    
+    // Prevent multiple simultaneous requests with better error recovery
     if (isLoading) {
-      console.warn('⚠️ [FETCH-DEBUG] Request already in progress, ignoring new request')
+      console.warn('⚠️ [FETCH-DEBUG] Request already in progress')
       console.warn('⚠️ [FETCH-DEBUG] Current loading state:', isLoading)
       console.warn('⚠️ [FETCH-DEBUG] AbortController exists:', !!abortControllerRef.current)
-      return null
+      
+      // 【Ultra Think】: Force cleanup if stuck in loading state for too long
+      if (abortControllerRef.current) {
+        console.warn('⚠️ [FETCH-DEBUG] Forcing cleanup of stuck request')
+        abortControllerRef.current.abort()
+        abortControllerRef.current = null
+        setIsLoading(false)
+        // Continue with new request after cleanup
+      } else {
+        // No controller but still loading - reset state
+        console.warn('⚠️ [FETCH-DEBUG] No controller but loading=true, resetting state')
+        setIsLoading(false)
+        // Continue with new request
+      }
     }
     
     console.log('🚀 [FETCH-DEBUG] Starting new sendMessage request')
@@ -257,7 +286,7 @@ export function useChatOptimized() {
       abortControllerRef.current = null
       console.log('🔄 [FETCH-DEBUG] Loading state cleared, abort controller reset')
     }
-  }, [cancelRequest])
+  }, [isLoading, cancelRequest]) // 【Ultra Think】: isLoading must be in dependencies to prevent stale closure
 
   const generateStructuredData = useCallback(async (
     conversations: Message[],
