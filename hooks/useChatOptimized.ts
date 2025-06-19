@@ -50,40 +50,74 @@ export function useChatOptimized() {
     }, timeoutMs)
 
     try {
-      console.log('[useChatOptimized] Starting fetch to /api/chat, phase:', phase)
+      console.log('🚀 [FETCH-DEBUG] Starting fetch to /api/chat')
+      console.log('🚀 [FETCH-DEBUG] Phase:', phase)
+      console.log('🚀 [FETCH-DEBUG] Message content:', content)
+      console.log('🚀 [FETCH-DEBUG] Messages count:', messages.length)
+      
+      const requestBody = {
+        message: content,
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content
+        })),
+        phase,
+      }
+      console.log('🚀 [FETCH-DEBUG] Request body:', JSON.stringify(requestBody, null, 2))
+      
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: content,
-          messages: messages.map(m => ({
-            role: m.role,
-            content: m.content
-          })),
-          phase,
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       })
       
-      console.log('[useChatOptimized] Fetch completed, status:', response.status)
+      console.log('✅ [FETCH-DEBUG] Fetch completed!')
+      console.log('✅ [FETCH-DEBUG] Response status:', response.status)
+      console.log('✅ [FETCH-DEBUG] Response ok:', response.ok)
+      console.log('✅ [FETCH-DEBUG] Response statusText:', response.statusText)
+      console.log('✅ [FETCH-DEBUG] Response headers:', Object.fromEntries(response.headers.entries()))
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('[useChatOptimized] HTTP error:', response.status, errorText)
-        throw new Error(`HTTP error! status: ${response.status}`)
+      // Always try to get response text for debugging
+      let responseText: string
+      try {
+        responseText = await response.text()
+        console.log('✅ [FETCH-DEBUG] Response text length:', responseText.length)
+        console.log('✅ [FETCH-DEBUG] Response text preview:', responseText.substring(0, 200) + '...')
+      } catch (textError) {
+        console.error('❌ [FETCH-DEBUG] Failed to read response text:', textError)
+        responseText = ''
       }
 
-      const data = await response.json()
-      console.log('[useChatOptimized] Response data received:', {
-        hasMessage: !!data.message,
-        messageLength: data.message?.length || 0,
-        hasError: !!data.error
-      })
+      if (!response.ok) {
+        console.error('❌ [FETCH-DEBUG] HTTP error detected!')
+        console.error('❌ [FETCH-DEBUG] Status:', response.status)
+        console.error('❌ [FETCH-DEBUG] StatusText:', response.statusText)
+        console.error('❌ [FETCH-DEBUG] Error text:', responseText)
+        throw new Error(`HTTP error! status: ${response.status}, text: ${responseText}`)
+      }
+
+      // Parse the response text as JSON
+      let data: any
+      try {
+        data = JSON.parse(responseText)
+        console.log('✅ [FETCH-DEBUG] JSON parsed successfully')
+        console.log('✅ [FETCH-DEBUG] Data structure:', {
+          hasMessage: !!data.message,
+          messageLength: data.message?.length || 0,
+          hasError: !!data.error,
+          keys: Object.keys(data)
+        })
+      } catch (jsonError) {
+        console.error('❌ [FETCH-DEBUG] Failed to parse JSON:', jsonError)
+        console.error('❌ [FETCH-DEBUG] Raw response:', responseText)
+        throw new Error('Invalid JSON response')
+      }
       
       if (data.error) {
-        console.error('[useChatOptimized] API returned error:', data.error)
+        console.error('❌ [FETCH-DEBUG] API returned error:', data.error)
         throw new Error(data.error)
       }
 
@@ -92,16 +126,26 @@ export function useChatOptimized() {
       
       return aiResponse
     } catch (err) {
+      console.error('💥 [FETCH-DEBUG] Error caught in fetch operation!')
+      console.error('💥 [FETCH-DEBUG] Error type:', typeof err)
+      console.error('💥 [FETCH-DEBUG] Error constructor:', err?.constructor?.name)
+      
       if (err instanceof Error) {
+        console.error('💥 [FETCH-DEBUG] Error details:', {
+          name: err.name,
+          message: err.message,
+          stack: err.stack
+        })
+        
         if (err.name === 'AbortError') {
-          console.error('[useChatOptimized] Request was aborted. Details:', {
-            name: err.name,
-            message: err.message,
-            stack: err.stack,
-            timeElapsed: 'tracking not implemented'
-          })
+          console.error('🚫 [FETCH-DEBUG] AbortError detected!')
+          console.error('🚫 [FETCH-DEBUG] This indicates the request was cancelled')
+          console.error('🚫 [FETCH-DEBUG] Possible causes:')
+          console.error('🚫 [FETCH-DEBUG] - User navigation')
+          console.error('🚫 [FETCH-DEBUG] - Timeout reached')
+          console.error('🚫 [FETCH-DEBUG] - Component unmount')
+          console.error('🚫 [FETCH-DEBUG] - Manual abort() call')
           
-          // Check if this was a timeout or manual abort
           const errorMessage = err.message.includes('timeout') || err.message.includes('Timeout')
             ? 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
             : 'リクエストがキャンセルされました。もう一度お試しください。'
@@ -111,10 +155,10 @@ export function useChatOptimized() {
           return null
         }
         
+        console.error('⚠️ [FETCH-DEBUG] Non-abort error:', err.message)
         const errorMessage = err.message
         setError(errorMessage)
         options?.onError?.(errorMessage)
-        console.error('Chat error:', err)
         return null
       }
       

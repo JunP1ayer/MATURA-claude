@@ -78,6 +78,24 @@ export async function POST(request: NextRequest) {
   let body: any
 
   try {
+    // ***** DETAILED DEBUG LOGGING START *****
+    console.log('='.repeat(50))
+    console.log('[DEBUG] /api/chat POST request received')
+    console.log('[DEBUG] Timestamp:', new Date().toISOString())
+    console.log('[DEBUG] Request URL:', request.url)
+    console.log('[DEBUG] Request method:', request.method)
+    console.log('[DEBUG] Request headers:', Object.fromEntries(request.headers.entries()))
+    
+    // API Key debug (safely)
+    const debugApiKey = process.env.OPENAI_API_KEY
+    console.log('[DEBUG] Environment check:')
+    console.log('[DEBUG] - OPENAI_API_KEY exists:', !!debugApiKey)
+    console.log('[DEBUG] - OPENAI_API_KEY length:', debugApiKey?.length || 0)
+    console.log('[DEBUG] - OPENAI_API_KEY prefix:', debugApiKey ? debugApiKey.substring(0, 3) + '...' : 'none')
+    console.log('[DEBUG] - NODE_ENV:', process.env.NODE_ENV)
+    console.log('='.repeat(50))
+    // ***** DETAILED DEBUG LOGGING END *****
+
     // Get abort signal from request
     const signal = request.signal
     
@@ -105,7 +123,13 @@ export async function POST(request: NextRequest) {
     // Parse and validate request body
     try {
       body = await request.json()
+      console.log('[DEBUG] Request body parsed successfully')
+      console.log('[DEBUG] Body contents:', JSON.stringify(body, null, 2))
+      console.log('[DEBUG] Message from UI:', body?.message)
+      console.log('[DEBUG] Phase:', body?.phase)
+      console.log('[DEBUG] Messages count:', body?.messages?.length || 0)
     } catch (parseError) {
+      console.error('[DEBUG] Failed to parse request body:', parseError)
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }

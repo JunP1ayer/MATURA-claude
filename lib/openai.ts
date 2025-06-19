@@ -52,6 +52,12 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
   const systemPrompt = PHASE_PROMPTS[phase as keyof typeof PHASE_PROMPTS] || PHASE_PROMPTS.FreeTalk
 
   try {
+    console.log('🤖 [OPENAI-DEBUG] Starting OpenAI API call')
+    console.log('🤖 [OPENAI-DEBUG] Phase:', phase)
+    console.log('🤖 [OPENAI-DEBUG] Messages count:', messages.length)
+    console.log('🤖 [OPENAI-DEBUG] Signal provided:', !!signal)
+    console.log('🤖 [OPENAI-DEBUG] Model: gpt-4')
+    
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [
@@ -60,14 +66,22 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
       ],
       temperature: 0.7,
       max_tokens: phase === 'CodePlayground' ? 2000 : 1000,
+      stream: false, // Explicitly disable streaming
     }, {
       signal,
       // OpenAI SDK supports timeout in milliseconds
       timeout: 90000, // 90 seconds timeout
     })
+    
+    console.log('🤖 [OPENAI-DEBUG] OpenAI API call completed successfully')
+    console.log('🤖 [OPENAI-DEBUG] Response choices:', completion.choices?.length || 0)
+    console.log('🤖 [OPENAI-DEBUG] First choice content length:', completion.choices[0]?.message?.content?.length || 0)
 
     return completion.choices[0].message.content
   } catch (error) {
+    console.error('💥 [OPENAI-DEBUG] OpenAI API error occurred!')
+    console.error('💥 [OPENAI-DEBUG] Error type:', typeof error)
+    console.error('💥 [OPENAI-DEBUG] Error constructor:', error?.constructor?.name)
     console.error('[chat-openai] OpenAI API error:', error)
     
     // Handle specific OpenAI errors
