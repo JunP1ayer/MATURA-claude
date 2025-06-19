@@ -41,10 +41,20 @@ export default function FreeTalk() {
   useEffect(() => {
     console.log('🔄 [FREETALK-DEBUG] ===== Conversations State Changed =====')
     console.log('🔄 [FREETALK-DEBUG] Total conversations:', state.conversations.length)
+    console.log('🔄 [FREETALK-DEBUG] Raw conversations array:', state.conversations)
     console.log('🔄 [FREETALK-DEBUG] Conversations details:')
     state.conversations.forEach((msg, index) => {
       console.log(`🔄 [FREETALK-DEBUG] ${index + 1}. ${msg.role}: ${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}`)
+      console.log(`🔄 [FREETALK-DEBUG]   - ID: ${msg.id}`)
+      console.log(`🔄 [FREETALK-DEBUG]   - Phase: ${msg.phase}`)
+      console.log(`🔄 [FREETALK-DEBUG]   - Timestamp: ${msg.timestamp}`)
     })
+    
+    // Count by role
+    const userCount = state.conversations.filter(m => m.role === 'user').length
+    const assistantCount = state.conversations.filter(m => m.role === 'assistant').length
+    console.log('🔄 [FREETALK-DEBUG] User messages:', userCount)
+    console.log('🔄 [FREETALK-DEBUG] Assistant messages:', assistantCount)
     console.log('🔄 [FREETALK-DEBUG] ===== State Change Complete =====')
   }, [state.conversations])
 
@@ -107,13 +117,21 @@ export default function FreeTalk() {
           
           console.log('📥 [FREETALK-DEBUG] Calling actions.addMessage...')
           console.log('📥 [FREETALK-DEBUG] Current conversations count:', state.conversations?.length || 0)
+          console.log('📥 [FREETALK-DEBUG] actions.addMessage function:', typeof actions.addMessage)
+          console.log('📥 [FREETALK-DEBUG] actions object keys:', Object.keys(actions))
           
           try {
             actions.addMessage(response, 'assistant', 'FreeTalk')
             console.log('📥 [FREETALK-DEBUG] actions.addMessage called successfully')
             console.log('📥 [FREETALK-DEBUG] New conversations count should be:', (state.conversations?.length || 0) + 1)
+            
+            // Force a small delay to see if state updates asynchronously
+            setTimeout(() => {
+              console.log('📥 [FREETALK-DEBUG] [DELAYED CHECK] Conversations count after 100ms:', state.conversations?.length || 0)
+            }, 100)
           } catch (addError) {
             console.error('❌ [FREETALK-DEBUG] Error calling actions.addMessage:', addError)
+            console.error('❌ [FREETALK-DEBUG] Error details:', addError)
           }
           
           console.log('📥 [FREETALK-DEBUG] ===== Message Reception Complete =====')

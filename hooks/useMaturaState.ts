@@ -34,7 +34,6 @@ export function useMaturaState() {
     console.log('💾 [STATE-DEBUG] Content:', content)
     console.log('💾 [STATE-DEBUG] Role:', role)
     console.log('💾 [STATE-DEBUG] Phase:', phase)
-    console.log('💾 [STATE-DEBUG] Current conversations count:', state.conversations.length)
     
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       console.error('❌ [STATE-DEBUG] Invalid message content:', content)
@@ -52,6 +51,7 @@ export function useMaturaState() {
     console.log('💾 [STATE-DEBUG] Generated message:', message)
     
     setState(prev => {
+      console.log('💾 [STATE-DEBUG] Previous conversations count:', prev.conversations.length)
       const newConversations = [...prev.conversations, message]
       console.log('💾 [STATE-DEBUG] New conversations count:', newConversations.length)
       console.log('💾 [STATE-DEBUG] Updated conversations:', newConversations.map(m => ({
@@ -68,7 +68,7 @@ export function useMaturaState() {
     })
     
     console.log('💾 [STATE-DEBUG] ===== Message Added to State =====')
-  }, [state.conversations.length])
+  }, [])
 
   const nextPhase = useCallback(() => {
     batchUpdateState(prev => ({

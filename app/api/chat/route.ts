@@ -120,18 +120,45 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Parse and validate request body
+    // Parse and validate request body with enhanced error handling
+    // 【Ultra Think】: Robust JSON parsing is critical for conversation continuity
+    let rawBody: string | null = null
     try {
-      body = await request.json()
+      // First, let's get the raw text to understand what we're receiving
+      const textBody = await request.text()
+      rawBody = textBody
+      console.log('[DEBUG] Raw request body received (length:', textBody.length, '):', textBody.substring(0, 200))
+      
+      if (!textBody || textBody.trim().length === 0) {
+        console.error('[DEBUG] Empty request body received')
+        return NextResponse.json(
+          { error: 'Empty request body. Please check frontend request implementation.' },
+          { status: 400 }
+        )
+      }
+      
+      // Parse JSON with detailed error context
+      body = JSON.parse(textBody)
       console.log('[DEBUG] Request body parsed successfully')
       console.log('[DEBUG] Body contents:', JSON.stringify(body, null, 2))
       console.log('[DEBUG] Message from UI:', body?.message)
       console.log('[DEBUG] Phase:', body?.phase)
       console.log('[DEBUG] Messages count:', body?.messages?.length || 0)
     } catch (parseError) {
-      console.error('[DEBUG] Failed to parse request body:', parseError)
+      console.error('[DEBUG] === JSON PARSING ERROR ANALYSIS ===')
+      console.error('[DEBUG] Parse error:', parseError)
+      console.error('[DEBUG] Error message:', parseError instanceof Error ? parseError.message : 'Unknown error')
+      console.error('[DEBUG] Raw body length:', rawBody?.length || 0)
+      console.error('[DEBUG] Raw body preview:', rawBody?.substring(0, 500) || 'null')
+      console.error('[DEBUG] Body ends with:', rawBody?.slice(-50) || 'null')
+      console.error('[DEBUG] ==============================')
+      
       return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
+        { 
+          error: 'Invalid JSON in request body', 
+          details: parseError instanceof Error ? parseError.message : 'Unknown parsing error',
+          bodyLength: rawBody?.length || 0
+        },
         { status: 400 }
       )
     }

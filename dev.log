@@ -1,0 +1,365 @@
+
+> matura-mvp@1.0.0 dev
+> next dev -H 0.0.0.0
+
+  ▲ Next.js 14.2.15
+  - Local:        http://localhost:3000
+  - Network:      http://0.0.0.0:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 3s
+ ○ Compiling / ...
+ ✓ Compiled / in 10.5s (1301 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 10916ms
+ ✓ Compiled in 883ms (655 modules)
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 699ms (670 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T09:44:50.078Z
+[DEBUG] Request URL: http://0.0.0.0:3000/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  connection: 'close',
+  'content-length': '48',
+  'content-type': 'application/json',
+  host: 'localhost:3000',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3000',
+  'x-forwarded-port': '3000',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T09:44:50.082Z
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "こんにちは",
+  "phase": "freetalk"
+}
+[DEBUG] Message from UI: こんにちは
+[DEBUG] Phase: freetalk
+[DEBUG] Messages count: 0
+ POST /api/chat 400 in 1004ms
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T09:45:18.203Z
+[DEBUG] Request URL: http://0.0.0.0:3000/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  connection: 'close',
+  'content-length': '48',
+  'content-type': 'application/json',
+  host: 'localhost:3000',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3000',
+  'x-forwarded-port': '3000',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T09:45:18.204Z
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "こんにちは",
+  "phase": "FreeTalk"
+}
+[DEBUG] Message from UI: こんにちは
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 0
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 1
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+🤖 [OPENAI-DEBUG] OpenAI API call completed successfully
+🤖 [OPENAI-DEBUG] Response choices: 1
+🤖 [OPENAI-DEBUG] First choice content length: 41
+[/api/chat] OpenAI API response received, length: 41
+[/api/chat] Request completed successfully in 2207 ms
+[/api/chat] status: 200
+ POST /api/chat 200 in 2239ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 296ms
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T09:48:52.875Z
+[DEBUG] Request URL: http://0.0.0.0:3000/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate',
+  'accept-language': '*',
+  connection: 'keep-alive',
+  'content-length': '62',
+  'content-type': 'application/json',
+  host: 'localhost:3000',
+  'sec-fetch-mode': 'cors',
+  'user-agent': 'node',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3000',
+  'x-forwarded-port': '3000',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T09:48:52.877Z
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "こんにちは",
+  "phase": "FreeTalk",
+  "messages": []
+}
+[DEBUG] Message from UI: こんにちは
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 0
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 1
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+🤖 [OPENAI-DEBUG] OpenAI API call completed successfully
+🤖 [OPENAI-DEBUG] Response choices: 1
+🤖 [OPENAI-DEBUG] First choice content length: 49
+[/api/chat] OpenAI API response received, length: 49
+[/api/chat] Request completed successfully in 3978 ms
+[/api/chat] status: 200
+ POST /api/chat 200 in 4006ms
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T09:48:56.906Z
+[DEBUG] Request URL: http://0.0.0.0:3000/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate',
+  'accept-language': '*',
+  connection: 'keep-alive',
+  'content-length': '298',
+  'content-type': 'application/json',
+  host: 'localhost:3000',
+  'sec-fetch-mode': 'cors',
+  'user-agent': 'node',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3000',
+  'x-forwarded-port': '3000',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T09:48:56.908Z
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "もっと詳しく教えて",
+  "phase": "FreeTalk",
+  "messages": [
+    {
+      "role": "user",
+      "content": "こんにちは"
+    },
+    {
+      "role": "assistant",
+      "content": "こんにちは！素敵な一日を過ごしていますか？何かお話ししたいこと、新たなアイデアや計画がありますか？"
+    }
+  ]
+}
+[DEBUG] Message from UI: もっと詳しく教えて
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 2
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 3
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+🤖 [OPENAI-DEBUG] OpenAI API call completed successfully
+🤖 [OPENAI-DEBUG] Response choices: 1
+🤖 [OPENAI-DEBUG] First choice content length: 96
+[/api/chat] OpenAI API response received, length: 96
+[/api/chat] Request completed successfully in 4943 ms
+[/api/chat] status: 200
+ POST /api/chat 200 in 4969ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 59ms
+ ✓ Compiled in 983ms (655 modules)
+ ✓ Compiled in 533ms (655 modules)
+ ✓ Compiled in 720ms (655 modules)
+ ✓ Compiled in 503ms (655 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 641ms (637 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 1040ms
+ ✓ Compiled /api/chat in 203ms (670 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T09:56:19.228Z
+[DEBUG] Request URL: http://0.0.0.0:3000/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'accept-encoding': 'gzip, deflate, br, zstd',
+  'accept-language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+  connection: 'keep-alive',
+  'content-length': '105',
+  'content-type': 'application/json',
+  host: 'localhost:3000',
+  origin: 'http://localhost:3000',
+  referer: 'http://localhost:3000/',
+  'sec-ch-ua': '"Not A(Brand";v="8", "Chromium";v="132", "Microsoft Edge";v="132"',
+  'sec-ch-ua-mobile': '?0',
+  'sec-ch-ua-platform': '"Windows"',
+  'sec-fetch-dest': 'empty',
+  'sec-fetch-mode': 'cors',
+  'sec-fetch-site': 'same-origin',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0',
+  'x-forwarded-for': '172.25.80.1',
+  'x-forwarded-host': 'localhost:3000',
+  'x-forwarded-port': '3000',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T09:56:19.230Z
+[DEBUG] Failed to parse request body: SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:5595:19)
+    at successSteps (node:internal/deps/undici/undici:5566:27)
+    at specConsumeBody (node:internal/deps/undici/undici:5572:9)
+    at NextRequest.json (node:internal/deps/undici/undici:5462:18)
+    at POST (webpack-internal:///(rsc)/./app/api/chat/route.ts:154:34)
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:55784
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NoopTracer.startActiveSpan (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
+    at ProxyTracer.startActiveSpan (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/trace/tracer.js:122:103
+    at NoopContextManager.with (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NextTracerImpl.trace (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/trace/tracer.js:122:28)
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:48572
+    at AsyncLocalStorage.run (node:async_hooks:338:14)
+    at Object.wrap (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:40957)
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47148
+    at AsyncLocalStorage.run (node:async_hooks:338:14)
+    at Object.wrap (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:38292)
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47110
+    at AsyncLocalStorage.run (node:async_hooks:338:14)
+    at eO.execute (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46557)
+    at eO.handle (/home/junp1ayer/matura-mvp/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57123)
+    at doRender (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1352:60)
+    at cacheEntry.responseCache.get.routeKind (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1574:34)
+    at ResponseCache.get (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/response-cache/index.js:49:26)
+    at DevServer.renderToResponseWithComponentsImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1482:53)
+    at /home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1003:121
+    at NextTracerImpl.trace (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/trace/tracer.js:105:20)
+    at DevServer.renderToResponseWithComponents (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1003:41)
+    at DevServer.renderPageComponent (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1908:35)
+    at async DevServer.renderToResponseImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:1946:32)
+    at async DevServer.pipeImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:921:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/base-server.js:817:17)
+    at async /home/junp1ayer/matura-mvp/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/junp1ayer/matura-mvp/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:350:24)
+    at async requestHandlerImpl (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/home/junp1ayer/matura-mvp/node_modules/next/dist/server/lib/start-server.js:141:13)
+ ✓ Compiled in 1082ms (1292 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 1365ms (1278 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 696ms
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 576ms (670 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T10:04:25.313Z
+[DEBUG] Request URL: http://0.0.0.0:3000/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'content-length': '91',
+  'content-type': 'application/json',
+  host: 'localhost:3000',
+  'user-agent': 'curl/8.5.0',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3000',
+  'x-forwarded-port': '3000',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T10:04:25.316Z
+[DEBUG] Raw request body received (length: 91 ): {"message": "test", "messages": [{"role": "user", "content": "test"}], "phase": "FreeTalk"}
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "test",
+  "messages": [
+    {
+      "role": "user",
+      "content": "test"
+    }
+  ],
+  "phase": "FreeTalk"
+}
+[DEBUG] Message from UI: test
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 1
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 2
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 2.5s (1314 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/css/app/layout.css?v=1750327465442 404 in 2760ms
+🤖 [OPENAI-DEBUG] OpenAI API call completed successfully
+🤖 [OPENAI-DEBUG] Response choices: 1
+🤖 [OPENAI-DEBUG] First choice content length: 32
+[/api/chat] OpenAI API response received, length: 32
+[/api/chat] Request completed successfully in 3844 ms
+[/api/chat] status: 200
+ POST /api/chat 200 in 4625ms
+[?25h

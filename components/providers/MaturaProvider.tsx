@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, useMemo } from 'react'
 import { useMaturaState } from '@/hooks/useMaturaState'
 import { useMaturaHistory } from '@/hooks/useLocalStorage'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
@@ -24,7 +24,8 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
   const history = useMaturaHistory()
   const chat = useChatOptimized()
 
-  const value: MaturaContextType = {
+  // Memoize the context value to prevent unnecessary re-renders and stale closures
+  const value: MaturaContextType = useMemo(() => ({
     state: maturaState.state,
     actions: {
       updateState: maturaState.updateState,
@@ -48,7 +49,28 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
     },
     history,
     chat,
-  }
+  }), [
+    maturaState.state,
+    maturaState.updateState,
+    maturaState.batchUpdateState,
+    maturaState.addMessage,
+    maturaState.nextPhase,
+    maturaState.setLoading,
+    maturaState.setError,
+    maturaState.setInsights,
+    maturaState.setSelectedUI,
+    maturaState.setUXDesign,
+    maturaState.setGeneratedCode,
+    maturaState.setReleaseInfo,
+    maturaState.resetState,
+    maturaState.getCurrentPhaseData,
+    maturaState.setInsightAndNextPhase,
+    maturaState.setUIAndNextPhase,
+    maturaState.setUXAndNextPhase,
+    maturaState.setCodeAndNextPhase,
+    history,
+    chat,
+  ])
 
   return (
     <MaturaContext.Provider value={value}>

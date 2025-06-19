@@ -62,6 +62,7 @@ export function useChatOptimized() {
       console.log('🚀 [FETCH-DEBUG] Message content:', content)
       console.log('🚀 [FETCH-DEBUG] Messages count:', messages.length)
       
+      // 【Ultra Think】: Ensure JSON serialization integrity for reliable conversation flow
       const requestBody = {
         message: content,
         messages: messages.map(m => ({
@@ -70,14 +71,39 @@ export function useChatOptimized() {
         })),
         phase,
       }
-      console.log('🚀 [FETCH-DEBUG] Request body:', JSON.stringify(requestBody, null, 2))
+      
+      // Validate request body structure before serialization
+      console.log('🚀 [FETCH-DEBUG] Pre-serialization validation:')
+      console.log('🚀 [FETCH-DEBUG] - Content type:', typeof content)
+      console.log('🚀 [FETCH-DEBUG] - Content length:', content?.length || 0)
+      console.log('🚀 [FETCH-DEBUG] - Messages count:', messages?.length || 0)
+      console.log('🚀 [FETCH-DEBUG] - Phase:', phase)
+      console.log('🚀 [FETCH-DEBUG] - Request body structure:', requestBody)
+      
+      // Safe JSON serialization with error handling
+      let serializedBody: string
+      try {
+        serializedBody = JSON.stringify(requestBody)
+        console.log('🚀 [FETCH-DEBUG] JSON serialization successful')
+        console.log('🚀 [FETCH-DEBUG] Serialized length:', serializedBody.length)
+        console.log('🚀 [FETCH-DEBUG] Serialized preview:', serializedBody.substring(0, 200) + '...')
+      } catch (serializationError) {
+        console.error('❌ [FETCH-DEBUG] JSON serialization failed:', serializationError)
+        throw new Error(`Failed to serialize request body: ${serializationError}`)
+      }
+      
+      console.log('🚀 [FETCH-DEBUG] Starting fetch request to /api/chat')
+      console.log('🚀 [FETCH-DEBUG] - Method: POST')
+      console.log('🚀 [FETCH-DEBUG] - Content-Type: application/json')
+      console.log('🚀 [FETCH-DEBUG] - Body length:', serializedBody.length)
+      console.log('🚀 [FETCH-DEBUG] - Signal provided:', !!controller.signal)
       
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: serializedBody,
         signal: controller.signal,
       })
       
@@ -158,10 +184,19 @@ export function useChatOptimized() {
       // Notify about the new message
       if (options?.onNewMessage) {
         try {
+          console.log('🎉 [RESPONSE-DEBUG] About to call onNewMessage with:', aiResponse)
+          console.log('🎉 [RESPONSE-DEBUG] onNewMessage function type:', typeof options.onNewMessage)
+          console.log('🎉 [RESPONSE-DEBUG] onNewMessage function details:', options.onNewMessage.toString().substring(0, 200))
+          
           options.onNewMessage(aiResponse)
           console.log('🎉 [RESPONSE-DEBUG] onNewMessage called successfully')
+          
+          // Add a small delay to let any state updates complete
+          await new Promise(resolve => setTimeout(resolve, 100))
+          console.log('🎉 [RESPONSE-DEBUG] Post-callback delay completed')
         } catch (callbackError) {
           console.error('❌ [RESPONSE-DEBUG] Error in onNewMessage callback:', callbackError)
+          console.error('❌ [RESPONSE-DEBUG] Callback error stack:', callbackError instanceof Error ? callbackError.stack : 'No stack available')
         }
       } else {
         console.warn('⚠️ [RESPONSE-DEBUG] No onNewMessage callback provided!')

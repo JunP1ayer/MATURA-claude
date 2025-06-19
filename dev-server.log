@@ -1,0 +1,107 @@
+
+> matura-mvp@1.0.0 dev
+> next dev -H 0.0.0.0
+
+  ▲ Next.js 14.2.15
+  - Local:        http://localhost:3001
+  - Network:      http://0.0.0.0:3001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.9s
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 1026ms (57 modules)
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T10:10:11.910Z
+[DEBUG] Request URL: http://0.0.0.0:3001/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'content-length': '131',
+  'content-type': 'application/json',
+  host: 'localhost:3001',
+  'user-agent': 'curl/8.5.0',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3001',
+  'x-forwarded-port': '3001',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T10:10:11.913Z
+[DEBUG] Raw request body received (length: 121 ): {
+    "messages": [
+      {
+        "role": "user",
+        "content": "こんにちは"
+      }
+    ],
+    "phase": "FreeTalk"
+  }
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "messages": [
+    {
+      "role": "user",
+      "content": "こんにちは"
+    }
+  ],
+  "phase": "FreeTalk"
+}
+[DEBUG] Message from UI: undefined
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 1
+ POST /api/chat 400 in 1301ms
+==================================================
+[DEBUG] /api/chat POST request received
+[DEBUG] Timestamp: 2025-06-19T10:10:30.966Z
+[DEBUG] Request URL: http://0.0.0.0:3001/api/chat
+[DEBUG] Request method: POST
+[DEBUG] Request headers: {
+  accept: '*/*',
+  'content-length': '63',
+  'content-type': 'application/json',
+  host: 'localhost:3001',
+  'user-agent': 'curl/8.5.0',
+  'x-forwarded-for': '127.0.0.1',
+  'x-forwarded-host': 'localhost:3001',
+  'x-forwarded-port': '3001',
+  'x-forwarded-proto': 'http'
+}
+[DEBUG] Environment check:
+[DEBUG] - OPENAI_API_KEY exists: true
+[DEBUG] - OPENAI_API_KEY length: 164
+[DEBUG] - OPENAI_API_KEY prefix: sk-...
+[DEBUG] - NODE_ENV: development
+==================================================
+[/api/chat] Request started at: 2025-06-19T10:10:30.966Z
+[DEBUG] Raw request body received (length: 53 ): {
+    "message": "こんにちは",
+    "phase": "FreeTalk"
+  }
+[DEBUG] Request body parsed successfully
+[DEBUG] Body contents: {
+  "message": "こんにちは",
+  "phase": "FreeTalk"
+}
+[DEBUG] Message from UI: こんにちは
+[DEBUG] Phase: FreeTalk
+[DEBUG] Messages count: 0
+[/api/chat] Calling OpenAI API with phase: FreeTalk
+🤖 [OPENAI-DEBUG] Starting OpenAI API call
+🤖 [OPENAI-DEBUG] Phase: FreeTalk
+🤖 [OPENAI-DEBUG] Messages count: 1
+🤖 [OPENAI-DEBUG] Signal provided: true
+🤖 [OPENAI-DEBUG] Model: gpt-4
+🤖 [OPENAI-DEBUG] OpenAI API call completed successfully
+🤖 [OPENAI-DEBUG] Response choices: 1
+🤖 [OPENAI-DEBUG] First choice content length: 40
+[/api/chat] OpenAI API response received, length: 40
+[/api/chat] Request completed successfully in 2666 ms
+[/api/chat] status: 200
+ POST /api/chat 200 in 2690ms
