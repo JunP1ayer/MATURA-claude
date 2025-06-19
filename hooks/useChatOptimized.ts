@@ -30,9 +30,15 @@ export function useChatOptimized() {
   ): Promise<string | null> => {
     // Prevent multiple simultaneous requests
     if (isLoading) {
-      console.log('[useChatOptimized] Request already in progress, ignoring new request')
+      console.warn('⚠️ [FETCH-DEBUG] Request already in progress, ignoring new request')
+      console.warn('⚠️ [FETCH-DEBUG] Current loading state:', isLoading)
+      console.warn('⚠️ [FETCH-DEBUG] AbortController exists:', !!abortControllerRef.current)
       return null
     }
+    
+    console.log('🚀 [FETCH-DEBUG] Starting new sendMessage request')
+    console.log('🚀 [FETCH-DEBUG] Content:', content)
+    console.log('🚀 [FETCH-DEBUG] Phase:', phase)
 
     setIsLoading(true)
     setError(null)
@@ -41,12 +47,13 @@ export function useChatOptimized() {
     const controller = new AbortController()
     abortControllerRef.current = controller
 
-    // Use a more reasonable timeout - 60 seconds
-    const timeoutMs = options?.timeout || 60000
+    // Use a more generous timeout - 120 seconds for OpenAI responses
+    const timeoutMs = options?.timeout || 120000
     const timeoutId = setTimeout(() => {
       console.error('[useChatOptimized] Request timed out after', timeoutMs, 'ms')
       console.error('[useChatOptimized] Aborting request due to timeout')
-      controller.abort()
+      // Mark this as a timeout before aborting
+      controller.abort('timeout')
     }, timeoutMs)
 
     try {
@@ -122,8 +129,16 @@ export function useChatOptimized() {
       }
 
       const aiResponse = data.message
+      console.log('🎉 [FETCH-DEBUG] Successfully received AI response!')
+      console.log('🎉 [FETCH-DEBUG] Response length:', aiResponse?.length || 0)
+      
+      // Clear any previous errors since we got a successful response
+      setError(null)
+      
+      // Notify about the new message
       options?.onNewMessage?.(aiResponse)
       
+      console.log('🎉 [FETCH-DEBUG] Message handler called successfully')
       return aiResponse
     } catch (err) {
       console.error('💥 [FETCH-DEBUG] Error caught in fetch operation!')
@@ -138,20 +153,22 @@ export function useChatOptimized() {
         })
         
         if (err.name === 'AbortError') {
-          console.error('🚫 [FETCH-DEBUG] AbortError detected!')
-          console.error('🚫 [FETCH-DEBUG] This indicates the request was cancelled')
-          console.error('🚫 [FETCH-DEBUG] Possible causes:')
-          console.error('🚫 [FETCH-DEBUG] - User navigation')
-          console.error('🚫 [FETCH-DEBUG] - Timeout reached')
-          console.error('🚫 [FETCH-DEBUG] - Component unmount')
-          console.error('🚫 [FETCH-DEBUG] - Manual abort() call')
+          console.warn('🚫 [FETCH-DEBUG] AbortError detected - request was cancelled')
+          console.warn('🚫 [FETCH-DEBUG] This might be intentional (user navigation, timeout, etc.)')
+          console.warn('🚫 [FETCH-DEBUG] Not showing error to user since this could be normal behavior')
           
-          const errorMessage = err.message.includes('timeout') || err.message.includes('Timeout')
-            ? 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
-            : 'リクエストがキャンセルされました。もう一度お試しください。'
-            
-          setError(errorMessage)
-          options?.onError?.(errorMessage)
+          // AbortErrorの場合、多くは意図的なキャンセルなのでエラー表示しない
+          // ただし、明示的にタイムアウトと判明している場合のみエラー表示
+          if (err.message.includes('timeout') || err.message.includes('Timeout')) {
+            console.error('🚫 [FETCH-DEBUG] Confirmed timeout error')
+            const errorMessage = 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
+            setError(errorMessage)
+            options?.onError?.(errorMessage)
+          } else {
+            console.warn('🚫 [FETCH-DEBUG] Likely intentional abort - not showing error to user')
+            // エラー表示しない（意図的なキャンセルの可能性が高い）
+          }
+          
           return null
         }
         
@@ -167,9 +184,14 @@ export function useChatOptimized() {
       options?.onError?.(errorMessage)
       return null
     } finally {
-      if (timeoutId) clearTimeout(timeoutId)
+      console.log('🔄 [FETCH-DEBUG] Cleaning up fetch operation')
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        console.log('🔄 [FETCH-DEBUG] Timeout cleared')
+      }
       setIsLoading(false)
       abortControllerRef.current = null
+      console.log('🔄 [FETCH-DEBUG] Loading state cleared, abort controller reset')
     }
   }, [cancelRequest])
 
@@ -180,9 +202,14 @@ export function useChatOptimized() {
   ): Promise<any> => {
     // Prevent multiple simultaneous requests
     if (isLoading) {
-      console.log('[useChatOptimized] Structured data request already in progress, ignoring new request')
+      console.warn('⚠️ [FETCH-DEBUG] Structured data request already in progress, ignoring new request')
+      console.warn('⚠️ [FETCH-DEBUG] Current loading state:', isLoading)
       return null
     }
+    
+    console.log('🚀 [FETCH-DEBUG] Starting generateStructuredData request')
+    console.log('🚀 [FETCH-DEBUG] Conversations count:', conversations.length)
+    console.log('🚀 [FETCH-DEBUG] Phase:', phase)
 
     setIsLoading(true)
     setError(null)
@@ -191,12 +218,13 @@ export function useChatOptimized() {
     const controller = new AbortController()
     abortControllerRef.current = controller
 
-    // Use a more reasonable timeout - 60 seconds
-    const timeoutMs = options?.timeout || 60000
+    // Use a more generous timeout - 120 seconds for OpenAI responses
+    const timeoutMs = options?.timeout || 120000
     const timeoutId = setTimeout(() => {
       console.error('[useChatOptimized] Request timed out after', timeoutMs, 'ms')
       console.error('[useChatOptimized] Aborting request due to timeout')
-      controller.abort()
+      // Mark this as a timeout before aborting
+      controller.abort('timeout')
     }, timeoutMs)
 
     try {
@@ -234,20 +262,24 @@ export function useChatOptimized() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
-          console.error('[useChatOptimized] Request was aborted. Details:', {
+          console.warn('🚫 [FETCH-DEBUG] AbortError in generateStructuredData - request was cancelled')
+          console.warn('🚫 [FETCH-DEBUG] Details:', {
             name: err.name,
-            message: err.message,
-            stack: err.stack,
-            timeElapsed: 'tracking not implemented'
+            message: err.message
           })
           
-          // Check if this was a timeout or manual abort
-          const errorMessage = err.message.includes('timeout') || err.message.includes('Timeout')
-            ? 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
-            : 'リクエストがキャンセルされました。もう一度お試しください。'
-            
-          setError(errorMessage)
-          options?.onError?.(errorMessage)
+          // AbortErrorの場合、多くは意図的なキャンセルなのでエラー表示しない
+          // ただし、明示的にタイムアウトと判明している場合のみエラー表示
+          if (err.message.includes('timeout') || err.message.includes('Timeout')) {
+            console.error('🚫 [FETCH-DEBUG] Confirmed timeout error in structured data generation')
+            const errorMessage = 'データ生成がタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
+            setError(errorMessage)
+            options?.onError?.(errorMessage)
+          } else {
+            console.warn('🚫 [FETCH-DEBUG] Likely intentional abort in structured data - not showing error to user')
+            // エラー表示しない（意図的なキャンセルの可能性が高い）
+          }
+          
           return null
         }
         
@@ -263,9 +295,14 @@ export function useChatOptimized() {
       options?.onError?.(errorMessage)
       return null
     } finally {
-      if (timeoutId) clearTimeout(timeoutId)
+      console.log('🔄 [FETCH-DEBUG] Cleaning up fetch operation')
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        console.log('🔄 [FETCH-DEBUG] Timeout cleared')
+      }
       setIsLoading(false)
       abortControllerRef.current = null
+      console.log('🔄 [FETCH-DEBUG] Loading state cleared, abort controller reset')
     }
   }, [cancelRequest])
 
