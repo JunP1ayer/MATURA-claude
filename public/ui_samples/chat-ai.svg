@@ -1,0 +1,60 @@
+<svg width="400" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="600" fill="#f3f4f6"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="400" height="60" fill="white"/>
+  <line x1="0" y1="60" x2="400" y2="60" stroke="#e5e7eb" stroke-width="1"/>
+  
+  <!-- Header Content -->
+  <text x="20" y="35" fill="#1f2937" font-family="Arial, sans-serif" font-size="14">←</text>
+  <circle cx="60" cy="30" r="12" fill="#6b7280"/>
+  <text x="80" y="28" fill="#1f2937" font-family="Arial, sans-serif" font-size="14" font-weight="500">AI Assistant</text>
+  <text x="80" y="42" fill="#22c55e" font-family="Arial, sans-serif" font-size="10">オンライン</text>
+  
+  <!-- Chat Messages -->
+  <!-- AI Message -->
+  <circle cx="40" cy="100" r="12" fill="#6b7280"/>
+  <rect x="60" y="85" width="180" height="30" rx="15" fill="white"/>
+  <text x="70" y="95" fill="#1f2937" font-family="Arial, sans-serif" font-size="10">こんにちは！何かお手伝いできる</text>
+  <text x="70" y="107" fill="#1f2937" font-family="Arial, sans-serif" font-size="10">ことはありますか？</text>
+  <text x="245" y="105" fill="#6b7280" font-family="Arial, sans-serif" font-size="8">10:30</text>
+  
+  <!-- User Message -->
+  <rect x="160" y="130" width="180" height="30" rx="15" fill="#22c55e"/>
+  <text x="170" y="140" fill="white" font-family="Arial, sans-serif" font-size="10">プログラミングについて</text>
+  <text x="170" y="152" fill="white" font-family="Arial, sans-serif" font-size="10">教えてください</text>
+  <text x="350" y="150" fill="#16a34a" font-family="Arial, sans-serif" font-size="8">10:31</text>
+  
+  <!-- AI Message with options -->
+  <circle cx="40" cy="190" r="12" fill="#6b7280"/>
+  <rect x="60" y="175" width="200" height="30" rx="15" fill="white"/>
+  <text x="70" y="185" fill="#1f2937" font-family="Arial, sans-serif" font-size="10">もちろんです！どの言語に</text>
+  <text x="70" y="197" fill="#1f2937" font-family="Arial, sans-serif" font-size="10">興味がありますか？</text>
+  
+  <!-- Option Badges -->
+  <rect x="60" y="215" width="50" height="18" rx="9" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="85" y="226" text-anchor="middle" fill="#6b7280" font-family="Arial, sans-serif" font-size="8">Python</text>
+  
+  <rect x="120" y="215" width="60" height="18" rx="9" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="150" y="226" text-anchor="middle" fill="#6b7280" font-family="Arial, sans-serif" font-size="8">JavaScript</text>
+  
+  <rect x="190" y="215" width="40" height="18" rx="9" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="210" y="226" text-anchor="middle" fill="#6b7280" font-family="Arial, sans-serif" font-size="8">Java</text>
+  
+  <!-- Typing Indicator -->
+  <circle cx="40" cy="260" r="12" fill="#6b7280"/>
+  <rect x="60" y="245" width="60" height="30" rx="15" fill="white"/>
+  <circle cx="75" cy="260" r="2" fill="#9ca3af"/>
+  <circle cx="85" cy="260" r="2" fill="#9ca3af"/>
+  <circle cx="95" cy="260" r="2" fill="#9ca3af"/>
+  
+  <!-- Input Area -->
+  <rect x="0" y="540" width="400" height="60" fill="white"/>
+  <line x1="0" y1="540" x2="400" y2="540" stroke="#e5e7eb" stroke-width="1"/>
+  
+  <rect x="20" y="555" width="320" height="30" rx="15" fill="#f3f4f6"/>
+  <text x="35" y="572" fill="#9ca3af" font-family="Arial, sans-serif" font-size="12">メッセージを入力...</text>
+  
+  <circle cx="360" cy="570" r="15" fill="#22c55e"/>
+  <text x="360" y="575" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12">→</text>
+</svg>

@@ -8,11 +8,13 @@ import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
 import { useMatura } from '@/components/providers/MaturaProvider'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
 import { UXDesign } from '@/lib/types'
+import UISelection, { UIStyle } from '@/components/ui-selection'
 
 export default function UXBuild() {
   const { state, actions } = useMatura()
   const chatOptimized = useChatOptimized()
   const [uxDesign, setUxDesign] = useState<UXDesign | null>(null)
+  const [showUISelection, setShowUISelection] = useState(!state.selectedUI)
 
   useEffect(() => {
     generateUXDesign()
@@ -81,6 +83,42 @@ export default function UXBuild() {
     generateUXDesign()
   }
 
+  const handleUIStyleSelected = (styles: UIStyle[]) => {
+    const selectedStyle = styles[0]
+    console.log('UXBuild: UIスタイル選択:', selectedStyle)
+    
+    // 選択されたUIスタイルをMATURAのstateに保存
+    // UIStyleをUIDesignに変換
+    const uiDesign = {
+      id: selectedStyle.id,
+      name: selectedStyle.name,
+      style: selectedStyle.name.toLowerCase().includes('minimal') ? 'minimal' as const : 
+             selectedStyle.name.toLowerCase().includes('dark') ? 'dark' as const :
+             selectedStyle.name.toLowerCase().includes('professional') ? 'professional' as const :
+             selectedStyle.name.toLowerCase().includes('playful') ? 'playful' as const : 'colorful' as const,
+      preview: selectedStyle.image,
+      description: selectedStyle.description,
+      color_scheme: Object.values(selectedStyle.colors)
+    }
+    actions.setSelectedUI(uiDesign)
+    setShowUISelection(false)
+    
+    // UIスタイルが選択されたらUXデザインを再生成
+    generateUXDesign()
+  }
+
+  // UIスタイル選択画面を表示
+  if (showUISelection) {
+    return (
+      <div className="relative">
+        <UISelection
+          onComplete={handleUIStyleSelected}
+          onBack={() => setShowUISelection(false)}
+        />
+      </div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -96,8 +134,22 @@ export default function UXBuild() {
               <div>
                 <h2 className="text-2xl font-bold mb-2">UXBuild - 体験設計の構築</h2>
                 <p className="text-white/90">
-                  選択されたデザインに基づいて最適なUX体験を設計します
+                  {state.selectedUIStyle 
+                    ? `「${state.selectedUIStyle.name}」スタイルに基づいて最適なUX体験を設計します`
+                    : '選択されたデザインに基づいて最適なUX体験を設計します'
+                  }
                 </p>
+                {state.selectedUIStyle && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: state.selectedUIStyle.colors.primary }}
+                    />
+                    <span className="text-xs text-white/80">
+                      {state.selectedUIStyle.category} | {state.selectedUIStyle.spacing} spacing
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex gap-2">

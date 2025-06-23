@@ -17,11 +17,61 @@ export default function ThemeShowcase() {
   const [message, setMessage] = useState('')
 
   const themes = [
-    { id: 'soft-cards', name: 'Soft Cards', description: '丸み、ふんわり影、優しい雰囲気' },
-    { id: 'flat-minimal', name: 'Flat Minimal', description: '角なし、余白多め、ミニマル' },
-    { id: 'glass-ui', name: 'Glass UI', description: '背景ぼかし、ガラス風、暗め背景' },
-    { id: 'notion-style', name: 'Notion Style', description: '白背景、タイポ中心、余白広め' },
-    { id: 'chat-ai', name: 'Chat AI', description: 'LINE風チャットUI、入力欄が下部に固定' }
+    { 
+      id: 'soft-cards', 
+      name: 'Soft Cards', 
+      description: '丸み、ふんわり影、優しい雰囲気',
+      colors: {
+        primary: { name: 'Pink', value: '#ec4899' },
+        secondary: { name: 'Purple', value: '#a855f7' },
+        background: { name: 'Pink Light', value: '#fce7f3' },
+        accent: { name: 'Purple Light', value: '#f3e8ff' }
+      }
+    },
+    { 
+      id: 'flat-minimal', 
+      name: 'Flat Minimal', 
+      description: '角なし、余白多め、ミニマル',
+      colors: {
+        primary: { name: 'Black', value: '#000000' },
+        secondary: { name: 'Gray', value: '#6b7280' },
+        background: { name: 'Gray Light', value: '#f9fafb' },
+        accent: { name: 'White', value: '#ffffff' }
+      }
+    },
+    { 
+      id: 'glass-ui', 
+      name: 'Glass UI', 
+      description: '背景ぼかし、ガラス風、暗め背景',
+      colors: {
+        primary: { name: 'Pink', value: '#ec4899' },
+        secondary: { name: 'Blue', value: '#3b82f6' },
+        background: { name: 'Purple Dark', value: '#581c87' },
+        accent: { name: 'White/20', value: 'rgba(255,255,255,0.2)' }
+      }
+    },
+    { 
+      id: 'notion-style', 
+      name: 'Notion Style', 
+      description: '白背景、タイポ中心、余白広め',
+      colors: {
+        primary: { name: 'Black', value: '#000000' },
+        secondary: { name: 'Gray', value: '#6b7280' },
+        background: { name: 'White', value: '#ffffff' },
+        accent: { name: 'Gray Light', value: '#f3f4f6' }
+      }
+    },
+    { 
+      id: 'chat-ai', 
+      name: 'Chat AI', 
+      description: 'LINE風チャットUI、入力欄が下部に固定',
+      colors: {
+        primary: { name: 'Green', value: '#22c55e' },
+        secondary: { name: 'Gray', value: '#6b7280' },
+        background: { name: 'Gray Light', value: '#f3f4f6' },
+        accent: { name: 'White', value: '#ffffff' }
+      }
+    }
   ]
 
   const renderThemeContent = () => {
@@ -396,8 +446,112 @@ export default function ThemeShowcase() {
                 <CardDescription>{theme.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-gray-100 rounded-md flex items-center justify-center">
-                  <span className="text-gray-400">プレビュー</span>
+                <div className="space-y-4">
+                  {/* Color Palette Preview */}
+                  <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 relative overflow-hidden">
+                    {/* Mini UI Preview */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {theme.id === 'soft-cards' && (
+                        <div className="scale-75 space-y-2">
+                          <div className="bg-white rounded-2xl shadow-lg p-4 w-48">
+                            <div className="h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full mb-2" />
+                            <div className="h-2 bg-gray-200 rounded-full w-3/4" />
+                          </div>
+                          <div className="flex gap-2">
+                            <div className="bg-pink-100 rounded-xl p-3 flex-1">
+                              <div className="h-2 bg-pink-300 rounded" />
+                            </div>
+                            <div className="bg-purple-100 rounded-xl p-3 flex-1">
+                              <div className="h-2 bg-purple-300 rounded" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {theme.id === 'flat-minimal' && (
+                        <div className="scale-75 space-y-4 w-48">
+                          <div className="space-y-2">
+                            <div className="h-3 bg-black w-20" />
+                            <div className="h-2 bg-gray-300 w-32" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="h-px bg-gray-300" />
+                            <div className="h-px bg-gray-300" />
+                          </div>
+                          <div className="bg-black text-white text-xs py-2 px-4 text-center">
+                            BUTTON
+                          </div>
+                        </div>
+                      )}
+                      {theme.id === 'glass-ui' && (
+                        <div className="scale-75 relative">
+                          <div className="absolute -top-4 -left-4 w-16 h-16 bg-pink-500 rounded-full blur-xl opacity-50" />
+                          <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-blue-500 rounded-full blur-xl opacity-50" />
+                          <div className="bg-white/10 backdrop-blur rounded-xl p-4 w-48 border border-white/20">
+                            <div className="h-2 bg-white/30 rounded mb-2" />
+                            <div className="h-2 bg-white/20 rounded w-3/4" />
+                          </div>
+                        </div>
+                      )}
+                      {theme.id === 'notion-style' && (
+                        <div className="scale-75 space-y-3 w-48 text-left">
+                          <div>
+                            <div className="h-4 bg-black w-32 mb-2" />
+                            <div className="h-2 bg-gray-300 w-full" />
+                            <div className="h-2 bg-gray-300 w-5/6 mt-1" />
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 border border-gray-400 rounded" />
+                              <div className="h-2 bg-gray-300 w-20" />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 border border-gray-400 rounded" />
+                              <div className="h-2 bg-gray-300 w-24" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {theme.id === 'chat-ai' && (
+                        <div className="scale-75 space-y-2 w-48">
+                          <div className="flex gap-2">
+                            <div className="w-6 h-6 bg-gray-300 rounded-full" />
+                            <div className="bg-white rounded-xl rounded-tl-none p-2 flex-1">
+                              <div className="h-2 bg-gray-300 rounded w-20" />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <div className="bg-green-500 rounded-xl rounded-tr-none p-2">
+                              <div className="h-2 bg-green-300 rounded w-16" />
+                            </div>
+                          </div>
+                          <div className="bg-gray-200 rounded-full px-3 py-1 flex items-center gap-2 mt-4">
+                            <div className="h-2 bg-gray-400 rounded flex-1" />
+                            <div className="w-4 h-4 bg-green-500 rounded-full" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Color Swatches */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {Object.entries(theme.colors).map(([key, color]) => (
+                      <div key={key} className="text-center">
+                        <div 
+                          className="h-12 w-full rounded-lg shadow-sm border border-gray-200 mb-1 relative group cursor-pointer transition-transform hover:scale-105"
+                          style={{ backgroundColor: color.value }}
+                        >
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-xs font-medium px-1 py-0.5 bg-black/70 text-white rounded">
+                              {color.value}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600 capitalize">{key}</p>
+                        <p className="text-xs text-gray-400">{color.name}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
