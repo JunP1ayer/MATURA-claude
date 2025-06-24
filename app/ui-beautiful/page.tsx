@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { UIStyle, UI_STYLES, UIPreview } from '@/components/ui-styles/StyleTemplates'
-import { UIStyleSelector } from '@/components/ui-styles/UIStyleSelector-simple'
+// Old UI style components removed - using new Card-based UI selection
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -10,7 +9,7 @@ import { ArrowLeft, Sparkles, Check, Download, Code, Palette, Crown } from 'luci
 import Link from 'next/link'
 
 export default function UIBeautifulPage() {
-  const [selectedStyle, setSelectedStyle] = useState<UIStyle | null>(null)
+  const [selectedStyle, setSelectedStyle] = useState<any | null>(null)
   const [showResult, setShowResult] = useState(false)
 
   const handleStyleSelected = (style: UIStyle) => {
@@ -74,7 +73,7 @@ export default function UIBeautifulPage() {
                     </h3>
                     <div className="bg-gray-50 rounded-xl p-6">
                       <div className="max-w-sm mx-auto">
-                        <UIPreview style={selectedStyle} />
+                        <div className="text-gray-500 text-sm">Preview not available</div>
                       </div>
                     </div>
                   </div>
@@ -240,10 +239,9 @@ export default function UIBeautifulPage() {
         </div>
 
         {/* Main UI Selection */}
-        <UIStyleSelector 
-          onStyleSelected={handleStyleSelected}
-          selectedStyle={selectedStyle}
-        />
+        <div className="text-center p-12">
+          <p className="text-gray-500">This page is deprecated. Use the new UI selection in the main application flow.</p>
+        </div>
       </div>
     </div>
   )

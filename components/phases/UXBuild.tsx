@@ -8,13 +8,11 @@ import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
 import { useMatura } from '@/components/providers/MaturaProvider'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
 import { UXDesign } from '@/lib/types'
-import UISelection, { UIStyle } from '@/components/ui-selection'
 
 export default function UXBuild() {
   const { state, actions } = useMatura()
   const chatOptimized = useChatOptimized()
   const [uxDesign, setUxDesign] = useState<UXDesign | null>(null)
-  const [showUISelection, setShowUISelection] = useState(!state.selectedUI)
 
   useEffect(() => {
     generateUXDesign()
@@ -32,7 +30,7 @@ export default function UXBuild() {
       // UXデザイン仕様を作成
       const uxSpec = {
         insights: state.insights,
-        selectedUI: state.selectedUI,
+        selectedUIStyle: state.selectedUIStyle,
         conversations: state.conversations
       }
 
@@ -58,8 +56,8 @@ export default function UXBuild() {
       } else {
         // フォールバックとしてダミーデータを生成
         const fallbackDesign: UXDesign = {
-          layout: state.selectedUI?.style === 'minimal' ? 'grid-minimal' : 'card-based',
-          colorScheme: state.selectedUI?.style === 'dark' ? 'dark-theme' : 'light-theme',
+          layout: state.selectedUIStyle?.category === 'minimal' ? 'grid-minimal' : 'card-based',
+          colorScheme: state.selectedUIStyle?.colors.background === '#000000' ? 'dark-theme' : 'light-theme',
           typography: 'modern-sans',
           navigation: 'header-nav',
           components: ['ヘッダー', 'メインコンテンツ', 'サイドバー', 'フッター'],
@@ -83,41 +81,7 @@ export default function UXBuild() {
     generateUXDesign()
   }
 
-  const handleUIStyleSelected = (styles: UIStyle[]) => {
-    const selectedStyle = styles[0]
-    console.log('UXBuild: UIスタイル選択:', selectedStyle)
-    
-    // 選択されたUIスタイルをMATURAのstateに保存
-    // UIStyleをUIDesignに変換
-    const uiDesign = {
-      id: selectedStyle.id,
-      name: selectedStyle.name,
-      style: selectedStyle.name.toLowerCase().includes('minimal') ? 'minimal' as const : 
-             selectedStyle.name.toLowerCase().includes('dark') ? 'dark' as const :
-             selectedStyle.name.toLowerCase().includes('professional') ? 'professional' as const :
-             selectedStyle.name.toLowerCase().includes('playful') ? 'playful' as const : 'colorful' as const,
-      preview: selectedStyle.image,
-      description: selectedStyle.description,
-      color_scheme: Object.values(selectedStyle.colors)
-    }
-    actions.setSelectedUI(uiDesign)
-    setShowUISelection(false)
-    
-    // UIスタイルが選択されたらUXデザインを再生成
-    generateUXDesign()
-  }
 
-  // UIスタイル選択画面を表示
-  if (showUISelection) {
-    return (
-      <div className="relative">
-        <UISelection
-          onComplete={handleUIStyleSelected}
-          onBack={() => setShowUISelection(false)}
-        />
-      </div>
-    )
-  }
 
   return (
     <motion.div
@@ -206,7 +170,7 @@ export default function UXBuild() {
               <div className="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-lg border border-green-100">
                 <h3 className="text-xl font-bold text-green-900 mb-3">設計概要</h3>
                 <p className="text-green-800">
-                  {state.selectedUI?.name}デザインに基づいた、
+                  {state.selectedUIStyle?.name}デザインに基づいた、
                   {state.insights?.target}向けの最適化されたUX体験を構築しました。
                 </p>
               </div>

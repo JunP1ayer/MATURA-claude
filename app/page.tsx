@@ -24,7 +24,7 @@ const phases = [
 ]
 
 export default function Home() {
-  const { state, userMessageCount } = useMatura()
+  const { state } = useMatura()
 
   // ページタイトルを動的に更新
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function Home() {
               <span>フェーズ {state.currentPhase + 1}/6</span>
               <span>•</span>
               <span>
-                対話数: {userMessageCount}
+                対話数: {state.messageCount || 0}
               </span>
               <span>•</span>
               <span>

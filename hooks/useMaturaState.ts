@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { MaturaState, Message, Insight, UIDesign, UIStyle, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure } from '@/lib/types'
+import { MaturaState, Message, Insight, UIDesign, UIStyle, TopPageDesign, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
 const initialState: MaturaState = {
@@ -8,6 +8,7 @@ const initialState: MaturaState = {
   insights: null,
   selectedUI: null,
   selectedUIStyle: null,
+  selectedTopPageDesign: null,
   uxDesign: null,
   generatedCode: null,
   releaseInfo: null,

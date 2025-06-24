@@ -46,6 +46,29 @@ export interface UIStyle {
   svgPreview?: string
 }
 
+// トップページデザイン案の型定義（新しい構造）
+export interface TopPageDesign {
+  id: string
+  heading: string // 見出し
+  subDescription: string // サブ説明
+  styleName: string // スタイル名
+  colorScheme: {
+    primary: string // メインカラー
+    secondary: string // サブカラー
+    background: string // 背景色
+  }
+  tags: string[] // タグ
+  targetAudience: string // 想定ユーザー層
+  uniqueValue: string // 独自価値提案
+  productAnalysis: {
+    why: string // なぜこのプロダクトが必要か
+    who: string // 誰がターゲットか
+    what: string // 何を提供するか
+    how: string // どうやって実現するか
+    impact: string // どんな影響を与えるか
+  }
+}
+
 export interface UXDesign {
   layout: string
   colorScheme: string
@@ -93,6 +116,7 @@ export interface MaturaState {
   insights: Insight | null
   selectedUI: UIDesign | null
   selectedUIStyle: UIStyle | null
+  selectedTopPageDesign: TopPageDesign | null
   uxDesign: UXDesign | null
   generatedCode: GeneratedCode | null
   releaseInfo: ReleaseInfo | null

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { UIStyleSelection, UIStyle } from '@/components/ui-styles'
+// Old UI style components removed - using new Card-based UI selection
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, Sparkles, Check, Download, Code, Palette } from 'lucide-react'
@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 export default function UIPremiumPage() {
-  const [selectedStyle, setSelectedStyle] = useState<UIStyle | null>(null)
+  const [selectedStyle, setSelectedStyle] = useState<any | null>(null)
   const [showResult, setShowResult] = useState(false)
 
   const handleStyleSelected = (style: UIStyle) => {
@@ -240,10 +240,9 @@ export default function UIPremiumPage() {
       </div>
 
       {/* Main UI Selection */}
-      <UIStyleSelection
-        onComplete={handleStyleSelected}
-        onBack={() => window.history.back()}
-      />
+      <div className="text-center p-12">
+        <p className="text-gray-500">This page is deprecated. Use the new UI selection in the main application flow.</p>
+      </div>
     </div>
   )
 }
