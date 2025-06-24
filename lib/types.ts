@@ -24,6 +24,28 @@ export interface UIDesign {
   color_scheme: string[]
 }
 
+// 新しい高品質UIスタイル定義
+export interface UIStyle {
+  id: string
+  name: string
+  description: string
+  category: 'modern' | 'minimal' | 'luxury' | 'creative' | 'professional'
+  colors: {
+    primary: string
+    secondary: string
+    accent: string
+    background: string
+    text: string
+  }
+  typography: {
+    heading: string
+    body: string
+  }
+  spacing: 'tight' | 'comfortable' | 'spacious'
+  personality: string[]
+  svgPreview?: string
+}
+
 export interface UXDesign {
   layout: string
   colorScheme: string
@@ -70,6 +92,7 @@ export interface MaturaState {
   conversations: Message[]
   insights: Insight | null
   selectedUI: UIDesign | null
+  selectedUIStyle: UIStyle | null
   uxDesign: UXDesign | null
   generatedCode: GeneratedCode | null
   releaseInfo: ReleaseInfo | null

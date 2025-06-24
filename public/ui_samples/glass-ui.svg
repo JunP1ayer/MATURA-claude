@@ -1,0 +1,51 @@
+<svg width="400" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#581c87;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#312e81;stop-opacity:1" />
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
+    </filter>
+  </defs>
+  
+  <rect width="400" height="600" fill="url(#darkBg)"/>
+  
+  <!-- Background Circles -->
+  <circle cx="100" cy="150" r="80" fill="#ec4899" opacity="0.3" filter="url(#blur)"/>
+  <circle cx="320" cy="450" r="100" fill="#3b82f6" opacity="0.3" filter="url(#blur)"/>
+  
+  <!-- Header -->
+  <text x="200" y="80" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="28" font-weight="bold">Glass Morphism</text>
+  <text x="200" y="105" text-anchor="middle" fill="#d1d5db" font-family="Arial, sans-serif" font-size="14">透明感のあるモダンデザイン</text>
+  
+  <!-- Glass Card -->
+  <rect x="40" y="140" width="320" height="220" rx="16" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.2" stroke-width="1" filter="drop-shadow(0 8px 32px rgba(0,0,0,0.3))"/>
+  
+  <!-- Card Content -->
+  <text x="60" y="180" fill="white" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Welcome</text>
+  <text x="60" y="200" fill="#d1d5db" font-family="Arial, sans-serif" font-size="12">ログインして続ける</text>
+  
+  <!-- Glass Input Fields -->
+  <rect x="60" y="220" width="280" height="20" rx="6" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <rect x="60" y="250" width="280" height="20" rx="6" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  
+  <!-- Glass Button -->
+  <rect x="60" y="280" width="280" height="20" rx="6" fill="white" fill-opacity="0.2" stroke="white" stroke-opacity="0.3" stroke-width="1"/>
+  <text x="200" y="295" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12">ログイン</text>
+  
+  <!-- Stats Cards -->
+  <rect x="60" y="400" width="80" height="60" rx="8" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <rect x="160" y="400" width="80" height="60" rx="8" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <rect x="260" y="400" width="80" height="60" rx="8" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  
+  <text x="100" y="425" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">10K+</text>
+  <text x="100" y="445" text-anchor="middle" fill="#d1d5db" font-family="Arial, sans-serif" font-size="10">Users</text>
+  
+  <text x="200" y="425" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">98%</text>
+  <text x="200" y="445" text-anchor="middle" fill="#d1d5db" font-family="Arial, sans-serif" font-size="10">Active</text>
+  
+  <text x="300" y="425" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">4.9</text>
+  <text x="300" y="445" text-anchor="middle" fill="#d1d5db" font-family="Arial, sans-serif" font-size="10">Rating</text>
+</svg>

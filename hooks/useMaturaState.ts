@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { MaturaState, Message, Insight, UIDesign, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure } from '@/lib/types'
+import { MaturaState, Message, Insight, UIDesign, UIStyle, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
 const initialState: MaturaState = {
@@ -7,6 +7,7 @@ const initialState: MaturaState = {
   conversations: [],
   insights: null,
   selectedUI: null,
+  selectedUIStyle: null,
   uxDesign: null,
   generatedCode: null,
   releaseInfo: null,
@@ -109,6 +110,10 @@ export function useMaturaState() {
     setState(prev => ({ ...prev, selectedUI: ui }))
   }, [])
 
+  const setSelectedUIStyle = useCallback((style: UIStyle) => {
+    setState(prev => ({ ...prev, selectedUIStyle: style }))
+  }, [])
+
   const setUXDesign = useCallback((uxDesign: UXDesign) => {
     setState(prev => ({ ...prev, uxDesign }))
   }, [])
@@ -170,6 +175,15 @@ export function useMaturaState() {
     }))
   }, [batchUpdateState])
 
+  const setUIStyleAndNextPhase = useCallback((style: UIStyle) => {
+    batchUpdateState(prev => ({
+      selectedUIStyle: style,
+      currentPhase: Math.min(prev.currentPhase + 1, 5),
+      isLoading: false,
+      error: null,
+    }))
+  }, [batchUpdateState])
+
   const setUXAndNextPhase = useCallback((uxDesign: UXDesign) => {
     batchUpdateState(prev => ({
       uxDesign,
@@ -189,11 +203,11 @@ export function useMaturaState() {
   }, [batchUpdateState])
 
   const getCurrentPhaseData = useCallback(() => {
-    const { currentPhase, insights, selectedUI, uxDesign, generatedCode, releaseInfo } = state
+    const { currentPhase, insights, selectedUI, selectedUIStyle, uxDesign, generatedCode, releaseInfo } = state
     
     switch (currentPhase) {
       case 1: return insights
-      case 2: return selectedUI
+      case 2: return selectedUIStyle || selectedUI
       case 3: return uxDesign
       case 4: return generatedCode
       case 5: return releaseInfo
@@ -228,7 +242,7 @@ export function useMaturaState() {
       const requirements = [
         state.conversations.length > 0, // FreeTalk
         state.insights !== null,         // InsightRefine
-        state.selectedUI !== null,       // SketchView
+        state.selectedUIStyle !== null || state.selectedUI !== null, // SketchView
         state.uxDesign !== null,         // UXBuild
         state.generatedCode !== null,    // CodePlayground
         state.releaseInfo !== null       // ReleaseBoard
@@ -248,6 +262,7 @@ export function useMaturaState() {
     setError,
     setInsights,
     setSelectedUI,
+    setSelectedUIStyle,
     setUXDesign,
     setGeneratedCode,
     setReleaseInfo,
@@ -260,6 +275,7 @@ export function useMaturaState() {
     // Batch operations
     setInsightAndNextPhase,
     setUIAndNextPhase,
+    setUIStyleAndNextPhase,
     setUXAndNextPhase,
     setCodeAndNextPhase,
     // Memoized values
