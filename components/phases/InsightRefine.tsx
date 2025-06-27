@@ -15,8 +15,30 @@ export default function InsightRefine() {
   const [insights, setInsights] = useState<Insight | null>(null)
 
   useEffect(() => {
-    generateInsights()
-  }, [])
+    // 初回レンダリング時にconversationsとcontextが揃っているかチェック
+    // 未取得の場合は呼び出しをスキップして、データが揃ったら自動実行
+    const hasValidConversations = state.conversations && 
+                                  Array.isArray(state.conversations) && 
+                                  state.conversations.length > 0 &&
+                                  state.conversations.some(conv => conv.content && conv.content.trim() !== '')
+    
+    console.log('🔍 InsightRefine useEffect triggered:', {
+      hasValidConversations,
+      conversationsLength: state.conversations?.length || 0,
+      hasInsights: !!insights,
+      isLoading: chatOptimized.isLoading,
+      conversations: state.conversations
+    })
+    
+    if (hasValidConversations && !insights && !chatOptimized.isLoading) {
+      console.log('✅ 自動洞察生成を開始:', { 
+        conversationsCount: state.conversations.length,
+        hasInsights: !!insights,
+        isLoading: chatOptimized.isLoading 
+      })
+      generateInsights()
+    }
+  }, [state.conversations, insights, chatOptimized.isLoading])
 
   // Cleanup on unmount - cancel any ongoing requests
   useEffect(() => {
@@ -27,23 +49,70 @@ export default function InsightRefine() {
 
   const generateInsights = async () => {
     try {
+      console.log('🚀 generateInsights called, starting validation...')
+      
+      // より厳密なデータ検証
+      if (!state.conversations || 
+          !Array.isArray(state.conversations) || 
+          state.conversations.length === 0) {
+        console.warn('❌ conversations が空または無効のため、洞察生成をスキップします')
+        return
+      }
+
+      // 有効なコンテンツがあるconversationが存在するかチェック
+      const validConversations = state.conversations.filter(conv => 
+        conv && conv.content && typeof conv.content === 'string' && conv.content.trim() !== ''
+      )
+
+      if (validConversations.length === 0) {
+        console.warn('❌ 有効なconversationが見つからないため、洞察生成をスキップします')
+        return
+      }
+
+      console.log('✅ 洞察生成を開始:', { 
+        totalConversations: state.conversations.length,
+        validConversations: validConversations.length,
+        isLoadingBefore: chatOptimized.isLoading,
+        firstConversation: validConversations[0]?.content?.substring(0, 100)
+      })
+
       const structuredData = await chatOptimized.generateStructuredData(
         state.conversations,
         'InsightRefine',
         {
           onError: (error) => {
-            console.error('洞察生成エラー:', error)
+            console.error('❌ 洞察生成エラー:', error)
+            // AbortErrorの場合はUI状態をリセット
+            if (error.includes('aborted') || error.includes('abort')) {
+              console.log('🚫 Request was aborted, not showing error to user')
+              return
+            }
           },
           timeout: 45000 // 45 second timeout for structured data generation
         }
       )
       
+      console.log('📊 generateStructuredData結果:', {
+        hasData: !!structuredData,
+        dataType: typeof structuredData,
+        dataKeys: structuredData ? Object.keys(structuredData) : null
+      })
+      
       if (structuredData) {
+        console.log('✅ 洞察データを設定中...')
         setInsights(structuredData)
         actions.setInsights(structuredData)
+        console.log('✅ 洞察データ設定完了')
+      } else {
+        console.warn('❌ generateStructuredDataがnullを返しました')
       }
     } catch (error) {
-      console.error('洞察生成エラー:', error)
+      console.error('💥 洞察生成エラー:', error)
+      // ユーザーの意図的なキャンセルの場合はエラー表示しない
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('🚫 Request was intentionally aborted, not showing error')
+        return
+      }
     }
   }
 
@@ -266,14 +335,55 @@ export default function InsightRefine() {
             </motion.div>
           ) : !insights && !chatOptimized.isLoading ? (
             <div className="text-center py-16">
-              <p className="text-red-600 mb-4">洞察の生成に失敗しました</p>
-              <button
-                onClick={handleRegenerate}
-                disabled={chatOptimized.isLoading}
-                className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors disabled:opacity-50"
-              >
-                再試行
-              </button>
+              {/* より詳細な状態判定でUI分岐 */}
+              {(() => {
+                // conversationsが完全に未定義または空
+                if (!state.conversations || state.conversations.length === 0) {
+                  return (
+                    <div>
+                      <p className="text-gray-600 mb-4">対話データを読み込み中...</p>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-matura-primary mx-auto"></div>
+                    </div>
+                  )
+                }
+                
+                // conversationsは存在するが有効なコンテンツがない
+                const hasValidContent = state.conversations.some(conv => 
+                  conv && conv.content && conv.content.trim() !== ''
+                )
+                
+                if (!hasValidContent) {
+                  return (
+                    <div>
+                      <p className="text-yellow-600 mb-4">有効な対話データが見つかりません</p>
+                      <p className="text-gray-500 text-sm mb-4">
+                        まず前のフェーズでしっかりと対話を行ってください
+                      </p>
+                      <button
+                        onClick={handleRegenerate}
+                        disabled={chatOptimized.isLoading}
+                        className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors disabled:opacity-50"
+                      >
+                        再試行
+                      </button>
+                    </div>
+                  )
+                }
+                
+                // 有効なデータはあるが生成に失敗した
+                return (
+                  <div>
+                    <p className="text-red-600 mb-4">洞察の生成に失敗しました</p>
+                    <button
+                      onClick={handleRegenerate}
+                      disabled={chatOptimized.isLoading}
+                      className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors disabled:opacity-50"
+                    >
+                      再試行
+                    </button>
+                  </div>
+                )
+              })()}
             </div>
           ) : null}
         </div>

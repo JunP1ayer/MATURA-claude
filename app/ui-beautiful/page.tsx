@@ -12,7 +12,7 @@ export default function UIBeautifulPage() {
   const [selectedStyle, setSelectedStyle] = useState<any | null>(null)
   const [showResult, setShowResult] = useState(false)
 
-  const handleStyleSelected = (style: UIStyle) => {
+  const handleStyleSelected = (style: any) => {
     setSelectedStyle(style)
     setShowResult(true)
     console.log('🎨 Beautiful UI Style Selected:', style)
@@ -125,7 +125,12 @@ export default function UIBeautifulPage() {
                         </div>
                         <div className="flex justify-between">
                           <span>タイポグラフィ:</span>
-                          <span className="font-medium text-gray-900">{selectedStyle.typography.heading}</span>
+                          <span className="font-medium text-gray-900">
+                            {typeof selectedStyle.typography === 'object' && selectedStyle.typography !== null 
+                              ? (selectedStyle.typography.heading || 'カスタム設定')
+                              : String(selectedStyle.typography || 'デフォルト')
+                            }
+                          </span>
                         </div>
                       </div>
                     </div>
