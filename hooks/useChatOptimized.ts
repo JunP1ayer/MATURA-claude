@@ -158,35 +158,39 @@ export function useChatOptimized() {
       console.error('💥 [FETCH-DEBUG] Error type:', typeof err)
       console.error('💥 [FETCH-DEBUG] Error constructor:', err?.constructor?.name)
       
-      if (err instanceof Error) {
+      // Handle both Error objects and thrown strings
+      const error = err instanceof Error ? err : new Error(String(err))
+      
+      if (error instanceof Error) {
         console.error('💥 [FETCH-DEBUG] Error details:', {
-          name: err.name,
-          message: err.message,
-          stack: err.stack
+          name: error.name,
+          message: error.message,
+          stack: error.stack
         })
         
-        if (err.name === 'AbortError') {
+        if (error.name === 'AbortError') {
           console.warn('🚫 [FETCH-DEBUG] AbortError detected - request was cancelled')
           console.warn('🚫 [FETCH-DEBUG] This might be intentional (user navigation, timeout, etc.)')
           console.warn('🚫 [FETCH-DEBUG] Not showing error to user since this could be normal behavior')
           
           // AbortErrorの場合、多くは意図的なキャンセルなのでエラー表示しない
           // ただし、明示的にタイムアウトと判明している場合のみエラー表示
-          if (err.message.includes('timeout') || err.message.includes('Timeout')) {
+          if (error.message.includes('timeout') || error.message.includes('Timeout')) {
             console.error('🚫 [FETCH-DEBUG] Confirmed timeout error')
             const errorMessage = 'リクエストがタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
             setError(errorMessage)
             options?.onError?.(errorMessage)
           } else {
             console.warn('🚫 [FETCH-DEBUG] Likely intentional abort - not showing error to user')
-            // エラー表示しない（意図的なキャンセルの可能性が高い）
+            // 意図的なキャンセルの場合はエラー状態をクリア
+            setError(null)
           }
           
           return null
         }
         
-        console.error('⚠️ [FETCH-DEBUG] Non-abort error:', err.message)
-        const errorMessage = err.message
+        console.error('⚠️ [FETCH-DEBUG] Non-abort error:', error.message)
+        const errorMessage = error.message
         setError(errorMessage)
         options?.onError?.(errorMessage)
         return null
@@ -210,8 +214,16 @@ export function useChatOptimized() {
     phase: string,
     options?: ChatOptions
   ): Promise<any> => {
+    console.log('🔧 generateStructuredData called:', {
+      conversationsLength: conversations?.length,
+      phase,
+      isCurrentlyLoading: isLoading,
+      hasOptions: !!options
+    })
+
     // Prevent multiple simultaneous requests
     if (isLoading) {
+      console.log('❌ Already loading, returning null')
       return null
     }
 
@@ -225,22 +237,38 @@ export function useChatOptimized() {
     // Set timeout for OpenAI responses
     const timeoutMs = options?.timeout || 120000
     const timeoutId = setTimeout(() => {
+      console.log('⏰ Request timeout triggered')
       controller.abort('timeout')
     }, timeoutMs)
 
     try {
+      const requestBody = {
+        message: JSON.stringify(conversations),
+        messages: [],
+        phase,
+        isStructured: true,
+      }
+
+      console.log('📤 Sending request to /api/chat:', {
+        bodySize: JSON.stringify(requestBody).length,
+        phase,
+        isStructured: true,
+        timeout: timeoutMs
+      })
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: JSON.stringify(conversations),
-          messages: [],
-          phase,
-          isStructured: true,
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
+      })
+
+      console.log('📥 Response received:', {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText
       })
 
       if (!response.ok) {
@@ -249,29 +277,53 @@ export function useChatOptimized() {
 
       const data = await response.json()
       
+      console.log('📊 Response data:', {
+        hasError: !!data.error,
+        hasMessage: !!data.message,
+        messageType: typeof data.message,
+        messageLength: data.message?.length || 0
+      })
+      
       if (data.error) {
         throw new Error(data.error)
       }
 
       // JSONレスポンスをパース
       try {
-        return JSON.parse(data.message)
-      } catch {
+        const parsed = JSON.parse(data.message)
+        console.log('✅ Successfully parsed JSON:', {
+          type: typeof parsed,
+          keys: parsed ? Object.keys(parsed) : null
+        })
+        return parsed
+      } catch (parseError) {
+        console.log('⚠️ JSON parse failed, returning raw message:', {
+          error: parseError,
+          messageType: typeof data.message
+        })
         // JSONパースに失敗した場合は生の文字列を返す
         return data.message
       }
     } catch (err) {
+      console.error('💥 Error in generateStructuredData:', err)
+      
       if (err instanceof Error) {
         if (err.name === 'AbortError') {
           // Handle abort errors
           if (err.message.includes('timeout') || err.message.includes('Timeout')) {
+            console.log('⏰ Confirmed timeout error')
             const errorMessage = 'データ生成がタイムアウトしました。ネットワーク接続を確認してもう一度お試しください。'
             setError(errorMessage)
             options?.onError?.(errorMessage)
+          } else {
+            console.log('🚫 Abort error (likely intentional)')
+            // 意図的なキャンセルの場合はエラー状態をクリア
+            setError(null)
           }
           return null
         }
         
+        console.log('❌ Non-abort error:', err.message)
         const errorMessage = err.message
         setError(errorMessage)
         options?.onError?.(errorMessage)
@@ -286,6 +338,7 @@ export function useChatOptimized() {
       if (timeoutId) {
         clearTimeout(timeoutId)
       }
+      console.log('🏁 generateStructuredData finishing, setting isLoading to false')
       setIsLoading(false)
       abortControllerRef.current = null
     }

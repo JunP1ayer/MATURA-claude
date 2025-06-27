@@ -151,8 +151,9 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
       console.error('[chat-openai] Type:', error.type)
       console.error('[chat-openai] Code:', error.code)
       
-      // Preserve original error for better handling in route
-      throw error
+      // Create a more descriptive error message for API errors
+      const apiErrorMessage = `OpenAI API Error (${error.status}): ${error.message}`
+      throw new Error(apiErrorMessage)
     }
     
     // Handle abort errors
@@ -160,7 +161,12 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
       throw error
     }
     
-    // Generic error
-    throw new Error('AI応答の生成に失敗しました')
+    // Handle other Error objects
+    if (error instanceof Error) {
+      throw new Error(`AI応答エラー: ${error.message}`)
+    }
+    
+    // Handle non-Error objects (strings, etc.)
+    throw new Error(`AI応答の生成に失敗しました: ${String(error)}`)
   }
 }
