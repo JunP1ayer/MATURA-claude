@@ -131,7 +131,7 @@ export default function UXBuild() {
         try {
           const parsed = JSON.parse(response)
           setUxStructure(parsed)
-          actions.setUXDesign(parsed)
+          actions.setUXDesign(parsed as any)
         } catch (error) {
           console.error('Failed to parse UX structure:', error)
           // フォールバックデータを使用
@@ -189,7 +189,7 @@ export default function UXBuild() {
       ]
     }
     setUxStructure(fallback)
-    actions.setUXDesign(fallback)
+    actions.setUXDesign(fallback as any)
   }
 
   const structuredIdea = {
@@ -231,56 +231,71 @@ export default function UXBuild() {
       animate={{ opacity: 1 }}
       className="max-w-7xl mx-auto px-4"
     >
-      {/* ヘッダー：構造化されたアイデアの可視化 */}
+      {/* ヘッダー：あなたのアプリがどうなるか */}
       <motion.div
         initial={{ y: -20 }}
         animate={{ y: 0 }}
-        className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8"
+        className="bg-gradient-to-br from-purple-900 via-indigo-800 to-blue-900 rounded-2xl shadow-xl overflow-hidden mb-8 relative"
       >
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">
-                🎯 あなたのアイデアを最適なUXに変換
-              </h2>
-              <p className="text-indigo-100 text-lg">
-                構造化された5つの要素と{state.selectedUIStyle?.name}スタイルから、
-                理想的な体験設計を導き出しました
-              </p>
-            </div>
-            <PreviewButton 
-              data={uxStructure} 
-              title="UX構造"
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-            />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        <div className="relative z-10 p-8">
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", delay: 0.2 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6"
+            >
+              <Sparkles className="w-10 h-10 text-yellow-300" />
+            </motion.div>
+            <h2 className="text-4xl font-bold mb-4 text-white">
+              あなたのアプリはこうなります
+            </h2>
+            <p className="text-xl text-indigo-100 max-w-3xl mx-auto leading-relaxed">
+              <span className="font-bold text-yellow-300">{state.selectedUIStyle?.name}スタイル</span>で
+              <span className="font-bold text-cyan-300">{state.insights?.target}</span>のための
+              <span className="font-bold text-pink-300">{state.insights?.vision}</span>を実現
+            </p>
           </div>
 
-          {/* 5つの構造要素のタブ */}
-          <div className="grid grid-cols-5 gap-2">
+          {/* アイデアの要素をビジュアルに表示 */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {Object.entries(structuredIdea).map(([key, item]) => {
               const Icon = item.icon
+              const isActive = activeSection === key
               return (
-                <button
+                <motion.button
                   key={key}
                   onClick={() => setActiveSection(key as any)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className={`
-                    p-3 rounded-lg transition-all transform
-                    ${activeSection === key 
-                      ? 'bg-white/30 scale-105 shadow-lg' 
-                      : 'bg-white/10 hover:bg-white/20'
+                    relative p-4 rounded-xl transition-all
+                    ${isActive 
+                      ? 'bg-white text-indigo-900 shadow-2xl' 
+                      : 'bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm'
                     }
                   `}
                 >
-                  <Icon className="w-5 h-5 mx-auto mb-1" />
-                  <div className="text-xs font-medium">{item.label.split(' - ')[0]}</div>
-                </button>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-xl opacity-20"
+                    />
+                  )}
+                  <div className="relative z-10">
+                    <Icon className="w-8 h-8 mx-auto mb-2" />
+                    <div className="text-sm font-bold">{item.label.split(' - ')[0]}</div>
+                    <div className="text-xs opacity-80 mt-1">{item.label.split(' - ')[1]}</div>
+                  </div>
+                </motion.button>
               )
             })}
           </div>
         </div>
 
-        {/* アクティブな構造要素の詳細 */}
-        <div className="p-6 bg-gray-50">
+        {/* アクティブな要素の詳細をわかりやすく表示 */}
+        <div className="p-8 bg-gradient-to-b from-gray-50 to-white">
           <AnimatePresence mode="wait">
             {Object.entries(structuredIdea).map(([key, item]) => {
               if (activeSection !== key) return null
@@ -288,18 +303,21 @@ export default function UXBuild() {
               return (
                 <motion.div
                   key={key}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="flex items-start gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="text-center"
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${item.color} flex items-center justify-center flex-shrink-0`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{item.label}</h3>
-                    <p className="text-gray-700">{item.content}</p>
-                  </div>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", delay: 0.1 }}
+                    className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                  >
+                    <Icon className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.label}</h3>
+                  <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">{item.content}</p>
                 </motion.div>
               )
             })}
@@ -325,298 +343,560 @@ export default function UXBuild() {
         </div>
       ) : uxStructure ? (
         <div className="space-y-8">
-          {/* サイトアーキテクチャ */}
+          {/* 実際の画面構成をビジュアルに */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
-              <div className="flex items-center gap-3">
-                <Globe className="w-8 h-8" />
-                <h3 className="text-2xl font-bold">🏗️ サイト構成</h3>
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-3xl font-bold mb-2">🖥️ こんな画面構成になります</h3>
+                  <p className="text-blue-100 text-lg">実際のユーザーが見る画面の流れ</p>
+                </div>
+                <Monitor className="w-16 h-16 text-blue-200" />
               </div>
             </div>
             <div className="p-8">
-              {/* トップページ設計 */}
-              <div className="mb-8">
-                <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Monitor className="w-5 h-5 text-blue-600" />
-                  トップページの役割
-                </h4>
-                <div className="bg-blue-50 rounded-xl p-6">
-                  <p className="text-blue-900 font-medium mb-4">{uxStructure.siteArchitecture.topPage.purpose}</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {uxStructure.siteArchitecture.topPage.elements.map((element, i) => (
-                      <div key={i} className="bg-white rounded-lg p-3 text-center shadow-sm">
-                        <span className="text-blue-700 font-medium text-sm">{element}</span>
-                      </div>
-                    ))}
+              {/* 最初に見る画面 */}
+              <div className="mb-10">
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-blue-200">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Globe className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold text-gray-900">最初に見る画面（トップページ）</h4>
+                      <p className="text-gray-600">訪問者が最初に目にする、大切な入り口</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
+                    <p className="text-gray-800 text-lg font-medium mb-4">
+                      💡 {uxStructure.siteArchitecture.topPage.purpose}
+                    </p>
+                    <p className="text-gray-600 mb-6">
+                      ユーザーは<span className="font-bold text-blue-600">数秒で判断</span>します。
+                      だから、一目で価値が伝わる構成にしています。
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {uxStructure.siteArchitecture.topPage.elements.map((element, i) => (
+                        <motion.div 
+                          key={i} 
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 * i }}
+                          className="flex items-center gap-3 bg-blue-50 rounded-lg p-4"
+                        >
+                          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-bold">{i + 1}</span>
+                          </div>
+                          <div>
+                            <p className="font-bold text-blue-900">{element}</p>
+                            <p className="text-sm text-gray-600">
+                              {element === 'ヒーローセクション' ? '最初に目に入る大きなビジュアル' :
+                               element === '価値提案' ? 'なぜこのサービスが必要か' :
+                               element === 'CTAボタン' ? '次のアクションへの誘導' :
+                               element === '機能紹介' ? '何ができるかを簡潔に' :
+                               '重要な情報'}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* 主要機能の画面設計 */}
-              <div className="mb-8">
-                <h4 className="text-lg font-bold text-gray-900 mb-4">📱 主要機能の画面構成</h4>
-                <div className="grid gap-4">
+              {/* それぞれの機能画面 */}
+              <div className="mb-10">
+                <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">各機能の画面イメージ</h4>
+                <div className="grid md:grid-cols-2 gap-6">
                   {uxStructure.siteArchitecture.mainFeatures.map((feature, i) => (
                     <motion.div
                       key={i}
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.1 * i }}
-                      className="bg-gray-50 rounded-xl p-6 border border-gray-200"
+                      className="bg-gradient-to-br from-gray-50 to-white rounded-xl border-2 border-gray-200 overflow-hidden hover:shadow-xl transition-shadow"
                     >
-                      <h5 className="font-bold text-gray-900 mb-2">{feature.name}</h5>
-                      <p className="text-gray-700 text-sm mb-3">{feature.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {feature.uiElements.map((ui, j) => (
-                          <span key={j} className="px-3 py-1 bg-white rounded-full text-xs font-medium text-gray-700 border border-gray-300">
-                            {ui}
-                          </span>
-                        ))}
+                      <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-white p-4">
+                        <h5 className="font-bold text-lg flex items-center gap-2">
+                          <Smartphone className="w-5 h-5" />
+                          {feature.name}
+                        </h5>
+                      </div>
+                      <div className="p-6">
+                        <p className="text-gray-700 mb-4 leading-relaxed">{feature.description}</p>
+                        <div className="bg-gray-100 rounded-lg p-4">
+                          <p className="text-sm font-semibold text-gray-600 mb-3">この画面に含まれるパーツ：</p>
+                          <div className="space-y-2">
+                            {feature.uiElements.map((ui, j) => (
+                              <div key={j} className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                                <span className="text-sm text-gray-700">
+                                  {ui}
+                                  <span className="text-gray-500 ml-2">
+                                    {ui === '入力フォーム' ? '- ユーザーが情報を入力' :
+                                     ui === 'アクションボタン' ? '- 処理を実行' :
+                                     ui === '結果表示エリア' ? '- 結果をわかりやすく表示' :
+                                     ''}
+                                  </span>
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* ユーザーフロー */}
-              <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-4">🚶 ユーザー体験の流れ</h4>
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                  {uxStructure.siteArchitecture.userFlow.map((step, i) => (
-                    <React.Fragment key={i}>
-                      <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg px-4 py-2 font-medium text-sm">
-                        {step}
-                      </div>
-                      {i < uxStructure.siteArchitecture.userFlow.length - 1 && (
-                        <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                      )}
-                    </React.Fragment>
-                  ))}
+              {/* ユーザーの操作の流れ */}
+              <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-8">
+                <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">使う人の体験ストーリー</h4>
+                <div className="relative">
+                  <div className="absolute left-8 top-12 bottom-0 w-1 bg-blue-300" />
+                  <div className="space-y-6">
+                    {uxStructure.siteArchitecture.userFlow.map((step, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * i }}
+                        className="flex items-center gap-4"
+                      >
+                        <div className="relative z-10 w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                          {i + 1}
+                        </div>
+                        <div className="flex-1 bg-white rounded-xl p-6 shadow-md">
+                          <p className="font-bold text-gray-900 text-lg">{step}</p>
+                          <p className="text-gray-600 text-sm mt-1">
+                            {i === 0 ? 'まずはここから始まります' :
+                             i === uxStructure.siteArchitecture.userFlow.length - 1 ? '目標達成！' :
+                             'スムーズに次のステップへ'}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* 体験スタイルのこだわり */}
+          {/* 見た目と操作感の特徴 */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6">
-              <div className="flex items-center gap-3">
-                <Heart className="w-8 h-8" />
-                <h3 className="text-2xl font-bold">💝 体験スタイルのこだわり</h3>
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8">
+              <div className="text-center">
+                <Heart className="w-16 h-16 mx-auto mb-4" />
+                <h3 className="text-3xl font-bold mb-2">見た目と操作感の特徴</h3>
+                <p className="text-purple-100 text-lg">
+                  {state.selectedUIStyle?.name}スタイルがもたらす、特別な体験
+                </p>
               </div>
-              <p className="text-purple-100 mt-2">
-                {state.selectedUIStyle?.name}スタイルで、あなたのアプリに込めた想いを形にします
-              </p>
             </div>
             <div className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* 見た目の第一印象 */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                      <Layout className="w-5 h-5 text-white" />
-                    </div>
-                    <h4 className="font-bold text-purple-900">見た目の第一印象</h4>
-                  </div>
-                  <p className="text-gray-700 mb-3">
-                    {uxStructure.designSystem.layout === 'カード型レイアウト' 
-                      ? 'ひと目で情報が整理されていて、迷わず使える親しみやすいデザイン'
-                      : uxStructure.designSystem.layout === 'グリッドレイアウト'
-                      ? 'すっきりと整理された、プロフェッショナルな印象のデザイン'
-                      : '使いやすさを重視した、親しみやすいデザイン'
-                    }
-                  </p>
-                  <div className="flex items-center gap-2 text-sm text-purple-700">
-                    <Sparkles className="w-4 h-4" />
-                    <span>{state.selectedUIStyle?.spacing === 'comfortable' ? 'ゆったりとした余白で見やすい' : 'コンパクトで情報量が多い'}</span>
-                  </div>
-                </div>
-
-                {/* 色づかいの意味 */}
-                <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center">
-                      <Palette className="w-5 h-5 text-white" />
-                    </div>
-                    <h4 className="font-bold text-pink-900">色づかいの意味</h4>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5" style={{ backgroundColor: state.selectedUIStyle?.colors.primary }} />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">メインカラー</p>
-                        <p className="text-sm text-gray-600">大切なボタンや注目してほしい場所に使用。あなたのサービスの印象を決める色</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5" style={{ backgroundColor: state.selectedUIStyle?.colors.secondary }} />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">サポートカラー</p>
-                        <p className="text-sm text-gray-600">補助的な情報やリンクに使用。全体のバランスを整える色</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 読みやすさへの配慮 */}
-                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-6 border border-orange-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                      <Type className="w-5 h-5 text-white" />
-                    </div>
-                    <h4 className="font-bold text-orange-900">読みやすさへの配慮</h4>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 mb-1">大きな見出し</p>
-                      <p className="text-sm text-gray-600">
-                        {uxStructure.designSystem.typography.heading === 'シンプルで読みやすい'
-                          ? 'すっきりとした文字で、内容がすぐに理解できます'
-                          : '印象的な文字で、重要な情報が目に飛び込んできます'
-                        }
-                      </p>
+                {/* 画面を開いたときの印象 */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-200 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Layout className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 mb-1">説明文</p>
-                      <p className="text-sm text-gray-600">
-                        長時間読んでも疲れない、最適な文字サイズと行間を採用
-                      </p>
+                      <h4 className="font-bold text-xl text-purple-900">画面を開いた瞬間の印象</h4>
+                      <p className="text-sm text-purple-600">ユーザーが最初に感じること</p>
                     </div>
                   </div>
-                </div>
-
-                {/* 操作の気持ちよさ */}
-                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-6 border border-teal-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center">
-                      <MousePointer className="w-5 h-5 text-white" />
-                    </div>
-                    <h4 className="font-bold text-teal-900">操作の気持ちよさ</h4>
-                  </div>
-                  <p className="text-gray-700 mb-3">
-                    クリックやタップが楽しくなる、細かな工夫を散りばめました
-                  </p>
-                  <div className="space-y-2">
-                    {uxStructure.designSystem.interactions.map((interaction, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-teal-500 rounded-full" />
-                        <span className="text-sm text-gray-700">
-                          {interaction === 'スムーズなホバー効果' ? 'マウスを乗せると優しく反応' :
-                           interaction === 'フェードトランジション' ? '画面の切り替わりがなめらか' :
-                           interaction === 'マイクロアニメーション' ? '小さな動きで操作を楽しく' :
-                           interaction}
-                        </span>
+                  <div className="bg-white rounded-xl p-6 shadow-sm">
+                    <p className="text-gray-800 text-lg leading-relaxed mb-4">
+                      {uxStructure.designSystem.layout === 'カード型レイアウト' 
+                        ? '「わかりやすい！」と感じる、整理された情報配置'
+                        : uxStructure.designSystem.layout === 'グリッドレイアウト'
+                        ? '「プロっぽい！」と感じる、洗練されたデザイン'
+                        : '「使いやすそう！」と感じる、親しみやすいデザイン'
+                      }
+                    </p>
+                    <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
+                      <Sparkles className="w-6 h-6 text-purple-600" />
+                      <div>
+                        <p className="font-semibold text-purple-900">
+                          {state.selectedUIStyle?.spacing === 'comfortable' ? '余白たっぷり' : 'コンパクト設計'}
+                        </p>
+                        <p className="text-sm text-purple-700">
+                          {state.selectedUIStyle?.spacing === 'comfortable' 
+                            ? '目が疲れにくく、長時間使っても快適' 
+                            : '一画面でたくさんの情報を確認できる'}
+                        </p>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
+                </motion.div>
+
+                {/* 色が伝える印象 */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-8 border-2 border-pink-200 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Palette className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xl text-pink-900">色が伝えるメッセージ</h4>
+                      <p className="text-sm text-pink-600">色には意味があります</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-xl p-6 shadow-sm">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-16 h-16 rounded-xl shadow-md" style={{ backgroundColor: state.selectedUIStyle?.colors.primary }} />
+                        <div className="flex-1">
+                          <p className="font-bold text-gray-900 text-lg">メインカラー</p>
+                          <p className="text-gray-600">ブランドの顔となる色</p>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          <span className="font-semibold">使われる場所：</span><br/>
+                          重要なボタン、メニュー、見出し、アイコンなど<br/>
+                          <span className="text-pink-600 font-medium">ユーザーに「ここが大事！」と伝える色です</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-xl p-6 shadow-sm">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-16 h-16 rounded-xl shadow-md" style={{ backgroundColor: state.selectedUIStyle?.colors.secondary }} />
+                        <div className="flex-1">
+                          <p className="font-bold text-gray-900 text-lg">サブカラー</p>
+                          <p className="text-gray-600">全体を調和させる色</p>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          <span className="font-semibold">使われる場所：</span><br/>
+                          背景、境界線、補助的な要素など<br/>
+                          <span className="text-purple-600 font-medium">画面全体に統一感を生み出す色です</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* 文字の見やすさ */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-8 border-2 border-orange-200 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Type className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xl text-orange-900">文字の見やすさ設計</h4>
+                      <p className="text-sm text-orange-600">読みやすさは使いやすさ</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 shadow-sm">
+                    <div className="space-y-4">
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <p className="font-bold text-2xl text-gray-900 mb-2">見出しの文字</p>
+                        <p className="text-gray-700">
+                          {uxStructure.designSystem.typography.heading === 'シンプルで読みやすい'
+                            ? '清潔感のある書体で、情報がスッと頭に入ります'
+                            : 'インパクトのある書体で、大事な情報が一目でわかります'
+                          }
+                        </p>
+                      </div>
+                      <div className="p-4 bg-yellow-50 rounded-lg">
+                        <p className="text-base leading-relaxed text-gray-800">
+                          本文の文字はこんな感じです。適度な大きさと行間で、
+                          長い文章でも疲れずに読めるよう工夫しています。
+                          {state.selectedUIStyle?.category === 'minimal' 
+                            ? 'シンプルで洗練された印象を大切にしています。' 
+                            : '親しみやすく、読みやすい文字設定です。'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* 触って楽しい操作感 */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-2xl p-8 border-2 border-teal-200 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <MousePointer className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-xl text-teal-900">触って楽しい操作感</h4>
+                      <p className="text-sm text-teal-600">使うたびに気持ちいい</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl p-6 shadow-sm">
+                    <p className="text-gray-800 mb-6 text-lg">
+                      細部にまでこだわった、心地よい操作体験
+                    </p>
+                    <div className="grid gap-3">
+                      {uxStructure.designSystem.interactions.map((interaction, i) => (
+                        <motion.div 
+                          key={i} 
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 * i }}
+                          className="flex items-center gap-4 p-4 bg-teal-50 rounded-lg"
+                        >
+                          <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <motion.div
+                              animate={{ scale: [1, 1.2, 1] }}
+                              transition={{ repeat: Infinity, duration: 2, delay: i * 0.5 }}
+                            >
+                              {i === 0 ? <MousePointer className="w-6 h-6 text-white" /> :
+                               i === 1 ? <Navigation className="w-6 h-6 text-white" /> :
+                               <Sparkles className="w-6 h-6 text-white" />}
+                            </motion.div>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-teal-900">
+                              {interaction === 'スムーズなホバー効果' ? 'カーソルを合わせると' :
+                               interaction === 'フェードトランジション' ? '画面が切り替わるとき' :
+                               interaction === 'マイクロアニメーション' ? 'ボタンを押したとき' :
+                               interaction}
+                            </p>
+                            <p className="text-sm text-teal-700">
+                              {interaction === 'スムーズなホバー効果' ? 'ふわっと色が変わって、押せる場所がわかります' :
+                               interaction === 'フェードトランジション' ? 'スムーズに切り替わって、目に優しい' :
+                               interaction === 'マイクロアニメーション' ? 'ちょっとした動きで、操作した実感が得られます' :
+                               interaction}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
               </div>
 
-              {/* スタイルの統一感 */}
-              <div className="mt-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <Sparkles className="w-6 h-6 text-purple-600" />
-                  <h5 className="font-bold text-purple-900">このスタイルが生み出す体験</h5>
+              {/* まとめ：全体の印象 */}
+              <div className="mt-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <Sparkles className="w-8 h-8 text-yellow-300" />
+                    <h5 className="font-bold text-2xl">完成するアプリの全体像</h5>
+                    <Sparkles className="w-8 h-8 text-yellow-300" />
+                  </div>
+                  <p className="text-xl leading-relaxed text-center max-w-3xl mx-auto">
+                    <span className="font-bold text-yellow-300">{state.selectedUIStyle?.name}スタイル</span>の特徴を活かして、
+                    <span className="font-bold text-cyan-300">{state.insights?.target}</span>が
+                    「{state.insights?.vision}」を実感できる、
+                    <span className="font-bold">統一感のある美しいデザイン</span>に仕上がります。
+                  </p>
+                  <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                      <p className="text-yellow-300 font-bold mb-1">見た目</p>
+                      <p className="text-sm">プロフェッショナル</p>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                      <p className="text-cyan-300 font-bold mb-1">操作性</p>
+                      <p className="text-sm">直感的でスムーズ</p>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+                      <p className="text-pink-300 font-bold mb-1">体験</p>
+                      <p className="text-sm">心地よく楽しい</p>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-700">
-                  {state.selectedUIStyle?.description || 'あなたのアイデアに最適化されたデザイン'}を通じて、
-                  {state.insights?.target}が{state.insights?.value || '価値を感じる'}体験を実現します。
-                  すべての要素が調和して、使う人の心に残るアプリケーションになります。
-                </p>
               </div>
             </div>
           </motion.div>
 
-          {/* 主要画面の詳細 */}
+          {/* 実際の画面例 */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden"
           >
-            <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-6">
-              <div className="flex items-center gap-3">
-                <Smartphone className="w-8 h-8" />
-                <h3 className="text-2xl font-bold">📱 主要画面の設計</h3>
+            <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white p-8">
+              <div className="text-center">
+                <Smartphone className="w-16 h-16 mx-auto mb-4" />
+                <h3 className="text-3xl font-bold mb-2">実際の画面イメージ</h3>
+                <p className="text-green-100 text-lg">こんな画面が完成します</p>
               </div>
             </div>
             <div className="p-8">
-              <div className="grid gap-6">
-                {uxStructure.keyScreens.map((screen, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.1 * i }}
-                    className="border-2 border-green-200 rounded-xl p-6 hover:border-green-400 transition-colors"
-                  >
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">{screen.name}</h4>
-                    <p className="text-gray-700 mb-4">{screen.purpose}</p>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <h5 className="text-sm font-semibold text-gray-600 mb-2">含まれる要素</h5>
-                        <div className="space-y-1">
-                          {screen.components.map((comp, j) => (
-                            <div key={j} className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-green-500 rounded-full" />
-                              <span className="text-sm text-gray-700">{comp}</span>
+              {uxStructure.keyScreens.map((screen, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 * i }}
+                  className="mb-8"
+                >
+                  <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-2xl p-8 border-2 border-green-200">
+                    <div className="text-center mb-8">
+                      <h4 className="text-3xl font-bold text-gray-900 mb-3">{screen.name}</h4>
+                      <p className="text-xl text-gray-700">{screen.purpose}</p>
+                    </div>
+                    
+                    {/* 画面のモックアップ風表示 */}
+                    <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+                      <div className="bg-gray-100 rounded-lg p-6 mb-6">
+                        <div className="h-20 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg mb-4 animate-pulse" />
+                        <div className="grid grid-cols-3 gap-4">
+                          {screen.components.slice(0, 3).map((comp, j) => (
+                            <div key={j} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                              <div className="h-4 bg-gray-300 rounded mb-2" />
+                              <p className="text-center text-sm text-gray-600">{comp}</p>
                             </div>
                           ))}
                         </div>
                       </div>
-                      <div>
-                        <h5 className="text-sm font-semibold text-gray-600 mb-2">ユーザーアクション</h5>
-                        <p className="text-sm text-gray-700 bg-green-50 rounded-lg p-3">{screen.userAction}</p>
+                      
+                      <div className="bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg p-6 text-center">
+                        <p className="text-lg font-semibold mb-2">ユーザーはここで：</p>
+                        <p className="text-xl">{screen.userAction}</p>
                       </div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="bg-white rounded-xl p-6 shadow-sm">
+                        <h5 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <Layout className="w-5 h-5 text-green-600" />
+                          この画面の構成要素
+                        </h5>
+                        <div className="space-y-3">
+                          {screen.components.map((comp, j) => (
+                            <div key={j} className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span className="text-green-600 font-bold text-sm">{j + 1}</span>
+                              </div>
+                              <div>
+                                <p className="font-semibold text-gray-800">{comp}</p>
+                                <p className="text-sm text-gray-600">
+                                  {comp.includes('ヒーロー') ? 'ユーザーの目を引く大きなビジュアル' :
+                                   comp.includes('ベネフィット') ? 'サービスの価値をわかりやすく説明' :
+                                   comp.includes('フォーム') ? 'ユーザーが情報を入力する場所' :
+                                   comp.includes('ボタン') ? '次のアクションへ誘導' :
+                                   '重要な情報を表示'}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white rounded-xl p-6 shadow-sm">
+                        <h5 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                          <MousePointer className="w-5 h-5 text-teal-600" />
+                          この画面での体験
+                        </h5>
+                        <div className="bg-gradient-to-br from-teal-50 to-green-50 rounded-lg p-6">
+                          <p className="text-gray-800 leading-relaxed">
+                            {screen.name === 'ランディングページ' 
+                              ? `最初の印象が大切。${state.selectedUIStyle?.name}スタイルで、訪問者の心をつかみます。` 
+                              : `使いやすさを第一に。${state.insights?.target}が迷わず操作できる設計です。`}
+                          </p>
+                          <div className="mt-4 flex items-center gap-2 text-sm text-teal-700">
+                            <Sparkles className="w-4 h-4" />
+                            <span>スムーズな操作で、目的達成まで導きます</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
-          {/* コード生成への導線 */}
+          {/* コード生成への導線（よりわかりやすく） */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl shadow-2xl p-8 text-white text-center"
+            className="relative overflow-hidden"
           >
-            <Sparkles className="w-16 h-16 mx-auto mb-4 text-yellow-300" />
-            <h3 className="text-3xl font-bold mb-4">
-              ✨ UX設計が完成しました！
-            </h3>
-            <p className="text-xl mb-2">
-              {state.insights?.target}のための{state.selectedUIStyle?.name}スタイルの
-            </p>
-            <p className="text-2xl font-bold mb-6">
-              「{state.insights?.vision}」を実現する設計
-            </p>
-            <p className="text-indigo-100 mb-8 max-w-2xl mx-auto">
-              この設計をもとに、実際に動作するHTML・CSS・JavaScriptを自動生成します。
-              あなたのアイデアが、今すぐ使えるWebアプリケーションに変わります。
-            </p>
-            <button
-              onClick={() => actions.nextPhase()}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-white text-indigo-600 rounded-xl font-bold text-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all"
-            >
-              <Code2 className="w-7 h-7" />
-              コード生成を開始
-              <ArrowRight className="w-7 h-7" />
-            </button>
-            <p className="text-indigo-200 text-sm mt-4">
-              約30秒で完全なコードが生成されます
-            </p>
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl" />
+            <div className="absolute inset-0 bg-black/20" />
+            <motion.div
+              animate={{ 
+                background: [
+                  'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                  'radial-gradient(circle at 80% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                  'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%)'
+                ]
+              }}
+              transition={{ duration: 5, repeat: Infinity }}
+              className="absolute inset-0"
+            />
+            
+            <div className="relative z-10 p-12 text-white text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", delay: 0.5 }}
+              >
+                <Sparkles className="w-24 h-24 mx-auto mb-6 text-yellow-300" />
+              </motion.div>
+              
+              <h3 className="text-4xl font-bold mb-6">
+                準備完了！コードを生成しましょう
+              </h3>
+              
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-3xl mx-auto mb-8">
+                <h4 className="text-2xl font-bold mb-4">これから生成されるもの：</h4>
+                <div className="grid md:grid-cols-3 gap-4 text-left">
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-yellow-300 font-bold mb-2">📄 HTML</div>
+                    <p className="text-sm">画面の構造</p>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-cyan-300 font-bold mb-2">🎨 CSS</div>
+                    <p className="text-sm">見た目のデザイン</p>
+                  </div>
+                  <div className="bg-white/10 rounded-xl p-4">
+                    <div className="text-pink-300 font-bold mb-2">⚡ JavaScript</div>
+                    <p className="text-sm">動きと機能</p>
+                  </div>
+                </div>
+                <p className="mt-6 text-lg">
+                  <span className="font-bold text-yellow-300">{state.selectedUIStyle?.name}スタイル</span>で
+                  <span className="font-bold text-cyan-300">{state.insights?.target}</span>のための
+                  <span className="font-bold text-pink-300">「{state.insights?.vision}」</span>を実現する
+                  <span className="font-bold">完全に動作するWebアプリ</span>が完成します！
+                </p>
+              </div>
+              
+              <motion.button
+                onClick={() => actions.nextPhase()}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-4 px-12 py-6 bg-white text-indigo-600 rounded-2xl font-bold text-2xl shadow-2xl hover:shadow-3xl transition-all"
+              >
+                <Code2 className="w-8 h-8" />
+                いますぐコード生成！
+                <ArrowRight className="w-8 h-8" />
+              </motion.button>
+              
+              <p className="text-indigo-200 text-lg mt-6">
+                ⏱️ 約30秒で、すぐに使えるコードが完成します
+              </p>
+            </div>
           </motion.div>
         </div>
       ) : (

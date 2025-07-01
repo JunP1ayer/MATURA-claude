@@ -1,0 +1,430 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  Code2, Database, Palette, Zap, CheckCircle, Clock, 
+  Cpu, Server, Smartphone, TestTube, Package, AlertCircle
+} from 'lucide-react'
+
+export interface ProgressStep {
+  id: string
+  title: string
+  description: string
+  icon: React.ComponentType<any>
+  progress: number
+  status: 'pending' | 'in_progress' | 'completed' | 'error'
+  estimatedTime: number // minutes
+  actualTime?: number // minutes
+  details?: string[]
+}
+
+interface AdvancedProgressTrackerProps {
+  steps: ProgressStep[]
+  currentStep: string
+  overallProgress: number
+  totalEstimatedTime: number
+  elapsedTime: number
+  isGenerating: boolean
+  onCancel?: () => void
+}
+
+export default function AdvancedProgressTracker({
+  steps,
+  currentStep,
+  overallProgress,
+  totalEstimatedTime,
+  elapsedTime,
+  isGenerating,
+  onCancel
+}: AdvancedProgressTrackerProps) {
+  const [showDetails, setShowDetails] = useState<string | null>(null)
+  const [animatedProgress, setAnimatedProgress] = useState(0)
+
+  // Smooth progress animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedProgress(overallProgress)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [overallProgress])
+
+  const currentStepData = steps.find(step => step.id === currentStep)
+  const completedSteps = steps.filter(step => step.status === 'completed').length
+  const remainingTime = Math.max(0, totalEstimatedTime - elapsedTime)
+
+  const formatTime = (minutes: number) => {
+    if (minutes < 1) return '<1分'
+    if (minutes < 60) return `${Math.round(minutes)}分`
+    const hours = Math.floor(minutes / 60)
+    const mins = Math.round(minutes % 60)
+    return `${hours}時間${mins}分`
+  }
+
+  const getStepStatusColor = (status: ProgressStep['status']) => {
+    switch (status) {
+      case 'completed': return 'text-green-600 bg-green-100'
+      case 'in_progress': return 'text-blue-600 bg-blue-100'
+      case 'error': return 'text-red-600 bg-red-100'
+      default: return 'text-gray-400 bg-gray-100'
+    }
+  }
+
+  const getStepIcon = (step: ProgressStep) => {
+    const IconComponent = step.icon
+    return <IconComponent className="w-5 h-5" />
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Code2 className="w-8 h-8" />
+            <div>
+              <h3 className="text-2xl font-bold">高品質コード生成中</h3>
+              <p className="text-indigo-100">
+                実際に動作するWebアプリケーションを構築しています
+              </p>
+            </div>
+          </div>
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-colors"
+            >
+              キャンセル
+            </button>
+          )}
+        </div>
+
+        {/* Overall Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>全体進捗</span>
+            <span>{Math.round(animatedProgress)}%</span>
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-3">
+            <motion.div
+              className="bg-gradient-to-r from-yellow-400 to-orange-400 h-3 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${animatedProgress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
+        {/* Time Information */}
+        <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+          <div className="text-center">
+            <div className="text-white/80">経過時間</div>
+            <div className="font-bold">{formatTime(elapsedTime)}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-white/80">残り時間</div>
+            <div className="font-bold">{formatTime(remainingTime)}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-white/80">完了済み</div>
+            <div className="font-bold">{completedSteps}/{steps.length}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Current Step Highlight */}
+      {currentStepData && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-blue-50 border-b border-blue-200 p-6"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white">
+              {getStepIcon(currentStepData)}
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-blue-900 mb-1">
+                {currentStepData.title}
+              </h4>
+              <p className="text-blue-700 mb-2">{currentStepData.description}</p>
+              
+              {/* Current Step Progress */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <motion.div
+                      className="bg-blue-500 h-2 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${currentStepData.progress}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
+                </div>
+                <span className="text-sm font-medium text-blue-600">
+                  {Math.round(currentStepData.progress)}%
+                </span>
+              </div>
+
+              {/* Step Details */}
+              {currentStepData.details && currentStepData.details.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {currentStepData.details.map((detail, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="text-sm text-blue-600 flex items-center gap-2"
+                    >
+                      <Zap className="w-3 h-3" />
+                      {detail}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-blue-600">予想時間</div>
+              <div className="font-bold text-blue-900">
+                {formatTime(currentStepData.estimatedTime)}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Steps List */}
+      <div className="p-6">
+        <div className="space-y-3">
+          {steps.map((step, index) => (
+            <motion.div
+              key={step.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`
+                relative p-4 rounded-lg border-2 transition-all cursor-pointer
+                ${step.id === currentStep 
+                  ? 'border-blue-300 bg-blue-50 shadow-md' 
+                  : step.status === 'completed'
+                  ? 'border-green-200 bg-green-50'
+                  : step.status === 'error'
+                  ? 'border-red-200 bg-red-50'
+                  : 'border-gray-200 bg-gray-50'
+                }
+              `}
+              onClick={() => setShowDetails(showDetails === step.id ? null : step.id)}
+            >
+              <div className="flex items-center gap-4">
+                {/* Status Icon */}
+                <div className={`
+                  w-10 h-10 rounded-full flex items-center justify-center
+                  ${getStepStatusColor(step.status)}
+                `}>
+                  {step.status === 'completed' ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : step.status === 'error' ? (
+                    <AlertCircle className="w-5 h-5" />
+                  ) : step.status === 'in_progress' ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    >
+                      {getStepIcon(step)}
+                    </motion.div>
+                  ) : (
+                    getStepIcon(step)
+                  )}
+                </div>
+
+                {/* Step Info */}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h5 className="font-semibold text-gray-900">{step.title}</h5>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <Clock className="w-4 h-4" />
+                      {step.actualTime ? formatTime(step.actualTime) : formatTime(step.estimatedTime)}
+                    </div>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-2">{step.description}</p>
+                  
+                  {/* Step Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <motion.div
+                      className={`
+                        h-2 rounded-full
+                        ${step.status === 'completed' 
+                          ? 'bg-green-500' 
+                          : step.status === 'in_progress'
+                          ? 'bg-blue-500'
+                          : step.status === 'error'
+                          ? 'bg-red-500'
+                          : 'bg-gray-300'
+                        }
+                      `}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${step.progress}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
+                </div>
+
+                {/* Progress Percentage */}
+                <div className="text-right">
+                  <div className={`
+                    text-lg font-bold
+                    ${step.status === 'completed' 
+                      ? 'text-green-600' 
+                      : step.status === 'in_progress'
+                      ? 'text-blue-600'
+                      : step.status === 'error'
+                      ? 'text-red-600'
+                      : 'text-gray-400'
+                    }
+                  `}>
+                    {step.progress}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Expanded Details */}
+              <AnimatePresence>
+                {showDetails === step.id && step.details && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-4 pt-4 border-t border-gray-200"
+                  >
+                    <div className="space-y-2">
+                      {step.details.map((detail, detailIndex) => (
+                        <div key={detailIndex} className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full" />
+                          {detail}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            💡 高品質なWebアプリケーションを生成中です。しばらくお待ちください。
+          </div>
+          {isGenerating && (
+            <div className="flex items-center gap-2 text-sm text-blue-600">
+              <motion.div
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-2 h-2 bg-blue-500 rounded-full"
+              />
+              生成中...
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Predefined step templates for code generation
+export const defaultCodeGenerationSteps: ProgressStep[] = [
+  {
+    id: 'analysis',
+    title: '要件分析',
+    description: 'ユーザーの要求とUI選択を分析しています',
+    icon: TestTube,
+    progress: 0,
+    status: 'pending',
+    estimatedTime: 2,
+    details: [
+      'Insightデータの解析',
+      'UI スタイルの解析',
+      '機能要件の抽出',
+      '技術要件の決定'
+    ]
+  },
+  {
+    id: 'architecture',
+    title: 'アーキテクチャ設計',
+    description: 'データモデルとコンポーネント構造を設計しています',
+    icon: Database,
+    progress: 0,
+    status: 'pending',
+    estimatedTime: 5,
+    details: [
+      'データモデルの設計',
+      'コンポーネント仕様の作成',
+      'API設計',
+      'ディレクトリ構造の計画'
+    ]
+  },
+  {
+    id: 'frontend',
+    title: 'フロントエンド生成',
+    description: 'React/HTMLコンポーネントを生成しています',
+    icon: Smartphone,
+    progress: 0,
+    status: 'pending',
+    estimatedTime: 8,
+    details: [
+      'HTMLマークアップの生成',
+      'CSS スタイルの適用',
+      'JavaScript ロジックの実装',
+      'レスポンシブ対応'
+    ]
+  },
+  {
+    id: 'backend',
+    title: 'バックエンド生成',
+    description: 'API と データ管理機能を実装しています',
+    icon: Server,
+    progress: 0,
+    status: 'pending',
+    estimatedTime: 6,
+    details: [
+      'RESTful API の実装',
+      'データ永続化の実装',
+      'バリデーション機能',
+      'エラーハンドリング'
+    ]
+  },
+  {
+    id: 'integration',
+    title: '統合とテスト',
+    description: 'フロントエンドとバックエンドを統合しています',
+    icon: Package,
+    progress: 0,
+    status: 'pending',
+    estimatedTime: 4,
+    details: [
+      'フロント・バック統合',
+      '機能テストの実行',
+      'クロスブラウザ対応',
+      'パフォーマンス最適化'
+    ]
+  },
+  {
+    id: 'validation',
+    title: '最終検証',
+    description: 'コード品質と機能の最終チェックを行っています',
+    icon: CheckCircle,
+    progress: 0,
+    status: 'pending',
+    estimatedTime: 3,
+    details: [
+      'コード品質チェック',
+      '機能完全性の確認',
+      'セキュリティ検証',
+      'ドキュメント生成'
+    ]
+  }
+]

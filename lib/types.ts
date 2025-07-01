@@ -89,6 +89,14 @@ export interface GeneratedCode {
   title?: string
   description?: string
   isComplete?: boolean
+  // Advanced generation fields
+  generationTime?: number
+  hasRealFunctionality?: boolean
+  includedFeatures?: string[]
+  estimatedLines?: number
+  qualityScore?: number
+  featureCompleteness?: number
+  testResults?: any
 }
 
 export interface ReleaseInfo {
@@ -110,6 +118,100 @@ export interface ExtractedStructure {
   keywords: string[]
 }
 
+// 統合されたUX設計型定義
+export interface UnifiedUXDesign {
+  // アイデアベース情報
+  concept: {
+    vision: string
+    target: string  
+    features: string[]
+    value: string
+    motivation: string
+  }
+  
+  // UIスタイル情報
+  designStyle: {
+    name: string
+    category: string
+    colors: {
+      primary: string
+      secondary: string
+      accent: string
+      background: string
+      text: string
+    }
+    typography: {
+      heading: string
+      body: string
+    }
+    personality: string[]
+    spacing: 'tight' | 'comfortable' | 'spacious'
+  }
+  
+  // 生成されたUX構造
+  structure: {
+    siteArchitecture: {
+      topPage: { purpose: string; elements: string[] }
+      mainFeatures: Array<{
+        name: string
+        description: string
+        uiElements: string[]
+        userInteractions: string[]
+      }>
+      userFlow: string[]
+    }
+    designSystem: {
+      layout: string
+      colorUsage: {
+        primary: string
+        secondary: string
+        accent: string
+        usage: string
+      }
+      typography: {
+        heading: string
+        body: string
+        accent: string
+      }
+      spacing: string
+      interactions: string[]
+    }
+    functionalComponents: Array<{
+      name: string
+      purpose: string
+      props: Record<string, any>
+      events: string[]
+      state: Record<string, any>
+    }>
+  }
+  
+  // 実装ガイド
+  implementation: {
+    recommendedFramework: string
+    keyLibraries: string[]
+    fileStructure: string[]
+    dataFlow: string
+    apiRequirements: string[]
+  }
+}
+
+// 動的UI生成の型定義
+export interface DynamicUIGeneration {
+  baseInsight: Insight
+  generatedStyles: Array<{
+    id: string
+    name: string
+    description: string
+    reasoning: string
+    colors: UIStyle['colors']
+    typography: UIStyle['typography']
+    personality: string[]
+    suitabilityScore: number
+  }>
+  selectedStyle: UIStyle
+  customizations: Record<string, any>
+}
+
 export interface MaturaState {
   currentPhase: number
   conversations: Message[]
@@ -118,6 +220,8 @@ export interface MaturaState {
   selectedUIStyle: UIStyle | null
   selectedTopPageDesign: TopPageDesign | null
   uxDesign: UXDesign | null
+  unifiedUXDesign: UnifiedUXDesign | null  // 新しい統合UX設計
+  dynamicUIGeneration: DynamicUIGeneration | null  // 動的UI生成
   generatedCode: GeneratedCode | null
   releaseInfo: ReleaseInfo | null
   isLoading: boolean

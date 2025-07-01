@@ -1,0 +1,799 @@
+import { Insight, UIStyle, UnifiedUXDesign, GeneratedCode } from '@/lib/types'
+
+export interface CodeGenerationOptions {
+  generateFullStack: boolean
+  includeDatabase: boolean
+  includeCRUDOperations: boolean
+  includeAuthentication: boolean
+  maxGenerationTimeMinutes: number
+  progressCallback?: (progress: number, status: string) => void
+}
+
+export interface GenerationProgress {
+  step: string
+  progress: number
+  eta: number
+  currentTask: string
+}
+
+export class AdvancedCodeGenerator {
+  private options: CodeGenerationOptions
+  private progressCallback?: (progress: GenerationProgress) => void
+
+  constructor(options: CodeGenerationOptions) {
+    this.options = {
+      generateFullStack: true,
+      includeDatabase: true,
+      includeCRUDOperations: true,
+      includeAuthentication: false,
+      maxGenerationTimeMinutes: 30,
+      ...options
+    }
+  }
+
+  /**
+   * メイン生成関数：完全に機能するWebアプリケーションを生成
+   */
+  async generateFunctionalApp(
+    insight: Insight,
+    uiStyle: UIStyle,
+    unifiedUXDesign?: UnifiedUXDesign
+  ): Promise<GeneratedCode> {
+    const startTime = Date.now()
+    
+    try {
+      // Phase 1: アプリケーション要件分析
+      this.updateProgress(0, '要件分析', 'ユーザーの要求を分析中...')
+      const appRequirements = await this.analyzeRequirements(insight, uiStyle, unifiedUXDesign)
+      
+      // Phase 2: データモデル設計
+      this.updateProgress(15, 'データモデル設計', 'データ構造を設計中...')
+      const dataModel = await this.designDataModel(appRequirements)
+      
+      // Phase 3: コンポーネント設計
+      this.updateProgress(30, 'コンポーネント設計', 'UIコンポーネントを設計中...')
+      const componentSpecs = await this.designComponents(appRequirements, uiStyle)
+      
+      // Phase 4: API設計
+      this.updateProgress(45, 'API設計', 'APIエンドポイントを設計中...')
+      const apiSpec = await this.designAPI(appRequirements, dataModel)
+      
+      // Phase 5: フロントエンド生成
+      this.updateProgress(60, 'フロントエンド生成', 'React/HTMLコンポーネントを生成中...')
+      const frontendCode = await this.generateFrontend(componentSpecs, uiStyle, dataModel)
+      
+      // Phase 6: バックエンド生成
+      this.updateProgress(75, 'バックエンド生成', 'API実装を生成中...')
+      const backendCode = await this.generateBackend(apiSpec, dataModel)
+      
+      // Phase 7: 統合とテスト
+      this.updateProgress(90, '統合とテスト', 'アプリケーションを統合中...')
+      const integratedCode = await this.integrateAndTest(frontendCode, backendCode, appRequirements)
+      
+      // Phase 8: 最終検証
+      this.updateProgress(100, '完了', '機能検証を実行中...')
+      const finalCode = await this.validateAndFinalize(integratedCode, appRequirements)
+      
+      const endTime = Date.now()
+      const generationTime = Math.round((endTime - startTime) / 1000)
+      
+      return {
+        ...finalCode,
+        title: insight.vision,
+        description: `${insight.target}向けの${insight.vision}アプリケーション`,
+        framework: 'React + Express.js',
+        dependencies: finalCode.dependencies || [],
+        isComplete: true,
+        generationTime,
+        hasRealFunctionality: true,
+        includedFeatures: appRequirements.features,
+        estimatedLines: this.estimateCodeLines(finalCode),
+      }
+      
+    } catch (error) {
+      console.error('❌ Advanced code generation failed:', error)
+      throw new Error(`コード生成に失敗しました: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * 要件分析：ユーザーのinsightからアプリケーション要件を抽出
+   */
+  private async analyzeRequirements(
+    insight: Insight,
+    uiStyle: UIStyle,
+    unifiedUXDesign?: UnifiedUXDesign
+  ) {
+    // 機能的要件の抽出
+    const functionalRequirements = this.extractFunctionalRequirements(insight)
+    
+    // 非機能的要件の抽出
+    const nonFunctionalRequirements = this.extractNonFunctionalRequirements(uiStyle)
+    
+    return {
+      vision: insight.vision,
+      targetUsers: insight.target,
+      features: insight.features || [],
+      value: insight.value,
+      motivation: insight.motivation,
+      functionalRequirements,
+      nonFunctionalRequirements,
+      uiStyle,
+      uxDesign: unifiedUXDesign,
+      complexity: this.assessComplexity(insight.features || [])
+    }
+  }
+
+  /**
+   * データモデル設計：アプリに必要なデータ構造を設計
+   */
+  private async designDataModel(requirements: any) {
+    const entities = this.identifyEntities(requirements.features)
+    const relationships = this.identifyRelationships(entities, requirements)
+    
+    return {
+      entities,
+      relationships,
+      schema: this.generateDatabaseSchema(entities, relationships),
+      localStorage: this.designLocalStorageStructure(entities),
+      apiEndpoints: this.designAPIEndpoints(entities)
+    }
+  }
+
+  /**
+   * コンポーネント設計：UIコンポーネントの仕様を設計
+   */
+  private async designComponents(requirements: any, uiStyle: UIStyle) {
+    const components = []
+    
+    // 各機能に対応するコンポーネントを設計
+    for (const feature of requirements.features) {
+      const componentType = this.determineComponentType(feature)
+      
+      components.push({
+        name: this.generateComponentName(feature),
+        type: componentType,
+        props: this.defineComponentProps(feature, componentType),
+        state: this.defineComponentState(feature, componentType),
+        methods: this.defineComponentMethods(feature, componentType),
+        styling: this.applyUIStyle(uiStyle, componentType),
+        functionality: this.defineFunctionality(feature)
+      })
+    }
+    
+    return components
+  }
+
+  /**
+   * API設計：RESTful APIの仕様を設計
+   */
+  private async designAPI(requirements: any, dataModel: any) {
+    const endpoints = []
+    
+    for (const entity of dataModel.entities) {
+      // CRUD操作のエンドポイント
+      endpoints.push({
+        path: `/${entity.name.toLowerCase()}s`,
+        methods: {
+          GET: { description: `Get all ${entity.name}s`, response: `Array<${entity.name}>` },
+          POST: { description: `Create new ${entity.name}`, body: entity.schema, response: entity.name }
+        }
+      })
+      
+      endpoints.push({
+        path: `/${entity.name.toLowerCase()}s/:id`,
+        methods: {
+          GET: { description: `Get ${entity.name} by ID`, response: entity.name },
+          PUT: { description: `Update ${entity.name}`, body: entity.schema, response: entity.name },
+          DELETE: { description: `Delete ${entity.name}`, response: 'success' }
+        }
+      })
+    }
+    
+    return { endpoints, authentication: requirements.needsAuth }
+  }
+
+  /**
+   * フロントエンド生成：実際に動作するReact/HTMLコードを生成
+   */
+  private async generateFrontend(componentSpecs: any[], uiStyle: UIStyle, dataModel: any) {
+    // OpenAI APIを使用して高品質なフロントエンドコードを生成
+    const prompt = this.buildFrontendPrompt(componentSpecs, uiStyle, dataModel)
+    
+    const generatedCode = await this.callOpenAIForCodeGeneration(prompt, 'frontend')
+    
+    return {
+      html: generatedCode.html,
+      css: generatedCode.css,
+      javascript: generatedCode.javascript,
+      react: generatedCode.react, // React components
+      components: componentSpecs
+    }
+  }
+
+  /**
+   * バックエンド生成：API実装を生成
+   */
+  private async generateBackend(apiSpec: any, dataModel: any) {
+    if (!this.options.generateFullStack) {
+      return null
+    }
+    
+    const prompt = this.buildBackendPrompt(apiSpec, dataModel)
+    const generatedCode = await this.callOpenAIForCodeGeneration(prompt, 'backend')
+    
+    return {
+      serverJs: generatedCode.server,
+      routes: generatedCode.routes,
+      models: generatedCode.models,
+      middleware: generatedCode.middleware
+    }
+  }
+
+  /**
+   * 統合とテスト：フロントエンドとバックエンドを統合
+   */
+  private async integrateAndTest(frontendCode: any, backendCode: any, requirements: any) {
+    // フロントエンドとバックエンドを統合
+    const integratedHTML = this.integrateFullStackApp(frontendCode, backendCode)
+    
+    // 基本的な機能テストを実行
+    const testResults = await this.runBasicTests(integratedHTML, requirements)
+    
+    return {
+      fullHtml: integratedHTML,
+      html: frontendCode.html,
+      css: frontendCode.css,
+      javascript: frontendCode.javascript,
+      serverCode: backendCode,
+      testResults,
+      isTestPassed: testResults.allPassed
+    }
+  }
+
+  /**
+   * 最終検証：生成されたコードの品質を検証
+   */
+  private async validateAndFinalize(code: any, requirements: any): Promise<GeneratedCode> {
+    // コード品質チェック
+    const qualityScore = this.assessCodeQuality(code)
+    
+    // 機能完全性チェック
+    const featureCompleteness = this.checkFeatureCompleteness(code, requirements.features)
+    
+    // 最終的なコード生成結果
+    return {
+      html: code.html,
+      css: code.css,
+      javascript: code.javascript,
+      fullHtml: code.fullHtml,
+      framework: 'React + Express.js',
+      dependencies: this.extractDependencies(code),
+      title: requirements.vision,
+      description: `完全機能付き${requirements.vision}アプリケーション`,
+      isComplete: true,
+      qualityScore,
+      featureCompleteness,
+      testResults: code.testResults
+    }
+  }
+
+  // ユーティリティメソッド
+  private updateProgress(progress: number, step: string, currentTask: string) {
+    if (this.progressCallback) {
+      this.progressCallback({
+        step,
+        progress,
+        eta: this.calculateETA(progress),
+        currentTask
+      })
+    }
+  }
+
+  private calculateETA(progress: number): number {
+    if (progress === 0) return this.options.maxGenerationTimeMinutes * 60
+    
+    const elapsed = Date.now() - (this as any).startTime
+    const estimated = (elapsed / progress) * 100
+    return Math.max(0, estimated - elapsed)
+  }
+
+  // プロンプト構築メソッド
+  private buildFrontendPrompt(componentSpecs: any[], uiStyle: UIStyle, dataModel: any): string {
+    return `
+Generate a complete, functional web application with the following specifications:
+
+UI STYLE:
+- Design: ${uiStyle.name}
+- Colors: Primary(${uiStyle.colors.primary}), Secondary(${uiStyle.colors.secondary})
+- Typography: ${uiStyle.typography.heading}, ${uiStyle.typography.body}
+- Personality: ${uiStyle.personality.join(', ')}
+
+COMPONENTS TO IMPLEMENT:
+${componentSpecs.map(comp => `
+- ${comp.name}: ${comp.type}
+  Purpose: ${comp.functionality}
+  Props: ${JSON.stringify(comp.props)}
+  State: ${JSON.stringify(comp.state)}
+  Methods: ${comp.methods.join(', ')}
+`).join('\n')}
+
+DATA MODEL:
+${JSON.stringify(dataModel, null, 2)}
+
+REQUIREMENTS:
+- Must include REAL CRUD operations (Create, Read, Update, Delete)
+- Must use localStorage for data persistence
+- Must include form validation
+- Must be responsive and mobile-friendly
+- Must include interactive elements
+- Must have proper error handling
+
+Generate complete HTML, CSS, and JavaScript that creates a fully functional application.
+Do not create placeholder or demo content - implement actual working functionality.
+`
+  }
+
+  private buildBackendPrompt(apiSpec: any, dataModel: any): string {
+    return `
+Generate a complete Express.js backend server with the following API specifications:
+
+API ENDPOINTS:
+${JSON.stringify(apiSpec.endpoints, null, 2)}
+
+DATA MODEL:
+${JSON.stringify(dataModel, null, 2)}
+
+REQUIREMENTS:
+- Express.js server with proper middleware
+- CORS support
+- JSON body parsing
+- Error handling
+- Input validation
+- Memory-based data storage (since no external DB)
+- RESTful API design
+
+Generate complete server.js with all routes and middleware.
+`
+  }
+
+  // OpenAI API呼び出し
+  private async callOpenAIForCodeGeneration(prompt: string, type: 'frontend' | 'backend'): Promise<any> {
+    // 実際のOpenAI API呼び出しを実装
+    // これは既存のuseChatOptimizedロジックを使用
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+        phase: 'CodePlayground',
+        generateCode: true,
+        codeType: type
+      })
+    })
+    
+    if (!response.ok) {
+      throw new Error(`OpenAI API call failed: ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    return this.parseCodeResponse(data.message, type)
+  }
+
+  private parseCodeResponse(response: string, type: string): any {
+    // OpenAIレスポンスからコードを抽出
+    try {
+      const codeBlocks = this.extractCodeBlocks(response)
+      
+      if (type === 'frontend') {
+        return {
+          html: codeBlocks.html || '',
+          css: codeBlocks.css || '',
+          javascript: codeBlocks.javascript || codeBlocks.js || '',
+          react: codeBlocks.react || codeBlocks.jsx || ''
+        }
+      } else {
+        return {
+          server: codeBlocks.javascript || codeBlocks.js || '',
+          routes: codeBlocks.routes || '',
+          models: codeBlocks.models || '',
+          middleware: codeBlocks.middleware || ''
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse code response:', error)
+      throw new Error('Generated code parsing failed')
+    }
+  }
+
+  private extractCodeBlocks(text: string): Record<string, string> {
+    const codeBlocks: Record<string, string> = {}
+    
+    // 一般的なコードブロックパターンを抽出
+    const patterns = [
+      { type: 'html', regex: /```html\n([\s\S]*?)\n```/gi },
+      { type: 'css', regex: /```css\n([\s\S]*?)\n```/gi },
+      { type: 'javascript', regex: /```javascript\n([\s\S]*?)\n```/gi },
+      { type: 'js', regex: /```js\n([\s\S]*?)\n```/gi },
+      { type: 'react', regex: /```jsx\n([\s\S]*?)\n```/gi },
+      { type: 'jsx', regex: /```jsx\n([\s\S]*?)\n```/gi }
+    ]
+    
+    patterns.forEach(({ type, regex }) => {
+      let match
+      let lastMatch: string | null = null
+      while ((match = regex.exec(text)) !== null) {
+        lastMatch = match[1]
+      }
+      if (lastMatch) {
+        codeBlocks[type] = lastMatch
+      }
+    })
+    
+    return codeBlocks
+  }
+
+  // ヘルパーメソッド
+  private extractFunctionalRequirements(insight: Insight) {
+    return {
+      crudOperations: insight.features?.some(f => 
+        f.includes('管理') || f.includes('追加') || f.includes('編集') || f.includes('削除')
+      ) || true,
+      dataStorage: true,
+      userInteraction: true,
+      formHandling: insight.features?.some(f => 
+        f.includes('入力') || f.includes('登録') || f.includes('フォーム')
+      ) || true,
+      listDisplay: insight.features?.some(f => 
+        f.includes('一覧') || f.includes('表示') || f.includes('リスト')
+      ) || true
+    }
+  }
+
+  private extractNonFunctionalRequirements(uiStyle: UIStyle) {
+    return {
+      responsive: true,
+      accessible: true,
+      performance: 'good',
+      usability: 'high',
+      maintainability: 'high',
+      theme: uiStyle.category,
+      colorScheme: uiStyle.colors
+    }
+  }
+
+  private identifyEntities(features: string[]) {
+    // 機能から主要なエンティティを特定
+    const commonEntities = ['User', 'Item', 'Record', 'Entry', 'Task', 'Event']
+    
+    return features.map((feature, index) => ({
+      name: this.extractEntityName(feature) || commonEntities[index % commonEntities.length],
+      fields: this.extractEntityFields(feature),
+      schema: this.generateEntitySchema(feature)
+    }))
+  }
+
+  private extractEntityName(feature: string): string {
+    // 機能名からエンティティ名を抽出するロジック
+    const keywords = ['ユーザー', 'アイテム', 'タスク', 'イベント', '記録', 'データ']
+    
+    for (const keyword of keywords) {
+      if (feature.includes(keyword)) {
+        return keyword.replace('ー', '') + 'Entity'
+      }
+    }
+    
+    return 'DataEntity'
+  }
+
+  private extractEntityFields(feature: string): string[] {
+    // 機能からフィールドを推測
+    return ['id', 'name', 'description', 'createdAt', 'updatedAt']
+  }
+
+  private generateEntitySchema(feature: string): any {
+    return {
+      id: 'string',
+      name: 'string',
+      description: 'string',
+      createdAt: 'date',
+      updatedAt: 'date'
+    }
+  }
+
+  private identifyRelationships(entities: any[], requirements: any) {
+    // エンティティ間の関係を特定
+    return []
+  }
+
+  private generateDatabaseSchema(entities: any[], relationships: any[]) {
+    return entities.reduce((schema, entity) => {
+      schema[entity.name] = entity.schema
+      return schema
+    }, {})
+  }
+
+  private designLocalStorageStructure(entities: any[]) {
+    return entities.reduce((structure, entity) => {
+      structure[entity.name.toLowerCase() + 's'] = {
+        key: `matura_${entity.name.toLowerCase()}s`,
+        structure: entity.schema
+      }
+      return structure
+    }, {})
+  }
+
+  private designAPIEndpoints(entities: any[]) {
+    const endpoints = []
+    
+    entities.forEach(entity => {
+      const basePath = `/${entity.name.toLowerCase()}s`
+      endpoints.push(
+        { method: 'GET', path: basePath, action: 'list' },
+        { method: 'POST', path: basePath, action: 'create' },
+        { method: 'GET', path: `${basePath}/:id`, action: 'get' },
+        { method: 'PUT', path: `${basePath}/:id`, action: 'update' },
+        { method: 'DELETE', path: `${basePath}/:id`, action: 'delete' }
+      )
+    })
+    
+    return endpoints
+  }
+
+  private assessComplexity(features: string[]): 'simple' | 'medium' | 'complex' {
+    if (features.length <= 2) return 'simple'
+    if (features.length <= 5) return 'medium'
+    return 'complex'
+  }
+
+  private determineComponentType(feature: string): string {
+    if (feature.includes('フォーム') || feature.includes('入力')) return 'form'
+    if (feature.includes('一覧') || feature.includes('リスト')) return 'list'
+    if (feature.includes('表示') || feature.includes('詳細')) return 'detail'
+    if (feature.includes('ダッシュボード')) return 'dashboard'
+    return 'generic'
+  }
+
+  private generateComponentName(feature: string): string {
+    return feature.replace(/[^a-zA-Z0-9]/g, '') + 'Component'
+  }
+
+  private defineComponentProps(feature: string, type: string): any {
+    const baseProps = { className: 'string?', data: 'any[]?' }
+    
+    switch (type) {
+      case 'form':
+        return { ...baseProps, onSubmit: 'function', initialValues: 'object?' }
+      case 'list':
+        return { ...baseProps, items: 'any[]', onItemClick: 'function?' }
+      case 'detail':
+        return { ...baseProps, item: 'object', onEdit: 'function?', onDelete: 'function?' }
+      default:
+        return baseProps
+    }
+  }
+
+  private defineComponentState(feature: string, type: string): any {
+    const baseState = { loading: false, error: null }
+    
+    switch (type) {
+      case 'form':
+        return { ...baseState, formData: {}, isSubmitting: false }
+      case 'list':
+        return { ...baseState, items: [], selectedItem: null }
+      case 'detail':
+        return { ...baseState, item: null, isEditing: false }
+      default:
+        return baseState
+    }
+  }
+
+  private defineComponentMethods(feature: string, type: string): string[] {
+    const baseMethods = ['componentDidMount', 'componentWillUnmount']
+    
+    switch (type) {
+      case 'form':
+        return [...baseMethods, 'handleInputChange', 'handleSubmit', 'validateForm']
+      case 'list':
+        return [...baseMethods, 'loadItems', 'handleItemClick', 'handleItemDelete']
+      case 'detail':
+        return [...baseMethods, 'loadItem', 'handleEdit', 'handleSave', 'handleDelete']
+      default:
+        return baseMethods
+    }
+  }
+
+  private applyUIStyle(uiStyle: UIStyle, componentType: string): any {
+    return {
+      theme: uiStyle.category,
+      colors: uiStyle.colors,
+      typography: uiStyle.typography,
+      spacing: uiStyle.spacing,
+      personality: uiStyle.personality
+    }
+  }
+
+  private defineFunctionality(feature: string): string {
+    return `Implement ${feature} functionality with full CRUD operations`
+  }
+
+  private integrateFullStackApp(frontendCode: any, backendCode: any): string {
+    // フロントエンドとバックエンドを統合した単一HTMLファイルを生成
+    let integratedHTML = frontendCode.html
+    
+    // インラインCSSを追加
+    if (frontendCode.css) {
+      integratedHTML = integratedHTML.replace(
+        '</head>',
+        `<style>\n${frontendCode.css}\n</style>\n</head>`
+      )
+    }
+    
+    // JavaScript（フロントエンド + バックエンドシミュレーション）を追加
+    const combinedJS = this.combineJavaScript(frontendCode.javascript, backendCode)
+    
+    integratedHTML = integratedHTML.replace(
+      '</body>',
+      `<script>\n${combinedJS}\n</script>\n</body>`
+    )
+    
+    return integratedHTML
+  }
+
+  private combineJavaScript(frontendJS: string, backendCode: any): string {
+    // バックエンドAPIをモックとしてフロントエンドに統合
+    const mockAPI = this.generateMockAPI(backendCode)
+    
+    return `
+// Mock API for standalone operation
+${mockAPI}
+
+// Frontend Application Logic
+${frontendJS}
+`
+  }
+
+  private generateMockAPI(backendCode: any): string {
+    return `
+// Mock API Server Implementation
+class MockAPIServer {
+  constructor() {
+    this.data = {};
+    this.init();
+  }
+  
+  init() {
+    // Initialize with localStorage
+    const stored = localStorage.getItem('matura_app_data');
+    if (stored) {
+      try {
+        this.data = JSON.parse(stored);
+      } catch (e) {
+        this.data = {};
+      }
+    }
+  }
+  
+  save() {
+    localStorage.setItem('matura_app_data', JSON.stringify(this.data));
+  }
+  
+  // CRUD Operations
+  create(entity, item) {
+    if (!this.data[entity]) this.data[entity] = [];
+    item.id = Date.now().toString();
+    item.createdAt = new Date().toISOString();
+    item.updatedAt = item.createdAt;
+    this.data[entity].push(item);
+    this.save();
+    return item;
+  }
+  
+  read(entity, id = null) {
+    if (!this.data[entity]) this.data[entity] = [];
+    if (id) {
+      return this.data[entity].find(item => item.id === id);
+    }
+    return this.data[entity];
+  }
+  
+  update(entity, id, updates) {
+    if (!this.data[entity]) return null;
+    const index = this.data[entity].findIndex(item => item.id === id);
+    if (index === -1) return null;
+    
+    this.data[entity][index] = {
+      ...this.data[entity][index],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    this.save();
+    return this.data[entity][index];
+  }
+  
+  delete(entity, id) {
+    if (!this.data[entity]) return false;
+    const index = this.data[entity].findIndex(item => item.id === id);
+    if (index === -1) return false;
+    
+    this.data[entity].splice(index, 1);
+    this.save();
+    return true;
+  }
+}
+
+// Global API instance
+window.mockAPI = new MockAPIServer();
+`
+  }
+
+  private async runBasicTests(code: string, requirements: any): Promise<any> {
+    // 基本的なコード検証
+    const tests = {
+      hasHTML: code.includes('<html'),
+      hasCSS: code.includes('<style>') || code.includes('stylesheet'),
+      hasJS: code.includes('<script>'),
+      hasCRUD: code.includes('create') && code.includes('read') && 
+               code.includes('update') && code.includes('delete'),
+      hasLocalStorage: code.includes('localStorage'),
+      hasFormHandling: code.includes('form') || code.includes('input'),
+      allPassed: true
+    }
+    
+    tests.allPassed = Object.values(tests).every(test => test === true)
+    
+    return tests
+  }
+
+  private assessCodeQuality(code: any): number {
+    let score = 0
+    
+    // 基本構造チェック
+    if (code.fullHtml?.includes('<!DOCTYPE html>')) score += 20
+    if (code.css?.length > 100) score += 20
+    if (code.javascript?.length > 200) score += 20
+    
+    // 機能性チェック
+    if (code.fullHtml?.includes('localStorage')) score += 15
+    if (code.fullHtml?.includes('addEventListener')) score += 15
+    if (code.fullHtml?.includes('function')) score += 10
+    
+    return Math.min(100, score)
+  }
+
+  private checkFeatureCompleteness(code: any, features: string[]): number {
+    const implementedFeatures = features.filter(feature => {
+      const featureKeywords = this.extractKeywords(feature)
+      return featureKeywords.some(keyword => 
+        code.fullHtml?.toLowerCase().includes(keyword.toLowerCase())
+      )
+    })
+    
+    return features.length > 0 ? (implementedFeatures.length / features.length) * 100 : 100
+  }
+
+  private extractKeywords(feature: string): string[] {
+    return feature.split(/[\s、]+/).filter(word => word.length > 1)
+  }
+
+  private extractDependencies(code: any): string[] {
+    const deps: string[] = []
+    
+    if (code.fullHtml?.includes('react')) deps.push('react')
+    if (code.fullHtml?.includes('express')) deps.push('express')
+    if (code.serverCode) deps.push('express', 'cors', 'body-parser')
+    
+    return Array.from(new Set(deps))
+  }
+
+  private estimateCodeLines(code: any): number {
+    const html = code.html?.split('\n').length || 0
+    const css = code.css?.split('\n').length || 0
+    const js = code.javascript?.split('\n').length || 0
+    
+    return html + css + js
+  }
+}
+
+// デフォルトエクスポート
+export default AdvancedCodeGenerator

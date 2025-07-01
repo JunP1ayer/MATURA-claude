@@ -64,6 +64,10 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
         setUIStyleAndNextPhase: maturaState.setUIStyleAndNextPhase,
         setUXAndNextPhase: maturaState.setUXAndNextPhase,
         setCodeAndNextPhase: maturaState.setCodeAndNextPhase,
+        // 新しい統合機能
+        setUnifiedUXDesign: maturaState.setUnifiedUXDesign,
+        setDynamicUIGeneration: maturaState.setDynamicUIGeneration,
+        generateUnifiedUX: maturaState.generateUnifiedUX,
       },
       history,
       chat,

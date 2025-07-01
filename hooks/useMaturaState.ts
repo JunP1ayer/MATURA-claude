@@ -1,15 +1,17 @@
 import { useState, useCallback, useMemo } from 'react'
-import { MaturaState, Message, Insight, UIDesign, UIStyle, TopPageDesign, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure } from '@/lib/types'
+import { MaturaState, Message, Insight, UIDesign, UIStyle, TopPageDesign, UXDesign, GeneratedCode, ReleaseInfo, ExtractedStructure, UnifiedUXDesign, DynamicUIGeneration } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
 const initialState: MaturaState = {
-  currentPhase: 0,
+  currentPhase: 0, // Start with FreeTalk phase
   conversations: [],
   insights: null,
   selectedUI: null,
   selectedUIStyle: null,
   selectedTopPageDesign: null,
   uxDesign: null,
+  unifiedUXDesign: null,
+  dynamicUIGeneration: null,
   generatedCode: null,
   releaseInfo: null,
   isLoading: false,
@@ -203,6 +205,46 @@ export function useMaturaState() {
     }))
   }, [batchUpdateState])
 
+  // 新しい統合機能のアクション
+  const setUnifiedUXDesign = useCallback((design: UnifiedUXDesign) => {
+    updateState({ unifiedUXDesign: design })
+  }, [updateState])
+
+  const setDynamicUIGeneration = useCallback((generation: DynamicUIGeneration) => {
+    updateState({ dynamicUIGeneration: generation })
+  }, [updateState])
+
+  const generateUnifiedUX = useCallback(async () => {
+    if (!state.insights || !state.selectedUIStyle) {
+      console.warn('Insights and UI style required for unified UX generation')
+      return null
+    }
+
+    setLoading(true)
+    try {
+      // Import UXGenerator dynamically to avoid circular dependencies
+      const { UXGenerator } = await import('@/lib/uxGenerator')
+      
+      const unifiedDesign = await UXGenerator.generateUnifiedUX(
+        state.insights,
+        state.selectedUIStyle,
+        {
+          generateInteractiveComponents: true,
+          includeImplementationGuide: true
+        }
+      )
+
+      setUnifiedUXDesign(unifiedDesign)
+      return unifiedDesign
+    } catch (error) {
+      console.error('Error generating unified UX:', error)
+      setError('統合UX生成に失敗しました')
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [state.insights, state.selectedUIStyle, setLoading, setError, setUnifiedUXDesign])
+
   const getCurrentPhaseData = useCallback(() => {
     const { currentPhase, insights, selectedUI, selectedUIStyle, uxDesign, generatedCode, releaseInfo } = state
     
@@ -279,6 +321,10 @@ export function useMaturaState() {
     setUIStyleAndNextPhase,
     setUXAndNextPhase,
     setCodeAndNextPhase,
+    // 新しい統合機能
+    setUnifiedUXDesign,
+    setDynamicUIGeneration,
+    generateUnifiedUX,
     // Memoized values
     userMessageCount,
     assistantMessageCount,

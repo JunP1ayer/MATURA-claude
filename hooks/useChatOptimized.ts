@@ -2,6 +2,64 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { Message } from '@/lib/types'
 import { generateId } from '@/lib/utils'
 
+// 429エラー専用のリトライ機能付きfetch
+async function fetchWithRetry(url: string, options: RequestInit, maxRetries: number = 3): Promise<Response> {
+  let lastError: Error | null = null
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 API呼び出し試行 ${attempt}/${maxRetries}:`, url)
+      
+      const response = await fetch(url, options)
+      
+      // 429エラーでない場合はそのまま返す
+      if (response.status !== 429) {
+        return response
+      }
+      
+      // 429エラーの場合
+      console.warn(`⏰ 429エラー発生 (試行 ${attempt}/${maxRetries}). 再試行まで待機中...`)
+      
+      // 最後の試行でない場合のみリトライ
+      if (attempt < maxRetries) {
+        // 指数バックオフ: 2秒、4秒、8秒...
+        const waitTime = Math.min(2000 * Math.pow(2, attempt - 1), 8000)
+        console.log(`⏱️ ${waitTime}ms待機後に再試行します...`)
+        
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+        continue
+      }
+      
+      // 最後の試行でも429の場合はレスポンスを返す
+      return response
+      
+    } catch (error) {
+      lastError = error as Error
+      console.error(`❌ API呼び出しエラー (試行 ${attempt}/${maxRetries}):`, error)
+      
+      // ネットワークエラーや中止エラーの場合はリトライしない
+      if (error instanceof Error && (
+        error.name === 'AbortError' || 
+        error.message.includes('aborted') ||
+        error.message.includes('network')
+      )) {
+        throw error
+      }
+      
+      // 最後の試行でない場合のみリトライ
+      if (attempt < maxRetries) {
+        const waitTime = 1000 * attempt // 1秒、2秒、3秒...
+        console.log(`⏱️ ${waitTime}ms待機後に再試行します...`)
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+        continue
+      }
+    }
+  }
+  
+  // すべての試行が失敗した場合
+  throw lastError || new Error('すべてのリトライが失敗しました')
+}
+
 interface ChatOptions {
   onNewMessage?: (message: string, data?: any) => void
   onError?: (error: string) => void
@@ -99,7 +157,7 @@ export function useChatOptimized() {
         throw new Error('Request aborted before fetch')
       }
       
-      const response = await fetch('/api/chat', fetchOptions)
+      const response = await fetchWithRetry('/api/chat', fetchOptions)
       
       // Read response text
       let responseText: string
@@ -256,7 +314,7 @@ export function useChatOptimized() {
         timeout: timeoutMs
       })
 
-      const response = await fetch('/api/chat', {
+      const response = await fetchWithRetry('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

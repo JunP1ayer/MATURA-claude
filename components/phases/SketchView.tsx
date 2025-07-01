@@ -1,14 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, Palette, CheckCircle } from 'lucide-react'
+import { ArrowRight, Palette, CheckCircle, Zap, RotateCcw } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useMatura } from '@/components/providers/MaturaProvider'
 import { UIStyleSelector } from '@/components/design-proposals/UIStyleSelector'
+import DynamicUISelector from '@/components/shared/DynamicUISelector'
 import type { DesignProposal } from '@/lib/prompts/design-generator'
+import type { UIStyle, DynamicUIGeneration } from '@/lib/types'
 
 export default function SketchView() {
   const { state, actions } = useMatura()
+  const [selectionMode, setSelectionMode] = useState<'dynamic' | 'template'>('dynamic')
   
   // ユーザーのアイデアを取得（InsightRefineフェーズから）
   const userIdea = state.insights?.vision || "革新的なアプリケーション"
@@ -17,8 +20,19 @@ export default function SketchView() {
   const uiSelected = !!state.selectedUIStyle
   const selectedDesign = state.selectedUIStyle
 
-  const handleDesignSelected = (design: DesignProposal) => {
+  // 動的UI選択のハンドラ
+  const handleDynamicUISelected = (selectedStyle: UIStyle, dynamicGeneration: DynamicUIGeneration) => {
+    actions.setSelectedUIStyle(selectedStyle)
+    actions.setDynamicUIGeneration(dynamicGeneration)
     
+    // 2秒後に自動的に次のフェーズに進む
+    setTimeout(() => {
+      actions.nextPhase()
+    }, 2000)
+  }
+
+  // テンプレートUI選択のハンドラ（既存）
+  const handleDesignSelected = (design: DesignProposal) => {
     // MATURAの状態管理に保存
     actions.setSelectedUIStyle({
       id: design.id,
@@ -106,13 +120,72 @@ export default function SketchView() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full"
+      className="w-full max-w-7xl mx-auto"
     >
-      <UIStyleSelector
-        userIdea={userIdea}
-        onDesignSelected={handleDesignSelected}
-        isSelectionComplete={uiSelected}
-      />
+      {!uiSelected && (
+        <>
+          {/* 選択モード切り替え */}
+          <div className="mb-8">
+            <div className="flex items-center justify-center mb-6">
+              <h2 className="text-3xl font-bold text-gray-900 mr-8">UIスタイルを選択</h2>
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setSelectionMode('dynamic')}
+                  className={`
+                    flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all
+                    ${selectionMode === 'dynamic' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-800'
+                    }
+                  `}
+                >
+                  <Zap className="w-4 h-4" />
+                  AI生成（推奨）
+                </button>
+                <button
+                  onClick={() => setSelectionMode('template')}
+                  className={`
+                    flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all
+                    ${selectionMode === 'template' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-800'
+                    }
+                  `}
+                >
+                  <Palette className="w-4 h-4" />
+                  テンプレート
+                </button>
+              </div>
+            </div>
+            
+            <div className="text-center mb-8">
+              {selectionMode === 'dynamic' ? (
+                <p className="text-gray-600">
+                  あなたのアイデア「{userIdea}」に最適化されたUIスタイルを生成します
+                </p>
+              ) : (
+                <p className="text-gray-600">
+                  事前に用意されたテンプレートから選択できます
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* 動的UI選択またはテンプレート選択 */}
+          {selectionMode === 'dynamic' && state.insights ? (
+            <DynamicUISelector
+              insight={state.insights}
+              onUISelected={handleDynamicUISelected}
+            />
+          ) : (
+            <UIStyleSelector
+              userIdea={userIdea}
+              onDesignSelected={handleDesignSelected}
+              isSelectionComplete={uiSelected}
+            />
+          )}
+        </>
+      )}
     </motion.div>
   )
 }
