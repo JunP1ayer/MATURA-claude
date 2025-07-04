@@ -41,23 +41,7 @@ export default function UXBuild() {
   const [uxStructure, setUxStructure] = useState<UXStructure | null>(null)
   const [activeSection, setActiveSection] = useState<'why' | 'who' | 'what' | 'how' | 'impact'>('why')
 
-  useEffect(() => {
-    // 少し遅延を入れて、状態が確実に更新されるのを待つ
-    const timer = setTimeout(() => {
-      if (state.insights && state.selectedUIStyle && !uxStructure && !chatOptimized.isLoading) {
-        console.log('🎯 Auto-triggering UX structure generation:', {
-          hasInsights: !!state.insights,
-          hasUIStyle: !!state.selectedUIStyle,
-          hasUXStructure: !!uxStructure,
-          isLoading: chatOptimized.isLoading
-        })
-        generateUXStructure()
-      }
-    }, 100)
-    
-    return () => clearTimeout(timer)
-  }, [state.insights, state.selectedUIStyle, uxStructure, generateUXStructure])
-
+  // generateUXStructure関数をuseCallbackでメモ化（useEffectより前に定義）
   const generateUXStructure = useCallback(async () => {
     try {
       // 構造化されたアイデアとUIスタイルから最適なUX構造を生成
@@ -120,34 +104,29 @@ export default function UXBuild() {
 }
 `
 
-      const response = await chatOptimized.sendMessage(
+      const result = await chatOptimized.sendMessage(
         prompt,
-        [],
-        'UXBuild',
+        [], // 新しいメッセージとして送信
+        'ux-design',
         {
-          timeout: 45000,
-          requestStructureExtraction: true,
+          timeout: 30000,
           onError: (error) => {
-            console.error('❌ UX構造生成エラー:', error)
-            // AbortErrorの場合はUI状態をリセット
-            if (error.includes('aborted') || error.includes('abort')) {
-              console.log('🚫 UX Build request was aborted, not showing error to user')
-              return
-            }
+            console.error('UX structure generation error:', error)
           }
         }
       )
 
-      if (response) {
+      if (result) {
         try {
-          const parsed = JSON.parse(response)
-          setUxStructure(parsed)
-          actions.setUXDesign(parsed as any)
-        } catch (error) {
-          console.error('Failed to parse UX structure:', error)
-          // フォールバックデータを使用
+          const parsedStructure = JSON.parse(result)
+          setUxStructure(parsedStructure)
+          actions.setUXDesign(parsedStructure as any)
+        } catch (parseError) {
+          console.error('JSON parsing error:', parseError)
           createFallbackStructure()
         }
+      } else {
+        createFallbackStructure()
       }
     } catch (error) {
       console.error('UX structure generation error:', error)
@@ -159,6 +138,23 @@ export default function UXBuild() {
       createFallbackStructure()
     }
   }, [state.insights, state.selectedUIStyle, chatOptimized, actions])
+
+  useEffect(() => {
+    // 少し遅延を入れて、状態が確実に更新されるのを待つ
+    const timer = setTimeout(() => {
+      if (state.insights && state.selectedUIStyle && !uxStructure && !chatOptimized.isLoading) {
+        console.log('🎯 Auto-triggering UX structure generation:', {
+          hasInsights: !!state.insights,
+          hasUIStyle: !!state.selectedUIStyle,
+          hasUXStructure: !!uxStructure,
+          isLoading: chatOptimized.isLoading
+        })
+        generateUXStructure()
+      }
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [state.insights, state.selectedUIStyle, uxStructure, generateUXStructure])
 
   const createFallbackStructure = () => {
     const fallback: UXStructure = {

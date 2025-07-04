@@ -14,6 +14,62 @@ export default function InsightRefine() {
   const chatOptimized = useChatOptimized()
   const [insights, setInsights] = useState<Insight | null>(null)
 
+  // generateInsights関数をuseCallbackでメモ化（useEffectより前に定義）
+  const generateInsights = useCallback(async () => {
+    try {
+      console.log('🚀 generateInsights called, starting validation...')
+      
+      // より厳密なデータ検証
+      const hasValidConversations = state.conversations && 
+                                    Array.isArray(state.conversations) && 
+                                    state.conversations.length > 0 &&
+                                    state.conversations.some(conv => conv.content && conv.content.trim() !== '')
+      
+      if (!hasValidConversations) {
+        console.warn('❌ Invalid conversations data')
+        return
+      }
+
+      if (chatOptimized.isLoading) {
+        console.warn('⏳ Already loading, skipping insight generation')
+        return
+      }
+
+      console.log('📊 構造化データ生成を開始...')
+      
+      const structuredData = await chatOptimized.generateStructuredData(
+        state.conversations,
+        'insight',
+        {
+          timeout: 30000,
+          requestStructureExtraction: true
+        }
+      )
+      
+      console.log('📊 generateStructuredData結果:', {
+        hasData: !!structuredData,
+        dataType: typeof structuredData,
+        dataKeys: structuredData ? Object.keys(structuredData) : null
+      })
+      
+      if (structuredData) {
+        console.log('✅ 洞察データを設定中...')
+        setInsights(structuredData)
+        actions.setInsights(structuredData)
+        console.log('✅ 洞察データ設定完了')
+      } else {
+        console.warn('❌ generateStructuredDataがnullを返しました')
+      }
+    } catch (error) {
+      console.error('💥 洞察生成エラー:', error)
+      // ユーザーの意図的なキャンセルの場合はエラー表示しない
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('🚫 Request was intentionally aborted, not showing error')
+        return
+      }
+    }
+  }, [state.conversations, chatOptimized, actions])
+
   useEffect(() => {
     // 初回レンダリング時にconversationsとcontextが揃っているかチェック
     // 未取得の場合は呼び出しをスキップして、データが揃ったら自動実行
@@ -52,75 +108,6 @@ export default function InsightRefine() {
       chatOptimized.cleanup()
     }
   }, [chatOptimized])
-
-  const generateInsights = useCallback(async () => {
-    try {
-      console.log('🚀 generateInsights called, starting validation...')
-      
-      // より厳密なデータ検証
-      if (!state.conversations || 
-          !Array.isArray(state.conversations) || 
-          state.conversations.length === 0) {
-        console.warn('❌ conversations が空または無効のため、洞察生成をスキップします')
-        return
-      }
-
-      // 有効なコンテンツがあるconversationが存在するかチェック
-      const validConversations = state.conversations.filter(conv => 
-        conv && conv.content && typeof conv.content === 'string' && conv.content.trim() !== ''
-      )
-
-      if (validConversations.length === 0) {
-        console.warn('❌ 有効なconversationが見つからないため、洞察生成をスキップします')
-        return
-      }
-
-      console.log('✅ 洞察生成を開始:', { 
-        totalConversations: state.conversations.length,
-        validConversations: validConversations.length,
-        isLoadingBefore: chatOptimized.isLoading,
-        firstConversation: validConversations[0]?.content?.substring(0, 100)
-      })
-
-      const structuredData = await chatOptimized.generateStructuredData(
-        state.conversations,
-        'InsightRefine',
-        {
-          onError: (error) => {
-            console.error('❌ 洞察生成エラー:', error)
-            // AbortErrorの場合はUI状態をリセット
-            if (error.includes('aborted') || error.includes('abort')) {
-              console.log('🚫 Request was aborted, not showing error to user')
-              return
-            }
-          },
-          timeout: 45000 // 45 second timeout for structured data generation
-        }
-      )
-      
-      console.log('📊 generateStructuredData結果:', {
-        hasData: !!structuredData,
-        dataType: typeof structuredData,
-        dataKeys: structuredData ? Object.keys(structuredData) : null
-      })
-      
-      if (structuredData) {
-        console.log('✅ 洞察データを設定中...')
-        setInsights(structuredData)
-        actions.setInsights(structuredData)
-        console.log('✅ 洞察データ設定完了')
-      } else {
-        console.warn('❌ generateStructuredDataがnullを返しました')
-      }
-    } catch (error) {
-      console.error('💥 洞察生成エラー:', error)
-      // ユーザーの意図的なキャンセルの場合はエラー表示しない
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('🚫 Request was intentionally aborted, not showing error')
-        return
-      }
-    }
-  }, [state.conversations, chatOptimized, actions])
 
   const handleNext = () => {
     if (insights) {
