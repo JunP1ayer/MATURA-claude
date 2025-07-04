@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { exec } from 'child_process'
-import { promisify } from 'util'
-
-const execAsync = promisify(exec)
 
 interface GeminiGenerateRequest {
   insights: {
@@ -10,12 +6,18 @@ interface GeminiGenerateRequest {
     target: string
     features: string[]
     value: string
-    motivation: string
+    motivation?: string
+    appName?: string
+    description?: string
   }
   uiStyle: {
     name: string
-    category: string
-    colors: {
+    category?: string
+    description?: string
+    primaryColor?: string
+    accentColor?: string
+    secondaryColor?: string
+    colors?: {
       primary: string
       secondary: string
       accent: string
@@ -24,14 +26,41 @@ interface GeminiGenerateRequest {
     }
     personality?: string[]
   }
-  uxDesign?: any
+  uxDesign?: {
+    layout?: {
+      principles: string[]
+      structure: string
+    }
+    colorScheme?: {
+      guidelines: string[]
+      accessibility: string
+    }
+    navigation?: {
+      strategy: string[]
+      userFlow: string
+    }
+    typography?: {
+      guidelines: string[]
+      hierarchy: string
+    }
+    animations?: {
+      principles: string[]
+      interactions: string
+    }
+  }
+  selectedTopPageDesign?: {
+    name: string
+    description: string
+    layout: string
+    components: string[]
+  }
   mode?: 'standard' | 'premium'
 }
 
-// Rate limiting (simple in-memory store)
+// Rate limiting
 const requestCounts = new Map<string, { count: number; resetTime: number }>()
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 50 // Increased for development
+const RATE_LIMIT_WINDOW = 60 * 1000
+const MAX_REQUESTS_PER_WINDOW = 10
 
 function getRateLimit(ip: string): { allowed: boolean; remaining: number } {
   const now = Date.now()
@@ -50,135 +79,104 @@ function getRateLimit(ip: string): { allowed: boolean; remaining: number } {
   return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - record.count }
 }
 
-// SSE streaming response
-function createProgressStream(insights: any, uiStyle: any, apiKey: string, ip: string) {
+// Simple and reliable code generation
+function createProgressStream(insights: any, uiStyle: any, uxDesign: any, topPageDesign: any, apiKey: string) {
   const encoder = new TextEncoder()
   
   return new ReadableStream({
     async start(controller) {
       try {
-        // Step 1: Requirements Analysis
+        console.log('[gemini-generate] Starting simple code generation')
+        
+        // Step 1: Analysis
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
           type: 'progress', 
-          step: 1,
-          totalSteps: 6,
-          phase: 'requirements',
-          message: `📋 ${insights.vision}の要件を分析中...`, 
-          progress: 10 
+          message: '📋 要件を分析中...', 
+          progress: 20
         })}\n\n`))
 
         await new Promise(resolve => setTimeout(resolve, 2000))
 
-        // Step 2: Architecture Design
+        // Step 2: Generate Code
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
           type: 'progress', 
-          step: 2,
-          totalSteps: 6,
-          phase: 'architecture',
-          message: `🏗️ ${insights.features[0]}のアーキテクチャを設計中...`, 
-          progress: 25 
-        })}\n\n`))
-
-        await new Promise(resolve => setTimeout(resolve, 2000))
-
-        // Step 3: UI Component Design
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-          type: 'progress', 
-          step: 3,
-          totalSteps: 6,
-          phase: 'ui-design',
-          message: `🎨 ${uiStyle.name}スタイルでUIコンポーネントを設計中...`, 
-          progress: 40 
-        })}\n\n`))
-
-        await new Promise(resolve => setTimeout(resolve, 2000))
-
-        // Step 4: Generate Code with Gemini
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-          type: 'progress', 
-          step: 4,
-          totalSteps: 6,
-          phase: 'generating',
           message: '🚀 Gemini AIでコードを生成中...', 
           progress: 60 
         })}\n\n`))
 
-        // Build comprehensive prompt
-        const geminiPrompt = buildGeminiPrompt(insights, uiStyle)
+        // Build a comprehensive prompt
+        const prompt = buildProfessionalPrompt(insights, uiStyle, uxDesign, topPageDesign)
+        console.log('[gemini-generate] Calling Gemini API with prompt length:', prompt.length)
         
-        // Execute Gemini CLI with stdin
-        const command = `echo "${geminiPrompt.replace(/"/g, '\\"')}" | gemini -y`
-        
-        try {
-          const { stdout, stderr } = await execAsync(command, {
-            timeout: 180000, // 3 minutes
-            env: {
-              ...process.env,
-              GEMINI_API_KEY: apiKey
-            },
-            maxBuffer: 1024 * 1024 * 20 // 20MB buffer
+        // Call Gemini API with correct endpoint
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 8192
+            }
           })
+        })
 
-          if (stderr && stderr.trim().length > 0) {
-            console.warn('[gemini-generate] stderr output:', stderr)
-          }
-
-          // Step 5: Code Enhancement
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-            type: 'progress', 
-            step: 5,
-            totalSteps: 6,
-            phase: 'enhancing',
-            message: '✨ コードを最適化中...', 
-            progress: 80 
-          })}\n\n`))
-
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Parse and enhance the generated code
-          const enhancedCode = parseAndEnhanceGeminiResponse(stdout, insights, uiStyle)
-
-          // Step 6: Validation
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-            type: 'progress', 
-            step: 6,
-            totalSteps: 6,
-            phase: 'validating',
-            message: '✅ コードを検証中...', 
-            progress: 95 
-          })}\n\n`))
-
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Send final result
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-            type: 'complete', 
-            code: enhancedCode,
-            metadata: {
-              title: insights.vision,
-              description: insights.value,
-              features: insights.features,
-              uiStyle: uiStyle.name,
-              generatedAt: new Date().toISOString()
-            },
-            message: '🎉 生成完了！',
-            progress: 100
-          })}\n\n`))
-
-        } catch (execError: any) {
-          console.error('[gemini-generate] Execution error:', execError)
-          
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-            type: 'error', 
-            error: execError.message || 'コード生成エラー',
-            message: '❌ コード生成に失敗しました'
-          })}\n\n`))
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error('[gemini-generate] API error:', response.status, errorText)
+          throw new Error(`Gemini API error: ${response.status} ${response.statusText}`)
         }
+
+        const geminiData = await response.json()
+        console.log('[gemini-generate] Gemini response:', geminiData)
+        
+        const generatedCode = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
+        
+        if (!generatedCode) {
+          throw new Error('Gemini APIからレスポンスが取得できませんでした')
+        }
+
+        console.log('[gemini-generate] Generated code length:', generatedCode.length)
+
+        // Step 3: Enhancement
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+          type: 'progress', 
+          message: '✨ コードを最適化中...', 
+          progress: 90 
+        })}\n\n`))
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        // Enhance the generated code
+        const enhancedCode = enhanceGeneratedCode(generatedCode, insights, uiStyle)
+        
+        console.log('[gemini-generate] Enhanced code length:', enhancedCode.length)
+
+        // Send final result
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+          type: 'complete', 
+          code: enhancedCode,
+          metadata: {
+            title: insights.vision,
+            description: insights.value,
+            features: insights.features,
+            uiStyle: uiStyle.name,
+            generatedAt: new Date().toISOString()
+          },
+          message: '🎉 コード生成完了！',
+          progress: 100
+        })}\n\n`))
 
         controller.close()
 
       } catch (error: any) {
-        console.error('[gemini-generate] Stream error:', error)
+        console.error('[gemini-generate] Error:', error)
         
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
           type: 'error', 
@@ -192,254 +190,199 @@ function createProgressStream(insights: any, uiStyle: any, apiKey: string, ip: s
   })
 }
 
-function buildGeminiPrompt(insights: any, uiStyle: any): string {
-  const { vision, target, features, value, motivation } = insights
-  const isIncomeApp = vision.includes('収入') || vision.includes('アルバイト') || features.some((f: string) => f.includes('収入'))
-  const isDark = uiStyle.category === 'dark'
+// Professional prompt builder with detailed design requirements
+function buildProfessionalPrompt(insights: any, uiStyle: any, uxDesign: any, topPageDesign: any): string {
+  const { vision, target, features, value, appName } = insights
+  const isIncomeApp = vision?.includes('収入') || vision?.includes('アルバイト') || features?.some((f: string) => f.includes('収入'))
 
-  return `You are a web development expert. Create a complete HTML file for a production-ready web application.
+  // Extract detailed color information
+  const colors = uiStyle?.colors || {
+    primary: uiStyle?.primaryColor || '#3B82F6',
+    secondary: uiStyle?.secondaryColor || '#6B7280', 
+    accent: uiStyle?.accentColor || '#10B981',
+    background: uiStyle?.category === 'dark' ? '#1F2937' : '#FFFFFF',
+    text: uiStyle?.category === 'dark' ? '#F9FAFB' : '#1F2937'
+  }
 
-CRITICAL INSTRUCTION: Only output the HTML code. Do not create any files. Only respond with the HTML code content.
+  // UX Design guidelines
+  const layoutPrinciples = uxDesign?.layout?.principles || []
+  const colorGuidelines = uxDesign?.colorScheme?.guidelines || []
+  const navigationStrategy = uxDesign?.navigation?.strategy || []
+  const typographyGuidelines = uxDesign?.typography?.guidelines || []
+  const animationPrinciples = uxDesign?.animations?.principles || []
 
-PROJECT: ${vision}
-TARGET: ${target}
-VALUE: ${value}
-FEATURES: ${features.join(', ')}
+  return `あなたは経験豊富なUI/UXデザイナー兼フルスタック開発者です。以下の詳細な要件に基づいて、プロダクションレベルの美しく実用的なWebアプリケーションを作成してください。
 
-UI REQUIREMENTS:
-- Use shadcn/ui component patterns
-- Apply Tailwind CSS for all styling
-- Primary color: ${uiStyle.colors.primary}
-- Secondary color: ${uiStyle.colors.secondary}
-- Accent color: ${uiStyle.colors.accent}
-- ${isDark ? 'Dark mode with' : 'Light mode with'} background: ${uiStyle.colors.background}
-- Text color: ${uiStyle.colors.text}
+# 🎯 プロジェクト概要
+**アプリ名**: ${appName || vision}
+**ビジョン**: ${vision}
+**ターゲットユーザー**: ${target}
+**提供価値**: ${value}
+**主要機能**: ${features?.join('、') || 'カスタム機能'}
 
-TECHNICAL REQUIREMENTS:
-1. Single HTML file with inline CSS and JavaScript
-2. Use Tailwind CSS via CDN
-3. Implement shadcn/ui component patterns:
-   - Card components with proper shadows and borders
-   - Form inputs with focus states
-   - Buttons with hover/active states
-   - Toast notifications for feedback
-   - Modal dialogs for confirmations
-4. Full CRUD operations with localStorage
-5. Responsive design (mobile-first)
-6. Input validation and error handling
-7. Loading states and transitions
-8. Keyboard shortcuts (Ctrl+S to save, etc.)
+# 🎨 UI/UXデザインシステム
+
+## カラーパレット
+- **プライマリ**: ${colors.primary} (メインアクション、ブランドカラー)
+- **セカンダリ**: ${colors.secondary} (サブ要素、テキスト)
+- **アクセント**: ${colors.accent} (強調、成功状態)
+- **背景**: ${colors.background}
+- **テキスト**: ${colors.text}
+- **UIスタイル**: ${uiStyle?.name} - ${uiStyle?.description || ''}
+- **パーソナリティ**: ${uiStyle?.personality?.join('、') || 'モダン、洗練された'}
+
+## レイアウト設計原則
+${layoutPrinciples.length > 0 ? layoutPrinciples.map(p => `- ${p}`).join('\n') : `
+- モバイルファーストアプローチ
+- グリッドシステムベースのレイアウト
+- 視覚的階層の明確化
+- 適切な余白とパディング`}
+
+## 配色ガイドライン
+${colorGuidelines.length > 0 ? colorGuidelines.map(g => `- ${g}`).join('\n') : `
+- 高コントラストで読みやすさを重視
+- ブランドカラーの一貫した使用
+- アクセシビリティ基準AAA準拠`}
+
+## ナビゲーション戦略
+${navigationStrategy.length > 0 ? navigationStrategy.map(s => `- ${s}`).join('\n') : `
+- 直感的なメニュー構造
+- パンくずナビゲーション
+- 明確なCTAボタン配置`}
+
+## タイポグラフィ
+${typographyGuidelines.length > 0 ? typographyGuidelines.map(t => `- ${t}`).join('\n') : `
+- 見出しは階層的なサイズ設定
+- 本文は読みやすいフォントサイズ
+- 重要情報の適切な強調表示`}
+
+## アニメーション・インタラクション
+${animationPrinciples.length > 0 ? animationPrinciples.map(a => `- ${a}`).join('\n') : `
+- 微細なホバーエフェクト
+- スムーズなページ遷移
+- ローディング状態の表現`}
+
+${topPageDesign ? `
+## トップページデザイン指定
+**レイアウト**: ${topPageDesign.name} - ${topPageDesign.description}
+**構成要素**: ${topPageDesign.components?.join('、') || ''}
+**レイアウト詳細**: ${topPageDesign.layout || ''}
+` : ''}
+
+# 🛠️ 技術実装要件
+
+## 基本構造
+1. **単一HTMLファイル** - CSS、JavaScriptを内包
+2. **Tailwind CSS** - CDN経由で最新版使用
+3. **Vanilla JavaScript** - ES6+、モジュラー設計
+4. **localStorage** - データ永続化
+5. **レスポンシブデザイン** - 全デバイス対応
+
+## UI コンポーネント要件
+- **ヘッダー**: ロゴ、ナビゲーション、ユーザーアクション
+- **サイドバー**: 機能別メニュー（モバイル時ハンバーガー）
+- **メインエリア**: ダッシュボード、データ表示
+- **フォーム**: 入力検証、エラー表示
+- **データテーブル**: ソート、フィルタ、ページネーション
+- **モーダル**: 確認ダイアログ、詳細表示
+- **トースト**: 操作結果フィードバック
+- **ローディング**: プログレスバー、スケルトン
 
 ${isIncomeApp ? `
-SPECIFIC FEATURES FOR INCOME TRACKING:
-- Work time tracking (start/end times)
-- Hourly wage calculation
-- Monthly income charts (use Chart.js or similar)
-- 103万円 limit tracking with progress bar
-- Income predictions
-- Export to CSV/JSON
+# 💰 収入管理アプリ特別要件
+
+## 核心機能
+- **時給計算エンジン**: 基本時給、残業手当（1.25倍）、深夜手当（0.25倍追加）
+- **シフト管理**: 勤務開始・終了時刻、休憩時間自動計算
+- **収入追跡**: 日別、週別、月別収入サマリー
+- **103万円限度額**: プログレスバー、アラート機能
+- **予測機能**: 現在のペースでの年収予測
+- **エクスポート**: CSV、PDF形式での給与明細出力
+
+## データ可視化
+- **月間収入グラフ**: Chart.js使用
+- **時間別労働統計**: 効率分析
+- **目標達成率**: プログレス表示
+
+## 税金計算機能
+- **所得税概算**: 基本控除込み
+- **住民税概算**: 地域差考慮
+- **社会保険料**: 概算計算
 ` : `
-SPECIFIC FEATURES FOR DATA MANAGEMENT:
-- Advanced search and filtering
-- Category-based organization
-- Statistics dashboard
-- Bulk operations
-- Import/Export functionality
+# 📊 データ管理アプリ要件
+
+## 高度な機能
+- **多層検索**: キーワード、カテゴリ、日付範囲
+- **高度フィルタ**: 複数条件組み合わせ
+- **データ統計**: グラフィカルな分析表示
+- **バルク操作**: 一括編集、削除
+- **インポート/エクスポート**: CSV、JSON、PDF
+- **データバックアップ**: 自動保存機能
 `}
 
-IMPORTANT CONSTRAINTS:
-- Generate production-ready code, NOT a demo
-- Include real business logic and calculations
-- Make it beautiful with smooth animations
-- Ensure all features actually work
-- Use Japanese labels and messages
-- DO NOT create any files
-- ONLY output the complete HTML code starting with <!DOCTYPE html>
+# 🎯 品質基準
 
-Please provide the complete HTML file code:`
+## デザイン品質
+- **Pixel Perfect**: デザインシステム完全準拠
+- **一貫性**: 全ページ統一されたUI/UX
+- **アクセシビリティ**: WCAG 2.1 AAA基準
+- **パフォーマンス**: 2秒以内ロード時間
+
+## 機能品質  
+- **エラーハンドリング**: 全入力の検証とフィードバック
+- **データ検証**: 型チェック、範囲チェック
+- **状態管理**: 一貫したアプリケーション状態
+- **セキュリティ**: XSS対策、データサニタイズ
+
+# 📝 出力指示
+
+**重要**: 以下の要件を全て満たした完全なHTMLファイルを出力してください：
+
+1. **完全性**: 全機能が実装され、実際に使用可能
+2. **美しさ**: プロのデザイナーが作成したレベルの視覚的品質
+3. **実用性**: 実際のユーザーが日常的に使えるアプリケーション
+4. **技術性**: モダンなWeb開発のベストプラクティス準拠
+
+<!DOCTYPE html>から始まる完全なHTMLファイルのみを出力してください。説明や前置きは不要です。`
 }
 
-function parseAndEnhanceGeminiResponse(response: string, insights: any, uiStyle: any): string {
-  // Extract HTML code from response
-  let code = response
-  const codeMatch = response.match(/```html([\s\S]*?)```/i)
-  if (codeMatch) {
-    code = codeMatch[1].trim()
+// Code enhancement function
+function enhanceGeneratedCode(code: string, insights: any, uiStyle: any): string {
+  let enhancedCode = code
+
+  // Extract HTML if it's wrapped in markdown
+  const htmlMatch = code.match(/```html\s*([\s\S]*?)\s*```/i)
+  if (htmlMatch) {
+    enhancedCode = htmlMatch[1].trim()
   }
 
   // Ensure proper HTML structure
-  if (!code.includes('<!DOCTYPE html>')) {
-    code = `<!DOCTYPE html>
+  if (!enhancedCode.includes('<!DOCTYPE html>')) {
+    enhancedCode = `<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${insights.vision}</title>
+    <title>${insights.vision || 'アプリケーション'}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-${code}
+${enhancedCode}
 </body>
 </html>`
   }
 
-  // Ensure Tailwind is included
-  if (!code.includes('tailwindcss')) {
-    code = code.replace('</head>', '<script src="https://cdn.tailwindcss.com"></script>\n</head>')
+  // Add Tailwind if not present
+  if (!enhancedCode.includes('tailwindcss')) {
+    enhancedCode = enhancedCode.replace('</head>', '    <script src="https://cdn.tailwindcss.com"></script>\n</head>')
   }
 
-  // Add custom Tailwind config for shadcn/ui compatibility
-  const tailwindConfig = `
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '${uiStyle.colors.primary}',
-              secondary: '${uiStyle.colors.secondary}',
-              accent: '${uiStyle.colors.accent}',
-              background: '${uiStyle.colors.background}',
-              foreground: '${uiStyle.colors.text}',
-              muted: '${uiStyle.category === 'dark' ? '#374151' : '#f3f4f6'}',
-              'muted-foreground': '${uiStyle.category === 'dark' ? '#9ca3af' : '#6b7280'}',
-              card: '${uiStyle.category === 'dark' ? '#1f2937' : '#ffffff'}',
-              'card-foreground': '${uiStyle.colors.text}',
-              popover: '${uiStyle.category === 'dark' ? '#1f2937' : '#ffffff'}',
-              'popover-foreground': '${uiStyle.colors.text}',
-              border: '${uiStyle.category === 'dark' ? '#374151' : '#e5e7eb'}',
-              input: '${uiStyle.category === 'dark' ? '#374151' : '#e5e7eb'}',
-              ring: '${uiStyle.colors.primary}',
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-            },
-          }
-        }
-      }
-    </script>
-  `
-
-  if (!code.includes('tailwind.config')) {
-    code = code.replace('</head>', `${tailwindConfig}\n</head>`)
+  // Add meta tags for better SEO
+  if (!enhancedCode.includes('<meta name="description"')) {
+    enhancedCode = enhancedCode.replace('</head>', `    <meta name="description" content="${insights.value || 'プロフェッショナルなWebアプリケーション'}">\n</head>`)
   }
 
-  // Add base shadcn/ui styles
-  const baseStyles = `
-    <style>
-      /* shadcn/ui base styles */
-      * {
-        border-color: theme('colors.border');
-      }
-      body {
-        font-family: theme('fontFamily.sans');
-        background-color: theme('colors.background');
-        color: theme('colors.foreground');
-      }
-      
-      /* shadcn/ui component styles */
-      .card {
-        @apply rounded-lg border bg-card text-card-foreground shadow-sm;
-      }
-      
-      .card-header {
-        @apply flex flex-col space-y-1.5 p-6;
-      }
-      
-      .card-title {
-        @apply text-2xl font-semibold leading-none tracking-tight;
-      }
-      
-      .card-description {
-        @apply text-sm text-muted-foreground;
-      }
-      
-      .card-content {
-        @apply p-6 pt-0;
-      }
-      
-      .card-footer {
-        @apply flex items-center p-6 pt-0;
-      }
-      
-      .btn {
-        @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
-      }
-      
-      .btn-primary {
-        @apply bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2;
-      }
-      
-      .btn-secondary {
-        @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2;
-      }
-      
-      .btn-destructive {
-        @apply bg-red-500 text-white hover:bg-red-600 h-10 px-4 py-2;
-      }
-      
-      .btn-outline {
-        @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2;
-      }
-      
-      .btn-ghost {
-        @apply hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2;
-      }
-      
-      .btn-icon {
-        @apply h-10 w-10;
-      }
-      
-      .input {
-        @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
-      }
-      
-      .label {
-        @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
-      }
-      
-      .textarea {
-        @apply flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
-      }
-      
-      .select {
-        @apply flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
-      }
-      
-      /* Animations */
-      @keyframes slideIn {
-        from {
-          transform: translateX(100%);
-        }
-        to {
-          transform: translateX(0);
-        }
-      }
-      
-      .animate-in {
-        animation: slideIn 0.2s ease-out;
-      }
-      
-      /* Toast notifications */
-      .toast {
-        @apply pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all;
-      }
-      
-      .toast-success {
-        @apply bg-green-50 text-green-900 border-green-200;
-      }
-      
-      .toast-error {
-        @apply bg-red-50 text-red-900 border-red-200;
-      }
-    </style>
-  `
-
-  if (!code.includes('shadcn/ui')) {
-    code = code.replace('</head>', `${baseStyles}\n</head>`)
-  }
-
-  return code
+  return enhancedCode
 }
 
 export async function POST(request: NextRequest) {
@@ -451,12 +394,20 @@ export async function POST(request: NextRequest) {
     // Get client IP for rate limiting
     const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
     
-    // DISABLED: Rate limiting completely disabled for development
-    console.log('[DEBUG] Rate limiting disabled for gemini-generate')
-    console.log('[DEBUG] NODE_ENV:', process.env.NODE_ENV)
-    
-    // Clear rate limit map to ensure fresh start
-    requestCounts.clear()
+    // Check rate limit
+    const rateLimit = getRateLimit(ip)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'レート制限に達しました。しばらく待ってから再試行してください。' },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': MAX_REQUESTS_PER_WINDOW.toString(),
+            'X-RateLimit-Remaining': '0',
+          }
+        }
+      )
+    }
 
     // Parse request body
     const body = await request.json() as GeminiGenerateRequest
@@ -469,8 +420,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check Gemini API key
-    const apiKey = process.env.GEMINI_API_KEY
+    // Check Gemini API key with manual fallback
+    let apiKey = process.env.GEMINI_API_KEY
+    
+    if (!apiKey) {
+      // Try manual .env.local loading
+      try {
+        const fs = require('fs')
+        const path = require('path')
+        const envPath = path.join(process.cwd(), '.env.local')
+        
+        if (fs.existsSync(envPath)) {
+          const envContent = fs.readFileSync(envPath, 'utf8')
+          const lines = envContent.split('\n')
+          
+          for (const line of lines) {
+            const trimmedLine = line.trim()
+            if (trimmedLine.startsWith('GEMINI_API_KEY=')) {
+              apiKey = trimmedLine.split('=')[1].trim()
+              console.log('[gemini-generate] Loaded GEMINI_API_KEY from .env.local')
+              break
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[gemini-generate] Error loading .env.local:', error)
+      }
+    }
+    
     if (!apiKey) {
       console.error('[gemini-generate] GEMINI_API_KEY is not set')
       return NextResponse.json(
@@ -480,7 +457,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create progress stream
-    const stream = createProgressStream(body.insights, body.uiStyle, apiKey, ip)
+    const stream = createProgressStream(body.insights, body.uiStyle, body.uxDesign, body.selectedTopPageDesign, apiKey)
 
     return new NextResponse(stream, {
       headers: {
@@ -498,7 +475,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(
       { 
-        error: 'Gemini CLI実行中に予期しないエラーが発生しました。',
+        error: 'Gemini API実行中に予期しないエラーが発生しました。',
         details: error instanceof Error ? error.message : 'Unknown error',
         responseTime
       },
@@ -512,19 +489,9 @@ export async function GET() {
   try {
     const hasApiKey = !!process.env.GEMINI_API_KEY
     
-    // Check if Gemini CLI is available
-    let geminiAvailable = false
-    try {
-      await execAsync('gemini --version', { timeout: 5000 })
-      geminiAvailable = true
-    } catch (error) {
-      console.warn('[gemini-generate] Gemini CLI not available:', error)
-    }
-
     return NextResponse.json({
       status: 'ok',
       geminiApiKeyConfigured: hasApiKey,
-      geminiCliAvailable: geminiAvailable,
       timestamp: new Date().toISOString()
     })
   } catch (error) {

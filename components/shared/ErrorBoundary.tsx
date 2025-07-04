@@ -33,10 +33,13 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary caught an error:', error, errorInfo)
-    }
+    // Log detailed error information
+    console.error('🚨 [ErrorBoundary] Caught an error:', error)
+    console.error('🚨 [ErrorBoundary] Error name:', error.name)
+    console.error('🚨 [ErrorBoundary] Error message:', error.message)
+    console.error('🚨 [ErrorBoundary] Error stack:', error.stack)
+    console.error('🚨 [ErrorBoundary] Component stack:', errorInfo.componentStack)
+    console.error('🚨 [ErrorBoundary] Full error info:', errorInfo)
     
     // You can also log the error to an error reporting service here
     this.setState({

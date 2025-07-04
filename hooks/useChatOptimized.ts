@@ -71,16 +71,23 @@ export function useChatOptimized() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const isLoadingRef = useRef(false) // isLoadingの参照を保持
   
-  // Reset loading state on mount
+  // Reset loading state on mount and sync ref
   useEffect(() => {
     setIsLoading(false)
+    isLoadingRef.current = false
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
     }
   }, [])
+  
+  // Sync isLoadingRef with isLoading state
+  useEffect(() => {
+    isLoadingRef.current = isLoading
+  }, [isLoading])
 
   // Cancel ongoing request
   const cancelRequest = useCallback(() => {
@@ -88,6 +95,7 @@ export function useChatOptimized() {
       abortControllerRef.current.abort()
       abortControllerRef.current = null
       setIsLoading(false)
+      isLoadingRef.current = false
     }
   }, [])
 
@@ -97,14 +105,16 @@ export function useChatOptimized() {
     phase: string,
     options?: ChatOptions
   ): Promise<string | null> => {
-    // Prevent concurrent requests
-    if (isLoading) {
+    // Prevent concurrent requests using ref to avoid stale closure
+    if (isLoadingRef.current) {
       const errorMessage = 'リクエストが既に進行中です。完了をお待ちください。'
+      console.warn('[useChatOptimized] 並行リクエストをブロック:', errorMessage)
       options?.onError?.(errorMessage)
       return null
     }
 
     setIsLoading(true)
+    isLoadingRef.current = true
     setError(null)
 
     // Create AbortController for request cancellation
@@ -263,9 +273,10 @@ export function useChatOptimized() {
         clearTimeout(timeoutId)
       }
       setIsLoading(false)
+      isLoadingRef.current = false
       abortControllerRef.current = null
     }
-  }, [isLoading, cancelRequest]) // 【Ultra Think】: isLoading must be in dependencies to prevent stale closure
+  }, [cancelRequest]) // isLoadingを依存配列から削除して無限ループを防ぐ
 
   const generateStructuredData = useCallback(async (
     conversations: Message[],
