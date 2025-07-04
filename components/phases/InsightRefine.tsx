@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Lightbulb, Target, Star, Heart, ArrowRight, RefreshCw, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PreviewButton from '@/components/shared/PreviewButton'
@@ -36,9 +36,15 @@ export default function InsightRefine() {
         hasInsights: !!insights,
         isLoading: chatOptimized.isLoading 
       })
-      generateInsights()
+      
+      // 小さな遅延を入れて状態が安定するのを待つ
+      const timer = setTimeout(() => {
+        generateInsights()
+      }, 100)
+      
+      return () => clearTimeout(timer)
     }
-  }, [state.conversations, insights, chatOptimized.isLoading])
+  }, [state.conversations, insights, generateInsights])
 
   // Cleanup on unmount - cancel any ongoing requests
   useEffect(() => {
@@ -47,7 +53,7 @@ export default function InsightRefine() {
     }
   }, [chatOptimized])
 
-  const generateInsights = async () => {
+  const generateInsights = useCallback(async () => {
     try {
       console.log('🚀 generateInsights called, starting validation...')
       
@@ -114,7 +120,7 @@ export default function InsightRefine() {
         return
       }
     }
-  }
+  }, [state.conversations, chatOptimized, actions])
 
   const handleNext = () => {
     if (insights) {

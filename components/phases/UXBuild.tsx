@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { 
   Lightbulb, Users, Package, Zap, TrendingUp, 
   ArrowRight, RefreshCw, Smartphone, Monitor, 
@@ -42,12 +42,23 @@ export default function UXBuild() {
   const [activeSection, setActiveSection] = useState<'why' | 'who' | 'what' | 'how' | 'impact'>('why')
 
   useEffect(() => {
-    if (state.insights && state.selectedUIStyle) {
-      generateUXStructure()
-    }
-  }, [])
+    // 少し遅延を入れて、状態が確実に更新されるのを待つ
+    const timer = setTimeout(() => {
+      if (state.insights && state.selectedUIStyle && !uxStructure && !chatOptimized.isLoading) {
+        console.log('🎯 Auto-triggering UX structure generation:', {
+          hasInsights: !!state.insights,
+          hasUIStyle: !!state.selectedUIStyle,
+          hasUXStructure: !!uxStructure,
+          isLoading: chatOptimized.isLoading
+        })
+        generateUXStructure()
+      }
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [state.insights, state.selectedUIStyle, uxStructure, generateUXStructure])
 
-  const generateUXStructure = async () => {
+  const generateUXStructure = useCallback(async () => {
     try {
       // 構造化されたアイデアとUIスタイルから最適なUX構造を生成
       const prompt = `
@@ -147,7 +158,7 @@ export default function UXBuild() {
       }
       createFallbackStructure()
     }
-  }
+  }, [state.insights, state.selectedUIStyle, chatOptimized, actions])
 
   const createFallbackStructure = () => {
     const fallback: UXStructure = {

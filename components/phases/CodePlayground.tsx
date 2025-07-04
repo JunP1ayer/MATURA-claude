@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ArrowRight, Eye, Palette, Layout, Type, Zap, CheckCircle, Code2, Download } from 'lucide-react'
 import { useMatura } from '@/components/providers/MaturaProvider'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 
 export default function CodePlayground() {
   const { state, actions } = useMatura()
@@ -77,81 +78,178 @@ export default function CodePlayground() {
   const [generationProgress, setGenerationProgress] = useState(0)
   const [generationMessage, setGenerationMessage] = useState('')
   const [generatedCode, setGeneratedCode] = useState<string | null>(null)
+  const [generationType, setGenerationType] = useState<'html' | 'modern'>('modern')
 
   const generateCode = async () => {
-    if (!state.insights || !state.selectedUIStyle) {
-      alert('洞察とUIスタイルが必要です')
-      return
-    }
-
-    setIsGeneratingCode(true)
-    setGenerationProgress(0)
-    setGenerationMessage('コード生成を開始中...')
-
     try {
-      const response = await fetch('/api/gemini-generate', {
+      console.log('[CodePlayground] ========== Starting generateCode ==========')
+      console.log('[CodePlayground] State insights:', state.insights)
+      console.log('[CodePlayground] State selectedUIStyle:', state.selectedUIStyle)
+      console.log('[CodePlayground] Generation type:', generationType)
+
+      if (!state.insights || !state.selectedUIStyle) {
+        console.error('[CodePlayground] Missing required data')
+        setGenerationMessage('❌ 洞察とUIスタイルが必要です')
+        setIsGeneratingCode(false)
+        return
+      }
+
+      console.log('[CodePlayground] Setting loading state...')
+      setIsGeneratingCode(true)
+      setGenerationProgress(0)
+      setGenerationMessage('コード生成を開始中...')
+
+      console.log('[CodePlayground] Preparing request body...')
+      
+      // UX構築フェーズのデータも取得
+      let uxStructure = null
+      if (state.uxDesign) {
+        // もしuxDesignがUXStructure形式の場合はそのまま使用
+        if (state.uxDesign.siteArchitecture || state.uxDesign.designSystem || state.uxDesign.keyScreens) {
+          uxStructure = state.uxDesign
+        }
+      }
+      
+      // unifiedUXDesignからも試してみる
+      if (!uxStructure && state.unifiedUXDesign?.structure) {
+        uxStructure = {
+          siteArchitecture: state.unifiedUXDesign.structure.siteArchitecture,
+          designSystem: state.unifiedUXDesign.structure.designSystem,
+          keyScreens: state.unifiedUXDesign.structure.keyScreens || []
+        }
+      }
+      
+      console.log('[CodePlayground] UX構築データ:', uxStructure)
+      
+      const requestBody = {
+        insights: state.insights,
+        uiStyle: state.selectedUIStyle,
+        uxDesign: state.uxDesign || state.unifiedUXDesign,
+        selectedTopPageDesign: state.selectedTopPageDesign,
+        uxStructure: uxStructure,  // 🚀 UX構築データを追加
+        mode: 'standard'
+      }
+      console.log('[CodePlayground] Request body:', JSON.stringify(requestBody, null, 2))
+
+      console.log('[CodePlayground] Calling API...', generationType)
+      const apiEndpoint = generationType === 'modern' ? '/api/generate-modern-app' : '/api/gemini-generate'
+      
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          insights: state.insights,
-          uiStyle: state.selectedUIStyle,
-          mode: 'standard'
-        }),
+        body: JSON.stringify(requestBody),
+      })
+
+      console.log('[CodePlayground] Response received:', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text()
+        console.error('[CodePlayground] Error response:', errorText)
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
       }
 
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('ストリーミングレスポンスが取得できません')
+      if (!response.body) {
+        console.error('[CodePlayground] No response body')
+        throw new Error('レスポンスボディが取得できません')
       }
 
+      console.log('[CodePlayground] Starting to read stream...')
+      const reader = response.body.getReader()
       const decoder = new TextDecoder()
-      let result = ''
+      let buffer = ''
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            console.log('[CodePlayground] Stream reading completed')
+            break
+          }
 
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
+          const chunk = decoder.decode(value, { stream: true })
+          buffer += chunk
+          console.log('[CodePlayground] Received chunk length:', chunk.length)
+          
+          // Process complete lines from buffer
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || '' // Keep the last incomplete line in buffer
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.slice(6))
-              
-              if (data.type === 'progress') {
-                setGenerationProgress(data.progress)
-                setGenerationMessage(data.message)
-              } else if (data.type === 'complete') {
-                setGeneratedCode(data.code)
-                setGenerationProgress(100)
-                setGenerationMessage('生成完了！')
-                
-                // 生成されたコードをstateに保存
-                actions.setGeneratedCode({
-                  html: data.code,
-                  metadata: data.metadata,
-                  generatedAt: new Date().toISOString()
-                })
-              } else if (data.type === 'error') {
-                throw new Error(data.error || '生成エラー')
+          for (const line of lines) {
+            if (line.trim() && line.startsWith('data: ')) {
+              try {
+                const dataStr = line.slice(6).trim()
+                if (dataStr) {
+                  console.log('[CodePlayground] Parsing data:', dataStr.substring(0, 100))
+                  const data = JSON.parse(dataStr)
+                  console.log('[CodePlayground] Parsed data:', data)
+                  
+                  // 新しいAPI形式に対応
+                  if (data.progress !== undefined) {
+                    console.log('[CodePlayground] Progress update:', data.progress, data.message)
+                    setGenerationProgress(data.progress)
+                    setGenerationMessage(data.message || '')
+                    
+                    // 生成完了の場合
+                    if (data.progress === 100 && data.code) {
+                      console.log('[CodePlayground] Generation complete, code length:', data.code?.length || 0)
+                      
+                      if (!data.code || data.code.length === 0) {
+                        throw new Error('生成されたコードが空です')
+                      }
+                      
+                      setGeneratedCode(data.code)
+                      setGenerationMessage('生成完了！')
+                      
+                      // 生成されたコードをstateに保存
+                      if (actions.setGeneratedCode) {
+                        actions.setGeneratedCode({
+                          html: data.code,
+                          fullHtml: data.code, // フルHTMLとして保存
+                          generationType: data.generationType || 'ux-enhanced',
+                          features: data.features || [],
+                          generatedAt: new Date().toISOString(),
+                          isComplete: true
+                        })
+                      }
+                      break // Exit the loop on completion
+                    }
+                  } else if (data.error) {
+                    console.error('[CodePlayground] Error from stream:', data.error)
+                    throw new Error(data.error || '生成エラー')
+                  }
+                }
+              } catch (parseError) {
+                console.warn('[CodePlayground] JSONパースエラー:', parseError, 'for line:', line.substring(0, 100))
+                // Continue processing other lines even if one fails
               }
-            } catch (parseError) {
-              console.warn('JSONパースエラー:', parseError)
             }
           }
         }
+      } finally {
+        // Always release the reader
+        reader.releaseLock()
       }
     } catch (error) {
-      console.error('コード生成エラー:', error)
-      setGenerationMessage(`エラー: ${error instanceof Error ? error.message : '不明なエラー'}`)
+      console.error('[CodePlayground] ========== ERROR in generateCode ==========')
+      console.error('[CodePlayground] Error type:', typeof error)
+      console.error('[CodePlayground] Error:', error)
+      console.error('[CodePlayground] Error stack:', error instanceof Error ? error.stack : 'No stack')
+      
+      setGenerationMessage(`❌ エラー: ${error instanceof Error ? error.message : '不明なエラー'}`)
+      setGeneratedCode(null) // エラー時は生成コードをクリア
+      setGenerationProgress(0)
+      
+      // 再生成ボタンを表示するためのヘルパー（UIで活用可能）
+      console.log('[CodePlayground] エラーが発生しました。再生成を試してください。')
     } finally {
+      console.log('[CodePlayground] ========== Finishing generateCode ==========')
       setIsGeneratingCode(false)
     }
   }
@@ -159,15 +257,47 @@ export default function CodePlayground() {
   const downloadCode = () => {
     if (!generatedCode) return
     
-    const blob = new Blob([generatedCode], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${state.insights?.appName || 'app'}.html`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    if (generationType === 'modern') {
+      // Reactアプリの場合は、HTMLプレビューファイルをダウンロード
+      const htmlPreview = state.generatedCode?.htmlPreview || `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${state.insights?.appName || 'App'}</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+${generatedCode}
+    </script>
+</body>
+</html>`
+      const blob = new Blob([htmlPreview], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${state.insights?.appName || 'app'}_react.html`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } else {
+      // 通常のHTMLファイルの場合
+      const blob = new Blob([generatedCode], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${state.insights?.appName || 'app'}.html`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
   }
 
   const handleNext = () => {
@@ -220,7 +350,8 @@ export default function CodePlayground() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <ErrorBoundary>
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* ヘッダー */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-4">
@@ -443,17 +574,100 @@ export default function CodePlayground() {
         
         <div className="p-6">
           {!isGeneratingCode && !generatedCode && (
-            <div className="text-center">
-              <p className="text-gray-600 mb-6">
-                Gemini AIを使用して、完全に動作するHTMLアプリケーションを生成します
-              </p>
-              <button
-                onClick={generateCode}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
-              >
-                <Code2 className="w-5 h-5" />
-                コード生成を開始
-              </button>
+            <div className="space-y-6">
+              {/* 生成タイプ選択 */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-3">生成タイプを選択</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div 
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      generationType === 'modern' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setGenerationType('modern')}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <input 
+                        type="radio" 
+                        checked={generationType === 'modern'} 
+                        onChange={() => setGenerationType('modern')}
+                        className="text-blue-600"
+                      />
+                      <h5 className="font-bold text-gray-900">⚡ モダンReactアプリ</h5>
+                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">推奨</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      React + TypeScript + Tailwind CSS
+                    </p>
+                    <ul className="text-xs text-gray-500 space-y-1">
+                      <li>✅ 完全な CRUD 操作</li>
+                      <li>✅ 型安全な開発体験</li>
+                      <li>✅ 高度なデータ永続化</li>
+                      <li>✅ ダッシュボード & 分析</li>
+                      <li>✅ コンポーネント分割</li>
+                    </ul>
+                  </div>
+                  
+                  <div 
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      generationType === 'html' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setGenerationType('html')}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <input 
+                        type="radio" 
+                        checked={generationType === 'html'} 
+                        onChange={() => setGenerationType('html')}
+                        className="text-blue-600"
+                      />
+                      <h5 className="font-bold text-gray-900">📄 シンプルHTML</h5>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      単一HTMLファイル
+                    </p>
+                    <ul className="text-xs text-gray-500 space-y-1">
+                      <li>✅ 即座にブラウザで実行</li>
+                      <li>✅ セットアップ不要</li>
+                      <li>✅ 軽量でシンプル</li>
+                      <li>⚠️ 基本的な機能のみ</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-gray-600 mb-6">
+                  {generationType === 'modern' 
+                    ? 'プロダクションレベルのReactアプリケーションを生成します' 
+                    : 'Gemini AIを使用して、完全に動作するHTMLアプリケーションを生成します'
+                  }
+                </p>
+                {generationMessage && generationMessage.startsWith('❌') && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <p className="text-red-700 font-medium mb-2">{generationMessage}</p>
+                    <button
+                      onClick={() => {
+                        setGenerationMessage('')
+                        generateCode()
+                      }}
+                      className="text-sm bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                    >
+                      再生成を試す
+                    </button>
+                  </div>
+                )}
+                <button
+                  onClick={generateCode}
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                >
+                  <Code2 className="w-5 h-5" />
+                  {generationType === 'modern' ? 'Reactアプリを生成' : 'HTMLファイルを生成'}
+                </button>
+              </div>
             </div>
           )}
           
@@ -486,12 +700,29 @@ export default function CodePlayground() {
               </div>
               
               <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-800 mb-3">生成されたコード</h4>
+                <h4 className="font-semibold text-gray-800 mb-3">
+                  {generationType === 'modern' ? '生成されたReactアプリケーション' : '生成されたHTMLコード'}
+                </h4>
                 <div className="bg-white border rounded-lg p-4 max-h-64 overflow-y-auto">
                   <pre className="text-xs text-gray-600 whitespace-pre-wrap">
                     {generatedCode.substring(0, 500)}...
                   </pre>
                 </div>
+                {generationType === 'modern' && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h5 className="font-medium text-blue-900 mb-2">📁 プロジェクト構成</h5>
+                    <div className="text-sm text-blue-700 grid grid-cols-2 gap-1">
+                      <div>• package.json</div>
+                      <div>• src/types/index.ts</div>
+                      <div>• src/stores/index.ts</div>
+                      <div>• src/db/index.ts</div>
+                      <div>• src/components/</div>
+                      <div>• src/pages/</div>
+                      <div>• src/App.tsx</div>
+                      <div>• tailwind.config.js</div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="flex gap-4 justify-center">
@@ -500,21 +731,75 @@ export default function CodePlayground() {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
                 >
                   <Download className="w-4 h-4" />
-                  HTMLファイルをダウンロード
+                  {generationType === 'modern' ? 'プロジェクトをダウンロード' : 'HTMLファイルをダウンロード'}
                 </button>
                 
-                <button
-                  onClick={() => {
-                    const blob = new Blob([generatedCode], { type: 'text/html' })
-                    const url = URL.createObjectURL(blob)
-                    window.open(url, '_blank')
-                    setTimeout(() => URL.revokeObjectURL(url), 100)
-                  }}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                >
-                  <Eye className="w-4 h-4" />
-                  プレビュー表示
-                </button>
+                {generationType === 'html' && (
+                  <button
+                    onClick={() => {
+                      const blob = new Blob([generatedCode], { type: 'text/html' })
+                      const url = URL.createObjectURL(blob)
+                      window.open(url, '_blank')
+                      setTimeout(() => URL.revokeObjectURL(url), 100)
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    プレビュー表示
+                  </button>
+                )}
+                
+                {generationType === 'modern' && (
+                  <button
+                    onClick={() => {
+                      try {
+                        // プレビュー用HTMLを取得（state.generatedCodeから優先的に取得）
+                        let htmlContent = ''
+                        
+                        if (state.generatedCode?.htmlPreview) {
+                          console.log('[CodePlayground] Using htmlPreview from state')
+                          htmlContent = state.generatedCode.htmlPreview
+                        } else if (generatedCode) {
+                          console.log('[CodePlayground] Creating preview from generated code')
+                          // Reactコードを実行可能なHTMLでラップ
+                          htmlContent = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${state.insights?.appName || 'App'} - プレビュー</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+${generatedCode}
+    </script>
+</body>
+</html>`
+                        } else {
+                          throw new Error('プレビュー用のコードがありません')
+                        }
+                        
+                        console.log('[CodePlayground] Preview HTML length:', htmlContent.length)
+                        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' })
+                        const url = URL.createObjectURL(blob)
+                        window.open(url, '_blank')
+                        setTimeout(() => URL.revokeObjectURL(url), 1000)
+                      } catch (error) {
+                        console.error('[CodePlayground] Preview error:', error)
+                        alert('プレビューの表示に失敗しました。コードを再生成してください。')
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    アプリをプレビュー
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -542,6 +827,7 @@ export default function CodePlayground() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   )
 }
