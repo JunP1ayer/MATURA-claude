@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Lightbulb, Target, Star, Heart, ArrowRight, RefreshCw, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PreviewButton from '@/components/shared/PreviewButton'
@@ -9,151 +9,166 @@ import { useMatura } from '@/components/providers/MaturaProvider'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
 import { Insight } from '@/lib/types'
 
-export default function InsightRefine() {
+function InsightRefineNew() {
+  console.log('🎉 BRAND NEW FILE - InsightRefineNew - NO CACHE ISSUES! 🎉')
+  
   const { state, actions } = useMatura()
   const chatOptimized = useChatOptimized()
   const [insights, setInsights] = useState<Insight | null>(null)
+  const hasTriedGenerationRef = useRef(false)
+  const isGeneratingRef = useRef(false)
 
+  // シンプルで確実な洞察生成関数
   const generateInsights = useCallback(async () => {
+    console.log('🚀 generateInsights実行開始!')
+    
+    // 重複実行防止
+    if (isGeneratingRef.current || chatOptimized.isLoading) {
+      console.log('❌ 既に処理中のためスキップ')
+      return
+    }
+    
+    // 会話データ検証
+    const conversations = state.conversations || []
+    const validConversations = conversations.filter(conv => 
+      conv && conv.content && conv.content.trim().length > 0
+    )
+    
+    if (validConversations.length === 0) {
+      console.log('❌ 有効な会話データなし')
+      return
+    }
+    
+    console.log('✅ 条件クリア、API呼び出し開始')
+    
+    isGeneratingRef.current = true
+    hasTriedGenerationRef.current = true
+    
     try {
-      console.log('🚀 generateInsights called, starting validation...')
+      const conversationText = validConversations
+        .map(conv => `${conv.role}: ${conv.content.trim()}`)
+        .join('\n\n')
       
-      // より厳密なデータ検証
-      if (!state.conversations || 
-          !Array.isArray(state.conversations) || 
-          state.conversations.length === 0) {
-        console.warn('❌ conversations が空または無効のため、洞察生成をスキップします')
-        return
-      }
+      const prompt = `以下の対話から、ユーザーのアイデアを分析し、JSON形式で洞察を抽出してください。
 
-      // 有効なコンテンツがあるconversationが存在するかチェック
-      const validConversations = state.conversations.filter(conv => 
-        conv && conv.content && typeof conv.content === 'string' && conv.content.trim() !== ''
-      )
+【対話内容】
+${conversationText}
 
-      if (validConversations.length === 0) {
-        console.warn('❌ 有効なconversationが見つからないため、洞察生成をスキップします')
-        return
-      }
+【要求】
+以下のJSON形式で出力してください：
+{
+  "vision": "実現したいビジョン",
+  "target": "ターゲットユーザー",
+  "features": ["機能1", "機能2", "機能3"],
+  "value": "提供価値",
+  "motivation": "動機・背景"
+}
 
-      console.log('✅ 洞察生成を開始:', { 
-        totalConversations: state.conversations.length,
-        validConversations: validConversations.length,
-        isLoadingBefore: chatOptimized.isLoading,
-        firstConversation: validConversations[0]?.content?.substring(0, 100)
-      })
+※必ずJSON形式で回答してください。`
 
-      const structuredData = await chatOptimized.generateStructuredData(
-        state.conversations,
+      const result = await chatOptimized.sendMessage(
+        prompt,
+        [],
         'InsightRefine',
         {
+          timeout: 30000,
           onError: (error) => {
-            console.error('❌ 洞察生成エラー:', error)
-            // AbortErrorの場合はUI状態をリセット
-            if (error.includes('aborted') || error.includes('abort')) {
-              console.log('🚫 Request was aborted, not showing error to user')
-              // 中止された場合は実行フラグをリセット
-              setHasExecuted(false)
-              return
-            }
-          },
-          timeout: 45000 // 45 second timeout for structured data generation
+            console.error('❌ API呼び出しエラー:', error)
+            isGeneratingRef.current = false
+            hasTriedGenerationRef.current = false
+          }
         }
       )
       
-      console.log('📊 generateStructuredData結果:', {
-        hasData: !!structuredData,
-        dataType: typeof structuredData,
-        dataKeys: structuredData ? Object.keys(structuredData) : null
-      })
+      console.log('📨 API応答:', { hasResult: !!result, resultLength: result?.length })
       
-      if (structuredData) {
-        console.log('✅ 洞察データを設定中...')
-        setInsights(structuredData)
-        actions.setInsights(structuredData)
-        console.log('✅ 洞察データ設定完了')
+      if (result && typeof result === 'string' && result.trim().length > 0) {
+        try {
+          // JSONの抽出
+          let jsonString = result.trim()
+          const jsonMatch = jsonString.match(/\{[^]*\}/)
+          if (jsonMatch) {
+            jsonString = jsonMatch[0]
+          }
+          
+          const parsedInsights = JSON.parse(jsonString)
+          
+          console.log('✅ 洞察データ解析成功:', parsedInsights)
+          
+          setInsights(parsedInsights)
+          actions.setInsights(parsedInsights)
+          
+        } catch (parseError) {
+          console.error('❌ JSON解析エラー:', parseError)
+          hasTriedGenerationRef.current = false
+        }
       } else {
-        console.warn('❌ generateStructuredDataがnullを返しました')
+        console.error('❌ 無効なAPI応答')
+        hasTriedGenerationRef.current = false
       }
+      
     } catch (error) {
-      console.error('💥 洞察生成エラー:', error)
-      // ユーザーの意図的なキャンセルの場合はエラー表示しない
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('🚫 Request was intentionally aborted, not showing error')
-        // 中止された場合は実行フラグをリセット
-        setHasExecuted(false)
-        return
-      }
+      console.error('❌ 洞察生成エラー:', error)
+      hasTriedGenerationRef.current = false
+    } finally {
+      isGeneratingRef.current = false
     }
   }, [state.conversations, chatOptimized, actions])
 
-  // 初回実行フラグを追加
-  const [hasExecuted, setHasExecuted] = useState(false)
-
+  // 自動実行Effect - シンプル版
   useEffect(() => {
-    // データが変わった場合のみ実行フラグをリセット
-    if (state.conversations && state.conversations.length > 0 && hasExecuted && !insights) {
-      setHasExecuted(false)
-    }
-  }, [state.conversations])
-
-  useEffect(() => {
-    // 洞察生成の条件をチェック
-    const hasValidConversations = state.conversations && 
-                                  Array.isArray(state.conversations) && 
-                                  state.conversations.length > 0 &&
-                                  state.conversations.some(conv => conv.content && conv.content.trim() !== '')
+    console.log('🔍 useEffect実行 - 自動生成チェック')
     
-    console.log('🔍 InsightRefine useEffect triggered:', {
+    const hasValidConversations = state.conversations && 
+                                  state.conversations.length > 0 &&
+                                  state.conversations.some(conv => conv.content && conv.content.trim().length > 0)
+    
+    const shouldGenerate = hasValidConversations && 
+                          !insights && 
+                          !hasTriedGenerationRef.current && 
+                          !isGeneratingRef.current &&
+                          !chatOptimized.isLoading
+    
+    console.log('🎯 自動生成判定:', {
       hasValidConversations,
-      conversationsLength: state.conversations?.length || 0,
       hasInsights: !!insights,
+      hasTriedGeneration: hasTriedGenerationRef.current,
+      isGenerating: isGeneratingRef.current,
       isLoading: chatOptimized.isLoading,
-      hasExecuted
+      shouldGenerate
     })
     
-    // 条件: 有効な会話があり、洞察がなく、ローディング中でなく、まだ実行していない場合
-    if (hasValidConversations && !insights && !chatOptimized.isLoading && !hasExecuted) {
-      console.log('✅ 自動洞察生成を開始:', { 
-        conversationsCount: state.conversations.length,
-        hasInsights: !!insights,
-        isLoading: chatOptimized.isLoading 
-      })
-      
-      setHasExecuted(true)
-      generateInsights()
+    if (shouldGenerate) {
+      console.log('🚀 自動生成を実行します!')
+      // 小さな遅延で確実に実行
+      setTimeout(() => generateInsights(), 100)
     }
-  }, [insights, hasExecuted]) // chatOptimized.isLoadingを除去して無限ループを防ぐ
+  }, [state.conversations, insights, chatOptimized.isLoading, generateInsights])
 
-  // Cleanup on unmount - cancel any ongoing requests
+  // 手動再生成
+  const handleRegenerate = useCallback(() => {
+    console.log('🔄 手動再生成開始')
+    
+    // フラグリセット
+    hasTriedGenerationRef.current = false
+    isGeneratingRef.current = false
+    setInsights(null)
+    chatOptimized.clearError?.()
+    
+    // 直接実行
+    setTimeout(() => generateInsights(), 100)
+  }, [generateInsights, chatOptimized])
+
+  // クリーンアップ
   useEffect(() => {
-    return () => {
-      // cleanup関数を呼ぶが、エラーは無視
-      try {
-        chatOptimized.cleanup()
-      } catch (error) {
-        // cleanup時のエラーは無視
-      }
-    }
-  }, [])
+    return () => chatOptimized.cleanup()
+  }, [chatOptimized])
 
   const handleNext = () => {
     if (insights) {
       actions.setInsights(insights)
       actions.nextPhase()
     }
-  }
-
-  const handleRegenerate = () => {
-    setInsights(null)
-    setHasExecuted(false)
-    // 少し遅延を入れてuseEffectが適切に実行されるようにする
-    setTimeout(() => {
-      if (!hasExecuted) {
-        setHasExecuted(true)
-        generateInsights()
-      }
-    }, 50)
   }
 
   return (
@@ -169,13 +184,24 @@ export default function InsightRefine() {
             <div className="flex items-center gap-3">
               <Lightbulb className="w-8 h-8" />
               <div>
-                <h2 className="text-2xl font-bold mb-2">InsightRefine - 洞察の精製</h2>
+                <h2 className="text-2xl font-bold mb-2">InsightRefine - 洞察の精製 (新版)</h2>
                 <p className="text-white/90">
                   あなたの対話から重要な洞察を抽出します
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
+              {/* 手動実行ボタン */}
+              <button
+                onClick={() => {
+                  console.log('🔧 手動実行ボタンクリック')
+                  generateInsights()
+                }}
+                className="px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors text-white text-sm"
+              >
+                🚀 今すぐ実行
+              </button>
+              
               {chatOptimized.isLoading && (
                 <button
                   onClick={chatOptimized.cancelRequest}
@@ -188,8 +214,7 @@ export default function InsightRefine() {
               {insights && !chatOptimized.isLoading && (
                 <button
                   onClick={handleRegenerate}
-                  disabled={chatOptimized.isLoading}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
                   再生成
@@ -362,61 +387,42 @@ export default function InsightRefine() {
                 </button>
               </motion.div>
             </motion.div>
-          ) : !insights && !chatOptimized.isLoading ? (
+          ) : (
             <div className="text-center py-16">
-              {/* より詳細な状態判定でUI分岐 */}
-              {(() => {
-                // conversationsが完全に未定義または空
-                if (!state.conversations || state.conversations.length === 0) {
-                  return (
-                    <div>
-                      <p className="text-gray-600 mb-4">対話データを読み込み中...</p>
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-matura-primary mx-auto"></div>
-                    </div>
-                  )
-                }
-                
-                // conversationsは存在するが有効なコンテンツがない
-                const hasValidContent = state.conversations.some(conv => 
-                  conv && conv.content && conv.content.trim() !== ''
-                )
-                
-                if (!hasValidContent) {
-                  return (
-                    <div>
-                      <p className="text-yellow-600 mb-4">有効な対話データが見つかりません</p>
-                      <p className="text-gray-500 text-sm mb-4">
-                        まず前のフェーズでしっかりと対話を行ってください
-                      </p>
-                      <button
-                        onClick={handleRegenerate}
-                        disabled={chatOptimized.isLoading}
-                        className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors disabled:opacity-50"
-                      >
-                        再試行
-                      </button>
-                    </div>
-                  )
-                }
-                
-                // 有効なデータはあるが生成に失敗した
-                return (
-                  <div>
-                    <p className="text-red-600 mb-4">洞察の生成に失敗しました</p>
-                    <button
-                      onClick={handleRegenerate}
-                      disabled={chatOptimized.isLoading}
-                      className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors disabled:opacity-50"
-                    >
-                      再試行
-                    </button>
-                  </div>
-                )
-              })()}
+              <div>
+                <p className="text-red-600 mb-4">洞察の生成に失敗しました</p>
+                <p className="text-gray-500 text-sm mb-4">
+                  「🚀 今すぐ実行」ボタンをクリックして手動で実行してください
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={handleRegenerate}
+                    className="px-6 py-2 bg-matura-primary text-white rounded-lg hover:bg-matura-secondary transition-colors"
+                  >
+                    再試行
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('🔧 デバッグ情報:', {
+                        conversations: state.conversations,
+                        hasTriedGeneration: hasTriedGenerationRef.current,
+                        isGenerating: isGeneratingRef.current,
+                        isLoading: chatOptimized.isLoading,
+                        error: chatOptimized.error
+                      })
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                  >
+                    デバッグ情報
+                  </button>
+                </div>
+              </div>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </motion.div>
   )
 }
+
+export default InsightRefineNew

@@ -41,23 +41,6 @@ export default function UXBuild() {
   const [uxStructure, setUxStructure] = useState<UXStructure | null>(null)
   const [activeSection, setActiveSection] = useState<'why' | 'who' | 'what' | 'how' | 'impact'>('why')
 
-  useEffect(() => {
-    // 少し遅延を入れて、状態が確実に更新されるのを待つ
-    const timer = setTimeout(() => {
-      if (state.insights && state.selectedUIStyle && !uxStructure && !chatOptimized.isLoading) {
-        console.log('🎯 Auto-triggering UX structure generation:', {
-          hasInsights: !!state.insights,
-          hasUIStyle: !!state.selectedUIStyle,
-          hasUXStructure: !!uxStructure,
-          isLoading: chatOptimized.isLoading
-        })
-        generateUXStructure()
-      }
-    }, 100)
-    
-    return () => clearTimeout(timer)
-  }, [state.insights, state.selectedUIStyle, uxStructure, generateUXStructure])
-
   const generateUXStructure = useCallback(async () => {
     try {
       // 構造化されたアイデアとUIスタイルから最適なUX構造を生成
@@ -159,6 +142,23 @@ export default function UXBuild() {
       createFallbackStructure()
     }
   }, [state.insights, state.selectedUIStyle, chatOptimized, actions])
+
+  useEffect(() => {
+    // 少し遅延を入れて、状態が確実に更新されるのを待つ
+    const timer = setTimeout(() => {
+      if (state.insights && state.selectedUIStyle && !uxStructure && !chatOptimized.isLoading) {
+        console.log('🎯 Auto-triggering UX structure generation:', {
+          hasInsights: !!state.insights,
+          hasUIStyle: !!state.selectedUIStyle,
+          hasUXStructure: !!uxStructure,
+          isLoading: chatOptimized.isLoading
+        })
+        generateUXStructure()
+      }
+    }, 100)
+    
+    return () => clearTimeout(timer)
+  }, [state.insights, state.selectedUIStyle, uxStructure, chatOptimized.isLoading])
 
   const createFallbackStructure = () => {
     const fallback: UXStructure = {
