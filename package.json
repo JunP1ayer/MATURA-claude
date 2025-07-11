@@ -1,41 +1,128 @@
 {
   "name": "matura-mvp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
+  "description": "MATURA - Autonomous High-Quality Code Generation Platform",
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "quality": "npm run type-check && npm run lint && npm run prettier",
+    "quality:fix": "npm run type-check && npm run lint:fix && npm run prettier:fix",
+    "prepare": "husky install",
+    "analyze": "cross-env ANALYZE=true next build",
+    "test:autonomous": "tsx scripts/test-autonomous-generation.ts",
+    "generate:all": "tsx scripts/generateAll.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@hookform/resolvers": "^3.3.2",
+    "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-toast": "^1.1.5",
+    "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^2.30.0",
     "framer-motion": "^11.18.2",
+    "immer": "^10.1.1",
     "lucide-react": "^0.454.0",
     "next": "^14.2.15",
+    "next-themes": "^0.4.6",
     "openai": "^4.67.3",
     "puppeteer": "^24.10.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.48.2",
+    "recharts": "^2.8.0",
     "tailwind-merge": "^3.3.1",
-    "zod": "^3.25.67"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.25.67",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^14.2.15",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/jest": "^29.5.8",
     "@types/node": "^22.8.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.15",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "lint-staged": "^15.1.0",
+    "node-fetch": "^2.7.0",
     "postcss": "^8.4.47",
     "postcss-import": "^15.1.0",
+    "prettier": "^3.1.0",
     "tailwindcss": "^3.4.14",
+    "tsx": "^4.6.0",
     "typescript": "^5.6.3"
-  }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run quality"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "nextjs",
+    "typescript",
+    "shadcn-ui",
+    "tailwindcss",
+    "autonomous-generation",
+    "code-generator",
+    "ai-powered",
+    "figma-integration",
+    "design-system"
+  ],
+  "author": "MATURA Development Team",
+  "license": "MIT"
 }

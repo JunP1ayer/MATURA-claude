@@ -232,32 +232,32 @@ function buildProfessionalPrompt(insights: any, uiStyle: any, uxDesign: any, top
 - **パーソナリティ**: ${uiStyle?.personality?.join('、') || 'モダン、洗練された'}
 
 ## レイアウト設計原則
-${layoutPrinciples.length > 0 ? layoutPrinciples.map(p => `- ${p}`).join('\n') : `
+${layoutPrinciples.length > 0 ? layoutPrinciples.map((p: any) => `- ${p}`).join('\n') : `
 - モバイルファーストアプローチ
 - グリッドシステムベースのレイアウト
 - 視覚的階層の明確化
 - 適切な余白とパディング`}
 
 ## 配色ガイドライン
-${colorGuidelines.length > 0 ? colorGuidelines.map(g => `- ${g}`).join('\n') : `
+${colorGuidelines.length > 0 ? colorGuidelines.map((g: any) => `- ${g}`).join('\n') : `
 - 高コントラストで読みやすさを重視
 - ブランドカラーの一貫した使用
 - アクセシビリティ基準AAA準拠`}
 
 ## ナビゲーション戦略
-${navigationStrategy.length > 0 ? navigationStrategy.map(s => `- ${s}`).join('\n') : `
+${navigationStrategy.length > 0 ? navigationStrategy.map((s: any) => `- ${s}`).join('\n') : `
 - 直感的なメニュー構造
 - パンくずナビゲーション
 - 明確なCTAボタン配置`}
 
 ## タイポグラフィ
-${typographyGuidelines.length > 0 ? typographyGuidelines.map(t => `- ${t}`).join('\n') : `
+${typographyGuidelines.length > 0 ? typographyGuidelines.map((t: any) => `- ${t}`).join('\n') : `
 - 見出しは階層的なサイズ設定
 - 本文は読みやすいフォントサイズ
 - 重要情報の適切な強調表示`}
 
 ## アニメーション・インタラクション
-${animationPrinciples.length > 0 ? animationPrinciples.map(a => `- ${a}`).join('\n') : `
+${animationPrinciples.length > 0 ? animationPrinciples.map((a: any) => `- ${a}`).join('\n') : `
 - 微細なホバーエフェクト
 - スムーズなページ遷移
 - ローディング状態の表現`}

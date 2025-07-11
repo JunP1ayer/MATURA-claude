@@ -254,3 +254,49 @@ export interface HistoryItem {
   data: any
   conversations: Message[]
 }
+
+// App generation types
+export interface AppRequirement {
+  appType: string
+  description: string
+  features: string[]
+  theme: string
+  complexity: string
+  apiNeeds: boolean
+  storeNeeds: boolean
+  category: string
+  targetUser: string
+  primaryColor: string
+  dataStructure: {
+    mainEntity: string
+    fields: string[]
+  }
+}
+
+export interface FigmaDesignSystem {
+  colors: string[]
+  fonts: string[]
+  components: Array<{
+    id: string
+    name: string
+    type: string
+  }>
+}
+
+export interface GeneratedAppResult {
+  mainPage: string
+  written: boolean
+  path: string
+  validated: boolean
+  generationMethod: string
+  timestamp: string
+  appType: string
+  features: string[]
+  figmaIntegrated: boolean
+  figmaData?: {
+    name: string
+    colorsUsed: string[]
+    fontsUsed: string[]
+    componentsUsed: number
+  } | null
+}
