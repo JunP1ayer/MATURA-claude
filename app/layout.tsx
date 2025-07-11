@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { MaturaProvider } from '@/components/providers/MaturaProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -58,11 +57,9 @@ export default function RootLayout({
   return (
     <html lang="ja" className="scroll-smooth">
       <body className={inter.className}>
-        <MaturaProvider>
-          <div className="min-h-screen bg-matura-bg">
-            {children}
-          </div>
-        </MaturaProvider>
+        <div className="min-h-screen bg-gray-50">
+          {children}
+        </div>
       </body>
     </html>
   )

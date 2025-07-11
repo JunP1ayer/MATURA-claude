@@ -231,7 +231,7 @@ class UXStructureCodeGenerator {
                         <button onclick="showPage('dashboard')" class="nav-link hover-smooth px-3 py-2 rounded-md text-sm font-medium">
                             ダッシュボード
                         </button>
-                        ${keyScreens.map(screen => `
+                        ${keyScreens.map((screen: any) => `
                         <button onclick="showPage('${screen.name.toLowerCase()}')" class="nav-link hover-smooth px-3 py-2 rounded-md text-sm font-medium">
                             ${screen.name}
                         </button>
@@ -314,12 +314,12 @@ class UXStructureCodeGenerator {
                     主要機能
                 </h3>
                 <div class="grid-layout">
-                    ${mainFeatures.map(feature => `
+                    ${mainFeatures.map((feature: any) => `
                     <div class="card-layout hover-smooth">
                         <h4 class="text-lg font-semibold ux-accent mb-2">${feature.name}</h4>
                         <p class="ux-body mb-4">${feature.description}</p>
                         <div class="feature-ui-elements">
-                            ${feature.uiElements.map(element => `
+                            ${feature.uiElements.map((element: any) => `
                             <span class="inline-block px-2 py-1 text-sm rounded mr-2 mb-1" style="background: ${colors.accent}20; color: ${colors.accent};">
                                 ${element}
                             </span>
@@ -415,7 +415,7 @@ class UXStructureCodeGenerator {
                 <p class="ux-body mb-6">${screen.purpose}</p>
                 
                 <div class="screen-components grid-layout">
-                    ${screen.components.map(component => `
+                    ${screen.components.map((component: any) => `
                     <div class="component-card p-4 border rounded hover-smooth" style="border-color: ${colors.border};">
                         <h4 class="font-semibold ux-accent mb-2">${component}</h4>
                         <p class="text-sm ux-body">このコンポーネントは${screen.purpose}をサポートします</p>
@@ -450,7 +450,7 @@ class UXStructureCodeGenerator {
             </div>
             
             <form id="create-form" class="space-y-4">
-                ${mainFeatures.length > 0 ? mainFeatures[0].uiElements.map(element => {
+                ${mainFeatures.length > 0 ? mainFeatures[0].uiElements.map((element: any) => {
                   if (element.includes('フォーム') || element.includes('入力')) {
                     return `
                     <div>
@@ -1096,8 +1096,8 @@ function createEnhancedProgressStream(
             const errorData = JSON.stringify({
               progress: 100,
               message: 'エラーが発生しました',
-              error: error.message,
-              code: UXStructureCodeGenerator.generateFallbackApp(insights, uiStyle)
+              error: (error as any)?.message || 'Unknown error',
+              code: ''
             })
             
             controller.enqueue(`data: ${errorData}\n\n`)

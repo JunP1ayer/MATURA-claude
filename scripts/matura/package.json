@@ -1,0 +1,22 @@
+{
+  "name": "matura-generator",
+  "version": "1.0.0",
+  "description": "MATURA - Natural Language to Next.js App Generator",
+  "main": "matura.ts",
+  "scripts": {
+    "build": "tsc",
+    "matura": "tsx matura.ts"
+  },
+  "bin": {
+    "matura": "./matura.ts"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "@google/generative-ai": "^0.1.0",
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

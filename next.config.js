@@ -26,6 +26,7 @@ try {
 
 console.log('🔧 [next.config.js] After manual loading - OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY)
 console.log('🔧 [next.config.js] After manual loading - GEMINI_API_KEY exists:', !!process.env.GEMINI_API_KEY)
+console.log('🔧 [next.config.js] After manual loading - FIGMA_API_KEY exists:', !!process.env.FIGMA_API_KEY)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -45,6 +46,7 @@ const nextConfig = {
   env: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
     GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
+    FIGMA_API_KEY: process.env.FIGMA_API_KEY || '',
   }
 }
 
