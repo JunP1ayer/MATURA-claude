@@ -271,6 +271,14 @@ export interface AppRequirement {
     mainEntity: string
     fields: string[]
   }
+  // 構造化思考フィールドを追加
+  structuredThinking?: {
+    why: string
+    who: string
+    what: string[]
+    how: string
+    impact: string
+  }
 }
 
 export interface FigmaDesignSystem {
