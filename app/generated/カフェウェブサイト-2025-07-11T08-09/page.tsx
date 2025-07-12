@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,13 +25,7 @@ import {
   Heart
 } from 'lucide-react'
 
-export default function GeneratedApp() {
-  const searchParams = useSearchParams()
-  const appId = searchParams.get('id') || 'default'
-  
-  // アプリIDに基づいて異なるコンテンツを表示
-  // 現時点では、すべてカフェアプリを表示
-  
+export default function CafeWebsite() {
   const [reservationData, setReservationData] = useState({
     date: '',
     time: '',

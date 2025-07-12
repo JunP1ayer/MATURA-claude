@@ -22,7 +22,7 @@ interface FigmaElement {
 interface ThinkingData {
   why: string
   who: string
-  what: string
+  what: string[]
   how: string
   impact: string
 }
@@ -40,7 +40,7 @@ export default function StructuredThinkingLayout({
     initialData || {
       why: '',
       who: '',
-      what: '',
+      what: [],
       how: '',
       impact: ''
     }
@@ -134,8 +134,36 @@ export default function StructuredThinkingLayout({
     }
   }
 
-  const updateThinkingData = (stage: keyof ThinkingData, value: string) => {
+  const updateThinkingData = (stage: keyof ThinkingData, value: string | string[]) => {
     setThinkingData(prev => ({ ...prev, [stage]: value }))
+  }
+
+  // AI思考支援機能
+  const handleAIAssist = async (stage: string, currentValue: string | string[]) => {
+    try {
+      const response = await fetch('/api/structure-autofill', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          userInput: `${stage}について考えてください。現在の内容: ${Array.isArray(currentValue) ? currentValue.join(', ') : currentValue}`,
+          stage: stage
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        const stageKey = stage as keyof ThinkingData
+        const newValue = result.data.structure[stageKey]
+        updateThinkingData(stageKey, newValue)
+      } else {
+        console.error('AI思考支援エラー:', result.error)
+      }
+    } catch (error) {
+      console.error('AI思考支援リクエストエラー:', error)
+    }
   }
 
   const toggleCardExpansion = (stage: string) => {
@@ -151,7 +179,17 @@ export default function StructuredThinkingLayout({
   }
 
   const getProgressPercentage = () => {
-    const filled = Object.values(thinkingData).filter(value => value.trim().length > 20).length
+    let filled = 0
+    
+    // why, who, how, impact をチェック
+    if (thinkingData.why.trim().length > 10) filled++
+    if (thinkingData.who.trim().length > 10) filled++
+    if (thinkingData.how.trim().length > 10) filled++
+    if (thinkingData.impact.trim().length > 10) filled++
+    
+    // what をチェック（配列）
+    if (Array.isArray(thinkingData.what) && thinkingData.what.length > 0) filled++
+    
     return Math.round((filled / 5) * 100)
   }
 
@@ -176,7 +214,7 @@ export default function StructuredThinkingLayout({
       stage: 'what' as const,
       title: 'What - なにを提供するか', 
       description: '具体的な価値・機能・コンテンツを定義する',
-      placeholder: '例：リアルタイム混雑情報、地域食材を使った出店マップ、学生とのマッチングシステム...',
+      placeholder: '例：ヒーローセクション、タイムテーブル、出展紹介、アクセスマップ...',
       figmaReferences: categorizedElements.what
     },
     {
@@ -245,6 +283,7 @@ export default function StructuredThinkingLayout({
       </header>
 
       <main className="container mx-auto px-4 py-8">
+
         {/* 進捗概要 */}
         <section className="mb-8">
           <Card>
@@ -262,7 +301,9 @@ export default function StructuredThinkingLayout({
                   <div key={frame.stage} className="flex items-center">
                     <div 
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                        thinkingData[frame.stage].length > 20 
+                        (frame.stage === 'what' ? 
+                          (Array.isArray(thinkingData[frame.stage]) && thinkingData[frame.stage].length > 0) :
+                          (typeof thinkingData[frame.stage] === 'string' && thinkingData[frame.stage].length > 10))
                           ? 'bg-green-500 text-white' 
                           : expandedCards.has(frame.stage)
                           ? 'bg-blue-500 text-white'
@@ -327,6 +368,7 @@ export default function StructuredThinkingLayout({
               }))}
               isExpanded={expandedCards.has(frame.stage)}
               onToggleExpand={() => toggleCardExpansion(frame.stage)}
+              onAIAssist={handleAIAssist}
             />
           ))}
         </section>

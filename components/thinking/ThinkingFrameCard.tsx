@@ -21,11 +21,12 @@ interface ThinkingFrameCardProps {
   title: string
   description: string
   placeholder: string
-  value: string
-  onChange: (value: string) => void
+  value: string | string[]
+  onChange: (value: string | string[]) => void
   figmaReferences?: FigmaReference[]
   isExpanded?: boolean
   onToggleExpand?: () => void
+  onAIAssist?: (stage: string, currentValue: string | string[]) => Promise<void>
 }
 
 const stageColors = {
@@ -53,17 +54,22 @@ export default function ThinkingFrameCard({
   onChange,
   figmaReferences = [],
   isExpanded = false,
-  onToggleExpand
+  onToggleExpand,
+  onAIAssist
 }: ThinkingFrameCardProps) {
   const [showFigmaRef, setShowFigmaRef] = useState(false)
   const [isThinking, setIsThinking] = useState(false)
 
-  const handleAIAssist = () => {
+  const handleAIAssist = async () => {
+    if (!onAIAssist) return
     setIsThinking(true)
-    // AI思考支援のロジック（将来実装）
-    setTimeout(() => {
+    try {
+      await onAIAssist(stage, value)
+    } catch (error) {
+      console.error('AI思考支援エラー:', error)
+    } finally {
       setIsThinking(false)
-    }, 2000)
+    }
   }
 
   const colorClass = stageColors[stage]
@@ -162,15 +168,22 @@ export default function ThinkingFrameCard({
                 <div className="space-y-3">
                   <Textarea
                     placeholder={placeholder}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
+                    value={Array.isArray(value) ? value.join(', ') : value}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (Array.isArray(value)) {
+                        onChange(newValue.split(', ').filter(v => v.trim()));
+                      } else {
+                        onChange(newValue);
+                      }
+                    }}
                     className="min-h-[100px] bg-white/70 border-0 focus:bg-white transition-colors"
                     rows={4}
                   />
                   
                   <div className="flex items-center justify-between">
                     <div className="text-xs opacity-60">
-                      {value.length} 文字 / 思考を深めるため、具体的に書いてください
+                      {Array.isArray(value) ? value.join(', ').length : value.length} 文字 / 思考を深めるため、具体的に書いてください
                     </div>
                     
                     <Button

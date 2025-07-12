@@ -10,7 +10,7 @@ export default function ThinkingDemoPage() {
       initialData={{
         why: '',
         who: '',
-        what: '',
+        what: [],
         how: '',
         impact: ''
       }}

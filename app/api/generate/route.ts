@@ -41,10 +41,11 @@ export async function POST(request: NextRequest) {
     console.log('📝 User input:', userInput.slice(0, 100) + '...')
     console.log('🎨 Figma File ID:', figmaFileId || 'default')
 
-    // 従来の生成システムにFigma統合
-    console.log('📋 Generating requirements from natural language...')
-    const requirements = await generateRequirementsFromNaturalLanguage(userInput)
+    // 構造化思考分析を含む要件生成
+    console.log('📋 Generating requirements with structured thinking...')
+    const requirements = await generateRequirementsWithStructuredThinking(userInput)
     console.log('✅ Requirements generated:', requirements.appType)
+    console.log('🧠 Structured thinking:', requirements.structuredThinking ? 'Available' : 'Not available')
     
     // Figmaデータの取得と統合
     let figmaData = null
@@ -63,14 +64,16 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🔧 Starting modern UI generation...')
-    const result = await generateModernUIApp(requirements, figmaData)
+    const result = await integrateAppWithFigma(requirements, process.env.GEMINI_API_KEY!, figmaData)
     console.log('✅ Modern UI generation completed')
 
     return NextResponse.json({ 
       success: true, 
       result,
       requirements,
-      figmaUsed: figmaData ? true : false
+      figmaUsed: figmaData ? true : false,
+      structuredThinking: requirements.structuredThinking,
+      appUrl: result.appUrl
     })
 
   } catch (error: any) {
@@ -91,7 +94,120 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 自然言語から要件を自動生成（AI活用版）
+// 構造化思考を含む要件生成（統合版）
+async function generateRequirementsWithStructuredThinking(userInput: string): Promise<AppRequirement> {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    return fallbackRequirementsGeneration(userInput)
+  }
+
+  try {
+    // 構造化思考分析を含む改良されたプロンプト
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `あなたは優秀なプロダクトマネージャーです。以下のユーザーのアイデアを分析し、まず構造化思考（Why/Who/What/How/Impact）で整理してから、適切なWebアプリケーションの要件を生成してください。
+
+ユーザー入力: "${userInput}"
+
+以下の形式で返答してください：
+
+{
+  "structuredThinking": {
+    "why": "なぜこのアプリが必要なのか（目的・理由・ビジョン）",
+    "who": "誰のためのアプリか（ターゲットユーザー・対象者）",
+    "what": ["何を提供するか（機能・価値・サービス）を3-5個のリストで"],
+    "how": "どうやって実現するか（実装方法・技術・プロセス）",
+    "impact": "どんな効果・変化を生むか（期待される成果・影響）"
+  },
+  "appType": "具体的なアプリタイプ（例：タスク管理アプリ、在庫管理システム、学習管理ツール等）",
+  "description": "アプリの詳細説明",
+  "features": ["機能1", "機能2", "機能3", "機能4", "機能5"],
+  "theme": "modern/minimal/colorful/professional",
+  "complexity": "simple/medium/advanced",
+  "apiNeeds": true/false,
+  "storeNeeds": true/false,
+  "category": "productivity/finance/education/entertainment/business/health/social/other",
+  "targetUser": "ターゲットユーザー",
+  "primaryColor": "適切な色（例：blue, green, purple, red等）",
+  "dataStructure": {
+    "mainEntity": "メインのデータ種別",
+    "fields": ["フィールド1", "フィールド2", "フィールド3"]
+  }
+}
+
+重要：
+- 必ずJSON形式で返答してください
+- 構造化思考を最初に行い、それに基づいて要件を生成してください
+- アプリタイプは具体的に（「カスタムアプリ」は避ける）
+- 機能は実用的で具体的なものを5つ
+- 構造化思考の各項目は具体的で実用的な内容にしてください`
+          }]
+        }]
+      })
+    })
+
+    const data = await response.json()
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text
+
+    if (content) {
+      try {
+        const parsed = JSON.parse(content.replace(/```json|```/g, '').trim())
+        
+        // 構造化思考の検証と補完
+        const structuredThinking = parsed.structuredThinking || {}
+        
+        // 必須フィールドの検証と補完
+        const result = {
+          appType: parsed.appType || 'カスタムアプリ',
+          description: parsed.description || userInput,
+          features: Array.isArray(parsed.features) ? parsed.features.slice(0, 5) : ['基本機能', 'データ管理', 'ユーザーインターフェース'],
+          theme: parsed.theme || 'modern',
+          complexity: parsed.complexity || 'medium',
+          apiNeeds: Boolean(parsed.apiNeeds),
+          storeNeeds: Boolean(parsed.storeNeeds),
+          category: parsed.category || 'other',
+          targetUser: parsed.targetUser || '一般ユーザー',
+          primaryColor: parsed.primaryColor || 'blue',
+          dataStructure: parsed.dataStructure || {
+            mainEntity: 'item',
+            fields: ['title', 'description', 'createdAt']
+          },
+          // 構造化思考を追加
+          structuredThinking: {
+            why: structuredThinking.why || 'ユーザーのニーズを満たすため',
+            who: structuredThinking.who || '一般ユーザー',
+            what: Array.isArray(structuredThinking.what) ? structuredThinking.what : ['基本機能', 'データ管理', 'ユーザーインターフェース'],
+            how: structuredThinking.how || 'Webアプリケーションとして実装',
+            impact: structuredThinking.impact || 'ユーザーの効率を向上させる'
+          }
+        }
+        
+        // 構造化思考の結果をログ出力
+        console.log('🧠 Structured Thinking Analysis:')
+        console.log('  Why:', result.structuredThinking.why)
+        console.log('  Who:', result.structuredThinking.who)
+        console.log('  What:', result.structuredThinking.what.join(', '))
+        console.log('  How:', result.structuredThinking.how)
+        console.log('  Impact:', result.structuredThinking.impact)
+        
+        return result
+      } catch (parseError) {
+        console.warn('AI response parsing failed, using fallback:', parseError)
+        return fallbackRequirementsGeneration(userInput)
+      }
+    }
+  } catch (error) {
+    console.warn('AI analysis failed, using fallback:', error)
+  }
+
+  return fallbackRequirementsGeneration(userInput)
+}
+
+// 自然言語から要件を自動生成（AI活用版）- 後方互換性のため保持
 async function generateRequirementsFromNaturalLanguage(userInput: string): Promise<AppRequirement> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -242,7 +358,15 @@ function fallbackRequirementsGeneration(userInput: string): AppRequirement {
     category,
     targetUser: '一般ユーザー',
     primaryColor,
-    dataStructure
+    dataStructure,
+    // 構造化思考のフォールバック
+    structuredThinking: {
+      why: `${appType}を通じてユーザーの課題を解決するため`,
+      who: '一般ユーザー',
+      what: features,
+      how: 'Webアプリケーションとして実装',
+      impact: 'ユーザーの生産性を向上させる'
+    }
   }
 }
 
@@ -309,6 +433,15 @@ function createFigmaPrompt(userRequirements: AppRequirement, figmaData: any): st
   
   return `あなたは高度なWebアプリケーション生成エキスパートです。以下の要件とFigmaデザインデータを基に、Next.js 14 + TypeScript + shadcn/ui + Tailwind CSS + Zustandを使用した完全なアプリケーションを生成してください。
 
+## 構造化思考分析結果
+${userRequirements.structuredThinking ? `
+- なぜ（Why）: ${userRequirements.structuredThinking.why}
+- だれ（Who）: ${userRequirements.structuredThinking.who}
+- なに（What）: ${userRequirements.structuredThinking.what.join(', ')}
+- どう（How）: ${userRequirements.structuredThinking.how}
+- インパクト（Impact）: ${userRequirements.structuredThinking.impact}
+` : ''}
+
 ## ユーザー要件
 - アプリタイプ: ${userRequirements.appType}
 - 説明: ${userRequirements.description}
@@ -354,6 +487,7 @@ ${figmaComponents.slice(0, 10).map(comp =>
 - エラーハンドリングとローディング状態
 - アクセシビリティ対応
 - SEO最適化
+- サイドバーまたはAboutセクションに構造化思考（Why/Who/Impact）を表示
 
 ## 出力形式
 純粋なTypeScriptコードのみを出力してください。説明文、コメント、マークダウンは含めないでください。
@@ -494,8 +628,26 @@ async function integrateAppWithFigma(requirements: AppRequirement, apiKey: strin
     }
   }
   
-  // ディレクトリとファイル保存処理
-  const outputDir = path.join(process.cwd(), 'app', 'generated-app')
+  // 静的なスロット番号を取得（最大10個のアプリをサポート）
+  const getNextSlot = async () => {
+    for (let i = 1; i <= 10; i++) {
+      const slotDir = path.join(process.cwd(), 'app', `app${i}`)
+      try {
+        await fsPromises.access(slotDir)
+        // ディレクトリが存在する場合、空いているかチェック
+        const files = await fsPromises.readdir(slotDir)
+        if (files.length === 0) return i
+      } catch {
+        // ディレクトリが存在しない場合は使用可能
+        return i
+      }
+    }
+    // すべてのスロットが使用中の場合は1に上書き
+    return 1
+  }
+  
+  const slotNumber = await getNextSlot()
+  const outputDir = path.join(process.cwd(), 'app', `app${slotNumber}`)
   const outputPath = path.join(outputDir, 'page.tsx')
   
   try {
@@ -538,10 +690,27 @@ async function integrateAppWithFigma(requirements: AppRequirement, apiKey: strin
     console.log(`✅ Generated app written to: ${outputPath}`)
     console.log(`📊 Generation stats: ${finalCode.length} characters, method: ${generationMethod}`)
     
+    // Save metadata
+    const metadata = {
+      id: `app${slotNumber}`,
+      slotNumber,
+      appType: requirements.appType,
+      timestamp: new Date().toISOString(),
+      features: requirements.features,
+      description: requirements.description,
+      structuredThinking: requirements.structuredThinking
+    }
+    const metadataPath = path.join(outputDir, 'metadata.json')
+    await fsPromises.writeFile(metadataPath, JSON.stringify(metadata, null, 2), 'utf-8')
+    console.log(`📋 Metadata saved to: ${metadataPath}`)
+    
     return {
       mainPage: finalCode,
       written: true,
       path: outputPath,
+      appUrl: `/generated-app?id=app${slotNumber}`,
+      uniqueId: `app${slotNumber}`,
+      slotNumber,
       validated: validationPassed,
       generationMethod,
       timestamp: new Date().toISOString(),
@@ -687,7 +856,16 @@ async function generateHighQualityAppWithAIAndFigma(requirements: AppRequirement
     const figmaFonts = figmaData?.designSystem?.fonts?.slice(0, 3) || []
     const figmaComponents = figmaData?.designSystem?.components?.slice(0, 10) || []
     
-    const prompt = `あなたは高品質なWebアプリケーションを生成するエキスパートです。以下の要件とFigmaデザインシステムに基づいて、完全に動作するNext.js + TypeScript + shadcn/ui + Zustandアプリを生成してください。
+    const prompt = `あなたは高品質なWebアプリケーションを生成するエキスパートです。以下の構造化思考分析結果と要件に基づいて、完全に動作するNext.js + TypeScript + shadcn/ui + Zustandアプリを生成してください。
+
+**構造化思考分析結果:**
+${requirements.structuredThinking ? `
+- なぜ（Why）: ${requirements.structuredThinking.why}
+- だれ（Who）: ${requirements.structuredThinking.who}
+- なに（What）: ${requirements.structuredThinking.what.join(', ')}
+- どう（How）: ${requirements.structuredThinking.how}
+- インパクト（Impact）: ${requirements.structuredThinking.impact}
+` : ''}
 
 **要件:**
 - アプリタイプ: ${requirements.appType}
@@ -710,6 +888,8 @@ async function generateHighQualityAppWithAIAndFigma(requirements: AppRequirement
 - useAppStoreからのZustand状態管理
 - framer-motion、レスポンシブデザイン、実際のCRUD操作機能
 - Figmaから抽出されたカラーとフォントを活用
+- 構造化思考分析結果を活用してユーザーに価値を提供するUI/UXを設計
+- サイドバーまたはAboutセクションに構造化思考（Why/Who/Impact）を表示
 - 自然言語テキストを一切含めず、純粋なTypeScriptコードのみ出力
 - 説明やコメントは含めない
 
@@ -940,6 +1120,16 @@ export default function GeneratedApp() {
                     <span className="text-sm">${feature}</span>
                   </div>`).join('')}
                 </div>
+                
+                ${requirements.structuredThinking ? `
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold text-sm mb-2">🧠 このアプリについて</h4>
+                  <div className="space-y-1 text-xs">
+                    <p><strong>Why:</strong> ${requirements.structuredThinking.why}</p>
+                    <p><strong>Who:</strong> ${requirements.structuredThinking.who}</p>
+                    <p><strong>Impact:</strong> ${requirements.structuredThinking.impact}</p>
+                  </div>
+                </div>` : ''}
                 ${figmaData ? `
                 <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-600">Colors: ${figmaColors.join(', ')}</p>

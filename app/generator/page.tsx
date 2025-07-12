@@ -88,7 +88,9 @@ export default function GeneratorPage() {
       updateStepStatus('deploy', 'completed')
       
       // 生成されたアプリのURLを設定
-      setGeneratedAppUrl('/generated-app')
+      const appUrl = integrationResult.result?.appUrl || integrationResult.appUrl || '/generated-app'
+      setGeneratedAppUrl(appUrl)
+      console.log('Generated app URL:', appUrl)
 
     } catch (error) {
       console.error('アプリ生成エラー:', error)
