@@ -41,6 +41,23 @@ export interface UIState {
   // ステップ管理
   currentStep: 1 | 2 | 3 | 4 | 5
   completedSteps: Set<number>
+  
+  // トークン使用量管理
+  tokenUsage: {
+    used: number
+    limit: number
+    resetDate: string
+    plan: 'free' | 'pro' | 'enterprise'
+    estimatedCost: number
+  }
+  
+  // 課金関連
+  subscriptionStatus: 'active' | 'inactive' | 'trial' | 'expired'
+  billingInfo: {
+    nextBillingDate: string | null
+    amount: number | null
+    currency: string
+  }
 }
 
 export interface UIActions {
@@ -76,6 +93,14 @@ export interface UIActions {
   setCurrentStep: (step: 1 | 2 | 3 | 4 | 5) => void
   markStepCompleted: (step: number) => void
   resetAllSteps: () => void
+  
+  // トークン関連
+  updateTokenUsage: (used: number) => void
+  setTokenLimit: (limit: number) => void
+  upgradeSubscription: (plan: 'free' | 'pro' | 'enterprise') => void
+  updateBillingInfo: (info: Partial<UIState['billingInfo']>) => void
+  addTokens: (amount: number) => void
+  resetTokenUsage: () => void
   
   // リセット機能
   resetAllState: () => void
@@ -113,7 +138,24 @@ const initialState: UIState = {
   
   // ステップ管理
   currentStep: 1,
-  completedSteps: new Set<number>()
+  completedSteps: new Set<number>(),
+  
+  // トークン使用量管理
+  tokenUsage: {
+    used: 0,
+    limit: 10000, // 無料プランのデフォルト
+    resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30日後
+    plan: 'free',
+    estimatedCost: 0
+  },
+  
+  // 課金関連
+  subscriptionStatus: 'inactive',
+  billingInfo: {
+    nextBillingDate: null,
+    amount: null,
+    currency: 'JPY'
+  }
 }
 
 // ===== Zustand Store 作成 =====
@@ -314,6 +356,75 @@ export const useMaturaStore = create<MaturaStore>()(
             console.log('🔄 All steps reset')
           },
 
+          // ===== トークン関連 =====
+          
+          updateTokenUsage: (used: number) => {
+            const tokenUsage = { ...get().tokenUsage, used }
+            const estimatedCost = tokenUsage.plan === 'free' ? 0 : used * 0.01 // 仮の料金計算
+            tokenUsage.estimatedCost = estimatedCost
+            
+            set({ tokenUsage }, false, 'updateTokenUsage')
+            
+            console.log('💳 Token usage updated:', { used, estimatedCost })
+          },
+
+          setTokenLimit: (limit: number) => {
+            const tokenUsage = { ...get().tokenUsage, limit }
+            set({ tokenUsage }, false, 'setTokenLimit')
+            
+            console.log('📊 Token limit updated:', { limit })
+          },
+
+          upgradeSubscription: (plan: 'free' | 'pro' | 'enterprise') => {
+            const planLimits = {
+              free: 10000,
+              pro: 100000,
+              enterprise: 1000000
+            }
+            
+            const tokenUsage = { 
+              ...get().tokenUsage, 
+              plan, 
+              limit: planLimits[plan]
+            }
+            
+            const subscriptionStatus = plan === 'free' ? 'inactive' : 'active'
+            
+            set({ tokenUsage, subscriptionStatus }, false, 'upgradeSubscription')
+            
+            console.log('⬆️ Subscription upgraded:', { plan, newLimit: planLimits[plan] })
+          },
+
+          updateBillingInfo: (info: Partial<UIState['billingInfo']>) => {
+            const billingInfo = { ...get().billingInfo, ...info }
+            set({ billingInfo }, false, 'updateBillingInfo')
+            
+            console.log('💰 Billing info updated:', info)
+          },
+
+          addTokens: (amount: number) => {
+            const tokenUsage = { 
+              ...get().tokenUsage, 
+              limit: get().tokenUsage.limit + amount 
+            }
+            set({ tokenUsage }, false, 'addTokens')
+            
+            console.log('➕ Tokens added:', { amount, newLimit: tokenUsage.limit })
+          },
+
+          resetTokenUsage: () => {
+            const tokenUsage = {
+              used: 0,
+              limit: get().tokenUsage.plan === 'free' ? 10000 : get().tokenUsage.limit,
+              resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              plan: get().tokenUsage.plan,
+              estimatedCost: 0
+            }
+            set({ tokenUsage }, false, 'resetTokenUsage')
+            
+            console.log('🔄 Token usage reset for new period')
+          },
+
           // ===== リセット機能 =====
           
           resetAllState: () => {
@@ -350,6 +461,9 @@ export const useCurrentPattern = () => useMaturaStore(state => state.selectedPat
 export const useGenerationProgress = () => useMaturaStore(state => state.generationProgress)
 export const useCurrentStep = () => useMaturaStore(state => state.currentStep)
 export const useCompletedSteps = () => useMaturaStore(state => state.completedSteps)
+export const useTokenUsage = () => useMaturaStore(state => state.tokenUsage)
+export const useSubscriptionStatus = () => useMaturaStore(state => state.subscriptionStatus)
+export const useBillingInfo = () => useMaturaStore(state => state.billingInfo)
 
 // ===== カスタムフック =====
 
@@ -442,4 +556,284 @@ export const useStepManager = () => {
   }
 }
 
+/**
+ * トークン管理用カスタムフック
+ */
+export const useTokenManager = () => {
+  const {
+    tokenUsage,
+    subscriptionStatus,
+    billingInfo,
+    updateTokenUsage,
+    setTokenLimit,
+    upgradeSubscription,
+    updateBillingInfo,
+    addTokens,
+    resetTokenUsage
+  } = useMaturaStore()
+
+  const usagePercentage = (tokenUsage.used / tokenUsage.limit) * 100
+  const remainingTokens = tokenUsage.limit - tokenUsage.used
+
+  return {
+    tokenUsage,
+    subscriptionStatus,
+    billingInfo,
+    usagePercentage,
+    remainingTokens,
+    updateTokenUsage,
+    setTokenLimit,
+    upgradeSubscription,
+    updateBillingInfo,
+    addTokens,
+    resetTokenUsage,
+    isLowOnTokens: () => usagePercentage >= 75,
+    isCriticallyLowOnTokens: () => usagePercentage >= 90,
+    canGenerate: () => remainingTokens > 100, // 最低100トークン必要と仮定
+    estimateTokensNeeded: (complexity: 'simple' | 'medium' | 'complex') => {
+      const estimates = {
+        simple: 500,
+        medium: 1500,
+        complex: 3000
+      }
+      return estimates[complexity]
+    },
+    getRecommendedAction: () => {
+      if (usagePercentage >= 90) {
+        return tokenUsage.plan === 'free' ? 'upgrade' : 'buyTokens'
+      }
+      if (usagePercentage >= 75 && tokenUsage.plan === 'free') {
+        return 'considerUpgrade'
+      }
+      return null
+    }
+  }
+}
+
 export default useMaturaStore
+
+// ===== CRUD機能追加 =====
+
+import type { HotelBooking, TaskItem, RecipeItem, InventoryItem, BlogPost } from './supabase'
+
+// Universal app store interface
+interface BaseAppState<T> {
+  items: T[]
+  loading: boolean
+  error: string | null
+  selectedItem: T | null
+  
+  // Actions
+  setItems: (items: T[]) => void
+  addItem: (item: T) => void
+  updateItem: (id: string, updates: Partial<T>) => void
+  deleteItem: (id: string) => void
+  setSelectedItem: (item: T | null) => void
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
+  clearError: () => void
+}
+
+// Hotel booking store
+interface HotelBookingStore extends BaseAppState<HotelBooking> {
+  // Hotel-specific actions
+  filterByStatus: (status: HotelBooking['status']) => HotelBooking[]
+  getTotalRevenue: () => number
+  getBookingsByDateRange: (startDate: string, endDate: string) => HotelBooking[]
+}
+
+export const useHotelBookingStore = create<HotelBookingStore>()(
+  devtools(
+    (set, get) => ({
+      items: [],
+      loading: false,
+      error: null,
+      selectedItem: null,
+
+      setItems: (items) => set({ items }),
+      addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+      updateItem: (id, updates) => set((state) => ({
+        items: state.items.map(item => 
+          item.id === id ? { ...item, ...updates, updated_at: new Date().toISOString() } : item
+        )
+      })),
+      deleteItem: (id) => set((state) => ({
+        items: state.items.filter(item => item.id !== id)
+      })),
+      setSelectedItem: (item) => set({ selectedItem: item }),
+      setLoading: (loading) => set({ loading }),
+      setError: (error) => set({ error }),
+      clearError: () => set({ error: null }),
+
+      // Hotel-specific methods
+      filterByStatus: (status) => get().items.filter(booking => booking.status === status),
+      getTotalRevenue: () => get().items
+        .filter(booking => booking.status === 'confirmed')
+        .reduce((total, booking) => total + booking.total_price, 0),
+      getBookingsByDateRange: (startDate, endDate) => get().items.filter(booking => 
+        booking.check_in >= startDate && booking.check_out <= endDate
+      )
+    }),
+    { name: 'hotel-booking-store' }
+  )
+)
+
+// Task management store
+interface TaskStore extends BaseAppState<TaskItem> {
+  filter: 'all' | 'pending' | 'completed'
+  sortBy: 'created_at' | 'due_date' | 'priority'
+  
+  setFilter: (filter: TaskStore['filter']) => void
+  setSortBy: (sortBy: TaskStore['sortBy']) => void
+  getFilteredTasks: () => TaskItem[]
+  toggleTaskComplete: (id: string) => void
+  getTasksByPriority: (priority: TaskItem['priority']) => TaskItem[]
+}
+
+export const useTaskStore = create<TaskStore>()(
+  devtools(
+    (set, get) => ({
+      items: [],
+      loading: false,
+      error: null,
+      selectedItem: null,
+      filter: 'all',
+      sortBy: 'created_at',
+
+      setItems: (items) => set({ items }),
+      addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+      updateItem: (id, updates) => set((state) => ({
+        items: state.items.map(item => 
+          item.id === id ? { ...item, ...updates, updated_at: new Date().toISOString() } : item
+        )
+      })),
+      deleteItem: (id) => set((state) => ({
+        items: state.items.filter(item => item.id !== id)
+      })),
+      setSelectedItem: (item) => set({ selectedItem: item }),
+      setLoading: (loading) => set({ loading }),
+      setError: (error) => set({ error }),
+      clearError: () => set({ error: null }),
+
+      setFilter: (filter) => set({ filter }),
+      setSortBy: (sortBy) => set({ sortBy }),
+      
+      getFilteredTasks: () => {
+        const { items, filter, sortBy } = get()
+        let filtered = items
+        
+        if (filter === 'pending') filtered = items.filter(task => !task.completed)
+        if (filter === 'completed') filtered = items.filter(task => task.completed)
+        
+        return filtered.sort((a, b) => {
+          if (sortBy === 'due_date' && a.due_date && b.due_date) {
+            return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+          }
+          if (sortBy === 'priority') {
+            const priorityOrder = { high: 3, medium: 2, low: 1 }
+            return priorityOrder[b.priority] - priorityOrder[a.priority]
+          }
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        })
+      },
+      
+      toggleTaskComplete: (id) => set((state) => ({
+        items: state.items.map(task => 
+          task.id === id ? { ...task, completed: !task.completed, updated_at: new Date().toISOString() } : task
+        )
+      })),
+      
+      getTasksByPriority: (priority) => get().items.filter(task => task.priority === priority)
+    }),
+    { name: 'task-store' }
+  )
+)
+
+// Recipe management store
+interface RecipeStore extends BaseAppState<RecipeItem> {
+  searchTerm: string
+  categoryFilter: string
+  
+  setSearchTerm: (term: string) => void
+  setCategoryFilter: (category: string) => void
+  getFilteredRecipes: () => RecipeItem[]
+  getRecipesByCategory: (category: string) => RecipeItem[]
+}
+
+export const useRecipeStore = create<RecipeStore>()(
+  devtools(
+    (set, get) => ({
+      items: [],
+      loading: false,
+      error: null,
+      selectedItem: null,
+      searchTerm: '',
+      categoryFilter: '',
+
+      setItems: (items) => set({ items }),
+      addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+      updateItem: (id, updates) => set((state) => ({
+        items: state.items.map(item => 
+          item.id === id ? { ...item, ...updates, updated_at: new Date().toISOString() } : item
+        )
+      })),
+      deleteItem: (id) => set((state) => ({
+        items: state.items.filter(item => item.id !== id)
+      })),
+      setSelectedItem: (item) => set({ selectedItem: item }),
+      setLoading: (loading) => set({ loading }),
+      setError: (error) => set({ error }),
+      clearError: () => set({ error: null }),
+
+      setSearchTerm: (term) => set({ searchTerm: term }),
+      setCategoryFilter: (category) => set({ categoryFilter: category }),
+      
+      getFilteredRecipes: () => {
+        const { items, searchTerm, categoryFilter } = get()
+        return items.filter(recipe => {
+          const matchesSearch = !searchTerm || 
+            recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
+          const matchesCategory = !categoryFilter || recipe.category === categoryFilter
+          return matchesSearch && matchesCategory
+        })
+      },
+      
+      getRecipesByCategory: (category) => get().items.filter(recipe => recipe.category === category)
+    }),
+    { name: 'recipe-store' }
+  )
+)
+
+// App metadata store for managing current app context
+interface AppMetadataStore {
+  currentAppId: string | null
+  currentAppType: string | null
+  currentAppMetadata: any | null
+  
+  setCurrentApp: (appId: string, appType: string, metadata?: any) => void
+  clearCurrentApp: () => void
+}
+
+export const useAppMetadataStore = create<AppMetadataStore>()(
+  devtools(
+    (set) => ({
+      currentAppId: null,
+      currentAppType: null,
+      currentAppMetadata: null,
+
+      setCurrentApp: (appId, appType, metadata) => set({
+        currentAppId: appId,
+        currentAppType: appType,
+        currentAppMetadata: metadata
+      }),
+      
+      clearCurrentApp: () => set({
+        currentAppId: null,
+        currentAppType: null,
+        currentAppMetadata: null
+      })
+    }),
+    { name: 'app-metadata-store' }
+  )
+)

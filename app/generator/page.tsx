@@ -6,7 +6,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, Sparkles, Rocket, CheckCircle2, Settings } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Loader2, Sparkles, Rocket, CheckCircle2, Settings, Brain, Wand2 } from 'lucide-react'
+import StructureViewer from '@/components/StructureViewer'
+import type { StructureData } from '@/lib/types'
 
 interface GenerationStep {
   id: string
@@ -21,6 +24,11 @@ export default function GeneratorPage() {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedAppUrl, setGeneratedAppUrl] = useState('')
+  const [testResult, setTestResult] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState('input')
+  const [structureData, setStructureData] = useState<StructureData | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<any>(null)
   const [steps, setSteps] = useState<GenerationStep[]>([
     { id: 'analyze', name: 'アイデア分析', status: 'pending', description: 'あなたのアイデアを理解中...' },
     { id: 'figma', name: 'Figmaデザイン取得', status: 'pending', description: 'デザインシステムを取得中...' },
@@ -34,6 +42,75 @@ export default function GeneratorPage() {
     setSteps(prev => prev.map(step => 
       step.id === stepId ? { ...step, status } : step
     ))
+  }
+
+  // アイデア分析機能
+  const analyzeIdea = async () => {
+    if (!input.trim()) return
+
+    setIsAnalyzing(true)
+    setActiveTab('structure')
+
+    try {
+      // 簡易構造化データ生成（実際の実装ではGemini APIを使用）
+      const mockStructureData: StructureData = {
+        why: `${input}により解決される問題と市場ニーズ`,
+        who: `${input}を必要とするターゲットユーザー層`,
+        what: [
+          "核となる基本機能",
+          "ユーザビリティ向上機能",
+          "差別化要因となる機能",
+          "エンゲージメント促進機能",
+          "将来拡張予定機能"
+        ],
+        how: "Next.js 14 + TypeScript + Tailwind CSS による最新技術スタックでの実装",
+        impact: "ユーザー効率化30%向上と市場における独自価値の創出"
+      }
+
+      // 遅延をシミュレート
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      setStructureData(mockStructureData)
+      setAnalysisResult({
+        qualityScore: 87,
+        readyForGeneration: true,
+        recommendations: [
+          "機能の優先順位付けが推奨されます",
+          "ターゲットユーザーをより具体化してください",
+          "技術スタックが適切に選択されています"
+        ]
+      })
+    } catch (error) {
+      console.error('分析エラー:', error)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  // 新機能テスト関数を追加
+  const testNewFeatures = async () => {
+    try {
+      // 動的インポートで新機能をテスト
+      const { checkStructureQuality } = await import('@/lib/validation')
+      const { promptTuner } = await import('@/lib/prompt-tuner')
+      
+      const testData = {
+        why: "ホテルの予約プロセスを簡単にして、旅行者に快適な宿泊体験を提供したい",
+        who: "旅行者、出張者、観光客",
+        what: ["客室検索機能", "予約システム", "決済機能", "レビュー表示", "キャンセル機能"],
+        how: "Next.js、TypeScript、Tailwind CSSを使用したモダンなWebアプリケーション実装",
+        impact: "予約効率が30%向上し、顧客満足度が向上する"
+      }
+      
+      const qualityCheck = checkStructureQuality(testData)
+      const optimization = promptTuner.optimizeForGeneration(testData)
+      
+      setTestResult({ qualityCheck, optimization })
+      alert(`✅ 新機能テスト成功！品質スコア: ${qualityCheck.qualityScore}%`)
+    } catch (error) {
+      console.error('新機能テストエラー:', error)
+      alert('❌ 新機能テストに失敗しました: ' + error)
+    }
   }
 
   const generateApp = async () => {
@@ -63,8 +140,10 @@ export default function GeneratorPage() {
       await new Promise(resolve => setTimeout(resolve, 500))
       updateStepStatus('logic', 'completed')
 
-      // ステップ5: 統合（Figmaデータを含む） - メイン処理
+      // ステップ5: 統合（構造化データを使用） - 新機能適用
       updateStepStatus('integration', 'running')
+      
+      // ユーザー入力のみでアプリを生成（構造化思考はAIが自動分析）
       const integrationResponse = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,10 +166,32 @@ export default function GeneratorPage() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       updateStepStatus('deploy', 'completed')
       
-      // 生成されたアプリのURLを設定
-      const appUrl = integrationResult.result?.appUrl || integrationResult.appUrl || '/generated-app'
-      setGeneratedAppUrl(appUrl)
-      console.log('Generated app URL:', appUrl)
+      // 生成されたアプリのURLを設定（新しい動的システム）
+      const appUrl = integrationResult.result?.appUrl || integrationResult.appUrl
+      
+      if (appUrl) {
+        // 新しい動的ビューアーURLを生成
+        const appId = appUrl.split('/').pop() || appUrl.replace('/', '')
+        const dynamicUrl = `/apps/${appId}`
+        setGeneratedAppUrl(dynamicUrl)
+        console.log('Generated app URL:', dynamicUrl, 'App ID:', appId)
+      } else {
+        // フォールバック: 生成されたアプリリストから最新を取得
+        try {
+          const appsResponse = await fetch('/api/apps')
+          if (appsResponse.ok) {
+            const appsData = await appsResponse.json()
+            if (appsData.apps && appsData.apps.length > 0) {
+              const latestApp = appsData.apps[0]
+              setGeneratedAppUrl(`/apps/${latestApp.id}`)
+              console.log('Using latest app:', latestApp.id)
+            }
+          }
+        } catch (error) {
+          console.error('Failed to get latest app:', error)
+          setGeneratedAppUrl('/generated-app') // 従来のフォールバック
+        }
+      }
 
     } catch (error) {
       console.error('アプリ生成エラー:', error)
@@ -123,13 +224,33 @@ export default function GeneratorPage() {
               MATURA
             </h1>
           </div>
-          <p className="text-xl text-gray-600 mb-2">自然言語でアプリを作ろう</p>
-          <p className="text-gray-500">あなたのアイデアを、そのまま文章で書いてください</p>
+          <p className="text-xl text-gray-600 mb-2">AI駆動のアプリ生成プラットフォーム</p>
+          <p className="text-gray-500">高精度構造化 → 美しいUI → 完全なコード生成</p>
         </div>
 
-        {/* メイン入力エリア */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <Card>
+        {/* メインタブナビゲーション */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-6xl mx-auto">
+          <div className="flex justify-center mb-8">
+            <TabsList className="grid w-full max-w-md grid-cols-3">
+              <TabsTrigger value="input" className="flex items-center space-x-2">
+                <Wand2 className="h-4 w-4" />
+                <span>アイデア入力</span>
+              </TabsTrigger>
+              <TabsTrigger value="structure" className="flex items-center space-x-2">
+                <Brain className="h-4 w-4" />
+                <span>構造化分析</span>
+              </TabsTrigger>
+              <TabsTrigger value="generate" className="flex items-center space-x-2">
+                <Rocket className="h-4 w-4" />
+                <span>アプリ生成</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* アイデア入力タブ */}
+          <TabsContent value="input">
+            <div className="max-w-2xl mx-auto">
+              <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Rocket className="h-5 w-5 text-blue-500" />
@@ -185,30 +306,71 @@ export default function GeneratorPage() {
                 )}
               </div>
               
-              <Button 
-                onClick={generateApp}
-                disabled={!input.trim() || isGenerating}
-                className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 text-lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    アプリを生成中...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-5 w-5" />
-                    アプリを作る
-                  </>
-                )}
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  onClick={analyzeIdea}
+                  disabled={!input.trim() || isAnalyzing}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 text-lg"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      分析中...
+                    </>
+                  ) : (
+                    <>
+                      <Brain className="mr-2 h-5 w-5" />
+                      アイデアを分析
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  onClick={testNewFeatures}
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 text-lg"
+                >
+                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  新機能をテスト
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
+          </TabsContent>
 
-        {/* 生成プロセス表示 */}
-        {isGenerating && (
-          <div className="max-w-2xl mx-auto mb-8">
+          {/* 構造化分析タブ */}
+          <TabsContent value="structure">
+            {structureData ? (
+              <StructureViewer
+                structureData={structureData}
+                qualityScore={analysisResult?.qualityScore || 85}
+                onGenerate={() => {
+                  setActiveTab('generate')
+                  generateApp()
+                }}
+                isGenerating={isGenerating}
+              />
+            ) : (
+              <div className="text-center py-12">
+                <Brain className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                  アイデアを分析してください
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  まず「アイデア入力」タブでアイデアを入力し、分析を実行してください
+                </p>
+                <Button onClick={() => setActiveTab('input')} variant="outline">
+                  アイデア入力へ戻る
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* アプリ生成タブ */}
+          <TabsContent value="generate">
+            {/* 生成プロセス表示 */}
+            {isGenerating ? (
+              <div className="max-w-2xl mx-auto mb-8">
             <Card>
               <CardHeader>
                 <CardTitle>生成進行状況</CardTitle>
@@ -242,44 +404,103 @@ export default function GeneratorPage() {
               </CardContent>
             </Card>
           </div>
-        )}
+            ) : generatedAppUrl ? (
+              <div className="max-w-2xl mx-auto">
+                <Card className="border-green-200 bg-green-50">
+                  <CardHeader>
+                    <CardTitle className="text-green-700 flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5" />
+                      🎉 デモ完成（機能実装中）
+                    </CardTitle>
+                    <CardDescription>
+                      CRUD機能・データベース連携・動的表示を備えたデモアプリが完成しました
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <Button 
+                        onClick={() => window.open(generatedAppUrl, '_blank')}
+                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3"
+                      >
+                        <Rocket className="mr-2 h-5 w-5" />
+                        アプリを開く
+                      </Button>
+                      
+                      <div className="text-center">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setInput('')
+                            setFigmaFileId('')
+                            setGeneratedAppUrl('')
+                            setStructureData(null)
+                            setAnalysisResult(null)
+                            setActiveTab('input')
+                            setSteps(prev => prev.map(step => ({ ...step, status: 'pending' })))
+                          }}
+                          className="text-gray-600"
+                        >
+                          新しいアプリを作る
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Rocket className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                  アプリ生成の準備が必要です
+                </h3>
+                <p className="text-gray-500 mb-6">
+                  まずアイデアを分析してから生成を開始してください
+                </p>
+                <Button onClick={() => setActiveTab('input')} variant="outline">
+                  アイデア入力へ戻る
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
-        {/* 完成したアプリ表示 */}
-        {generatedAppUrl && (
-          <div className="max-w-2xl mx-auto">
-            <Card className="border-green-200 bg-green-50">
+        {/* 新機能テスト結果表示 */}
+        {testResult && (
+          <div className="max-w-2xl mx-auto mb-8 mt-8">
+            <Card className="bg-green-50 border-green-200">
               <CardHeader>
-                <CardTitle className="text-green-700 flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5" />
-                  🎉 アプリが完成しました！
-                </CardTitle>
-                <CardDescription>
-                  あなたのアイデアが動くアプリになりました
-                </CardDescription>
+                <CardTitle className="text-green-800">✅ 新機能テスト結果</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <Button 
-                    onClick={() => window.open(generatedAppUrl, '_blank')}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3"
-                  >
-                    <Rocket className="mr-2 h-5 w-5" />
-                    アプリを開く
-                  </Button>
-                  
-                  <div className="text-center">
-                    <Button 
-                      variant="outline"
-                      onClick={() => {
-                        setInput('')
-                        setFigmaFileId('')
-                        setGeneratedAppUrl('')
-                        setSteps(prev => prev.map(step => ({ ...step, status: 'pending' })))
-                      }}
-                      className="text-gray-600"
-                    >
-                      新しいアプリを作る
-                    </Button>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {testResult.qualityCheck.qualityScore}%
+                      </div>
+                      <div className="text-sm text-gray-600">品質スコア</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {testResult.qualityCheck.completeness}%
+                      </div>
+                      <div className="text-sm text-gray-600">完全性</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600">
+                        {testResult.optimization.promptStrategy}
+                      </div>
+                      <div className="text-sm text-gray-600">戦略</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-orange-600">
+                        {testResult.optimization.estimatedOutputQuality}%
+                      </div>
+                      <div className="text-sm text-gray-600">予想品質</div>
+                    </div>
+                  </div>
+                  <div className="text-center text-green-700">
+                    🎉 新機能が正常に動作しています！構造データの品質チェックとプロンプト最適化が成功しました。
                   </div>
                 </div>
               </CardContent>

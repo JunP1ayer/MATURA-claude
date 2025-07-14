@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { QueryProvider } from '@/components/providers/query-provider'
+import { ToastProvider } from '@/components/ui/interactive-feedback'
+import { Toaster } from 'sonner'
+import ClientLayout from './client-layout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -57,9 +61,16 @@ export default function RootLayout({
   return (
     <html lang="ja" className="scroll-smooth">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
-          {children}
-        </div>
+        <QueryProvider>
+          <ToastProvider>
+            <ClientLayout>
+              <div className="min-h-screen bg-gray-50">
+                {children}
+                <Toaster />
+              </div>
+            </ClientLayout>
+          </ToastProvider>
+        </QueryProvider>
       </body>
     </html>
   )

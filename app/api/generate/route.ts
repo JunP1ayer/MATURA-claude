@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     console.log('Request body:', body)
-    const { userInput, autonomous = false, figmaFileId } = body
+    const { userInput, autonomous = false, figmaFileId, structureData, optimizedPrompt } = body
 
     if (!userInput) {
       return NextResponse.json(
@@ -40,12 +40,21 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Starting app generation process...')
     console.log('📝 User input:', userInput.slice(0, 100) + '...')
     console.log('🎨 Figma File ID:', figmaFileId || 'default')
+    console.log('🧠 Structure data provided:', !!structureData)
+    console.log('✨ Optimized prompt provided:', !!optimizedPrompt)
 
-    // 構造化思考分析を含む要件生成
-    console.log('📋 Generating requirements with structured thinking...')
-    const requirements = await generateRequirementsWithStructuredThinking(userInput)
-    console.log('✅ Requirements generated:', requirements.appType)
-    console.log('🧠 Structured thinking:', requirements.structuredThinking ? 'Available' : 'Not available')
+    // 新機能：構造化データが提供されている場合はそれを使用
+    let requirements
+    if (structureData && optimizedPrompt) {
+      console.log('🚀 Using provided structure data and optimized prompt...')
+      requirements = await generateRequirementsFromStructure(structureData)
+      console.log('✅ Requirements generated from structure data:', requirements.appType)
+    } else {
+      console.log('📋 Generating requirements with structured thinking...')
+      requirements = await generateRequirementsWithStructuredThinking(userInput)
+      console.log('✅ Requirements generated:', requirements.appType)
+      console.log('🧠 Structured thinking:', requirements.structuredThinking ? 'Available' : 'Not available')
+    }
     
     // Figmaデータの取得と統合
     let figmaData = null
@@ -94,7 +103,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 構造化思考を含む要件生成（統合版）
+// 構造化思考を含む要件生成（高精度エンジン統合版）
 async function generateRequirementsWithStructuredThinking(userInput: string): Promise<AppRequirement> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -102,49 +111,78 @@ async function generateRequirementsWithStructuredThinking(userInput: string): Pr
   }
 
   try {
-    // 構造化思考分析を含む改良されたプロンプト
+    // 高精度プロンプトエンジンによる段階的分析
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `あなたは優秀なプロダクトマネージャーです。以下のユーザーのアイデアを分析し、まず構造化思考（Why/Who/What/How/Impact）で整理してから、適切なWebアプリケーションの要件を生成してください。
+            text: `あなたは世界最高のプロダクトマネージャー兼ビジネスアナリストです。
 
-ユーザー入力: "${userInput}"
+【ミッション】
+ユーザーの抽象的・断片的なアイデアを、実行可能で具体的なプロダクト構造に変換してください。
 
-以下の形式で返答してください：
+【ユーザー入力】
+"${userInput}"
+
+【分析フレームワーク】
+1. **問題深掘り**: 表面的な要望の背後にある真の課題を特定
+2. **市場文脈**: 類似プロダクトの成功パターンと差別化要因を分析
+3. **ユーザー中心設計**: 具体的なユーザーシナリオとペインポイントを定義
+4. **技術実現性**: 現実的な技術スタックと実装計画を策定
+5. **ビジネス価値**: 定量的な成果指標とROIを設計
+
+【出力要求】
+以下の構造で、各項目を【具体的・詳細・実行可能】レベルまで深掘りしてください：
 
 {
   "structuredThinking": {
-    "why": "なぜこのアプリが必要なのか（目的・理由・ビジョン）",
-    "who": "誰のためのアプリか（ターゲットユーザー・対象者）",
-    "what": ["何を提供するか（機能・価値・サービス）を3-5個のリストで"],
-    "how": "どうやって実現するか（実装方法・技術・プロセス）",
-    "impact": "どんな効果・変化を生むか（期待される成果・影響）"
+    "why": "【具体的問題定義】現状のどんな課題を解決するのか？なぜ今このソリューションが必要なのか？（150-200文字で市場ニーズと解決価値を明確に）",
+    "who": "【詳細ターゲット像】主要ユーザー層の属性・行動パターン・技術リテラシー・利用シーン（100-150文字で具体的なペルソナレベルまで）", 
+    "what": [
+      "【必須Core機能】ユーザーが最も頻繁に使う基本操作（具体的な操作フローまで記述）",
+      "【差別化機能】競合にない独自価値を提供する機能（実装方法も含む）",
+      "【UX向上機能】ユーザビリティと継続利用を促進する機能",
+      "【データ管理機能】情報の保存・検索・分析機能",
+      "【将来拡張機能】Phase2以降の発展可能性"
+    ],
+    "how": "【技術アーキテクチャ】Next.js 14+TypeScript+Tailwind基盤での具体的実装戦略、データベース設計、API設計、セキュリティ対策（200-250文字で技術選定根拠も含む）",
+    "impact": "【定量的成果指標】ユーザー数・利用頻度・効率改善・満足度等の具体的KPIと、【社会的意義】を150-200文字で"
   },
-  "appType": "具体的なアプリタイプ（例：タスク管理アプリ、在庫管理システム、学習管理ツール等）",
-  "description": "アプリの詳細説明",
-  "features": ["機能1", "機能2", "機能3", "機能4", "機能5"],
-  "theme": "modern/minimal/colorful/professional",
-  "complexity": "simple/medium/advanced",
-  "apiNeeds": true/false,
-  "storeNeeds": true/false,
+  "appType": "【明確なカテゴリ】例：プロジェクト管理ツール、在庫管理システム、学習進捗管理アプリ等",
+  "description": "【詳細説明】アプリの価値提案・主要機能・利用シーンを包括的に（200文字程度）",
+  "features": [
+    "具体的機能1（ユーザーが実行する操作を動詞で開始）",
+    "具体的機能2（どんな情報をどう処理するか明確に）", 
+    "具体的機能3（UI/UXの特徴も含む）",
+    "具体的機能4（データの流れも説明）",
+    "具体的機能5（将来性も考慮）"
+  ],
+  "theme": "modern/minimal/colorful/professional/elegant（ターゲットに最適な選択）",
+  "complexity": "simple/medium/advanced（機能数と技術要件に基づく）",
+  "apiNeeds": true/false（外部データ連携の必要性）,
+  "storeNeeds": true/false（永続化データの必要性）,
   "category": "productivity/finance/education/entertainment/business/health/social/other",
-  "targetUser": "ターゲットユーザー",
-  "primaryColor": "適切な色（例：blue, green, purple, red等）",
+  "targetUser": "【具体的ユーザー像】職業・年齢層・技術レベル・利用コンテキスト",
+  "primaryColor": "ブランドイメージとユーザビリティを両立する最適色",
   "dataStructure": {
-    "mainEntity": "メインのデータ種別",
-    "fields": ["フィールド1", "フィールド2", "フィールド3"]
+    "mainEntity": "アプリの中核となるデータモデル",
+    "fields": ["必須フィールド1", "必須フィールド2", "オプションフィールド3", "メタデータフィールド4", "関連データフィールド5"]
   }
 }
+
+【品質基準】
+- 抽象的表現禁止：「〜のような」「〜に関する」ではなく具体的機能を記述
+- 実装可能性重視：技術的に実現可能で現実的な提案のみ
+- ユーザー価値優先：機能の羅列ではなく価値創出を明確化
+- 差別化明確：競合との違いを具体的に説明
+- KPI設定：定量的な成功指標を必ず含める
 
 重要：
 - 必ずJSON形式で返答してください
 - 構造化思考を最初に行い、それに基づいて要件を生成してください
-- アプリタイプは具体的に（「カスタムアプリ」は避ける）
-- 機能は実用的で具体的なものを5つ
-- 構造化思考の各項目は具体的で実用的な内容にしてください`
+- 抽象的なアイデアでも、業界知識と常識に基づいて具体的な仕様まで補完してください`
           }]
         }]
       })
@@ -205,6 +243,92 @@ async function generateRequirementsWithStructuredThinking(userInput: string): Pr
   }
 
   return fallbackRequirementsGeneration(userInput)
+}
+
+// 新機能：構造化データから要件を生成
+async function generateRequirementsFromStructure(structureData: any): Promise<AppRequirement> {
+  console.log('🚀 Generating requirements from structure data...')
+  
+  // 構造化データから適切なアプリタイプを推測
+  const appType = inferAppTypeFromStructure(structureData)
+  
+  return {
+    appType: appType,
+    description: structureData.why || 'ユーザーが提供した構造データに基づくアプリケーション',
+    features: structureData.what || ['基本機能', 'ユーザー管理', 'データ管理', 'レポート機能', '設定管理'],
+    theme: 'modern',
+    complexity: 'medium',
+    apiNeeds: true,
+    storeNeeds: true,
+    category: 'business',
+    targetUser: structureData.who || '一般ユーザー',
+    primaryColor: 'blue',
+    dataStructure: {
+      mainEntity: extractMainEntity(structureData),
+      fields: extractMainFields(structureData)
+    },
+    structuredThinking: {
+      why: structureData.why || '',
+      who: structureData.who || '',
+      what: structureData.what || [],
+      how: structureData.how || '',
+      impact: structureData.impact || ''
+    }
+  }
+}
+
+// 構造化データからアプリタイプを推測
+function inferAppTypeFromStructure(structureData: any): string {
+  const what = Array.isArray(structureData.what) ? structureData.what.join(' ') : structureData.what || ''
+  const why = structureData.why || ''
+  const combined = (what + ' ' + why).toLowerCase()
+  
+  if (combined.includes('予約') || combined.includes('booking') || combined.includes('ホテル') || combined.includes('宿泊')) {
+    return 'ホテル予約システム'
+  }
+  if (combined.includes('eコマース') || combined.includes('ショップ') || combined.includes('購入') || combined.includes('商品')) {
+    return 'ECサイト'
+  }
+  if (combined.includes('学習') || combined.includes('教育') || combined.includes('勉強')) {
+    return '学習管理システム'
+  }
+  if (combined.includes('タスク') || combined.includes('todo') || combined.includes('管理')) {
+    return 'タスク管理アプリ'
+  }
+  if (combined.includes('健康') || combined.includes('医療') || combined.includes('病院')) {
+    return '健康管理アプリ'
+  }
+  
+  return '業務管理システム'
+}
+
+// メインエンティティを抽出
+function extractMainEntity(structureData: any): string {
+  const what = Array.isArray(structureData.what) ? structureData.what.join(' ') : structureData.what || ''
+  
+  if (what.includes('予約') || what.includes('ホテル')) return '予約'
+  if (what.includes('商品') || what.includes('製品')) return '商品'
+  if (what.includes('ユーザー') || what.includes('会員')) return 'ユーザー'
+  if (what.includes('タスク') || what.includes('作業')) return 'タスク'
+  
+  return 'データ'
+}
+
+// メインフィールドを抽出
+function extractMainFields(structureData: any): string[] {
+  const appType = inferAppTypeFromStructure(structureData)
+  
+  if (appType.includes('ホテル') || appType.includes('予約')) {
+    return ['名前', 'チェックイン日', 'チェックアウト日', '部屋タイプ', '料金', '予約状況']
+  }
+  if (appType.includes('EC') || appType.includes('ショップ')) {
+    return ['商品名', '価格', '在庫数', 'カテゴリ', '説明', '画像URL']
+  }
+  if (appType.includes('学習') || appType.includes('教育')) {
+    return ['コース名', '進捗', '完了日', '評価', '内容', '難易度']
+  }
+  
+  return ['ID', '名前', '説明', '作成日', 'ステータス']
 }
 
 // 自然言語から要件を自動生成（AI活用版）- 後方互換性のため保持
@@ -407,11 +531,11 @@ async function fetchFigmaData(fileId?: string) {
     console.log(`🔤 Fonts: ${figmaData.designSystem?.fonts?.length || 0}`)
     
     // Parse design for better UI generation
-    if (figmaData.document) {
+    if ((figmaData as any).document) {
       try {
         const parsedDesign = FigmaDesignParser.parseDesign(figmaData)
         console.log(`🎨 Parsed ${parsedDesign.elements.length} design elements`)
-        figmaData.parsedDesign = parsedDesign
+        ;(figmaData as any).parsedDesign = parsedDesign
       } catch (parseError) {
         console.warn('⚠️ Failed to parse Figma design:', parseError)
         // Continue without parsed design
@@ -629,6 +753,7 @@ async function integrateAppWithFigma(requirements: AppRequirement, apiKey: strin
   }
   
   // 静的なスロット番号を取得（最大10個のアプリをサポート）
+  const { promises: fsPromises } = await import('fs')
   const getNextSlot = async () => {
     for (let i = 1; i <= 10; i++) {
       const slotDir = path.join(process.cwd(), 'app', `app${i}`)
@@ -651,13 +776,12 @@ async function integrateAppWithFigma(requirements: AppRequirement, apiKey: strin
   const outputPath = path.join(outputDir, 'page.tsx')
   
   try {
-    // Ensure directory exists
-    const { promises: fsPromises } = await import('fs')
+    // Ensure directory exists  
     await fsPromises.mkdir(outputDir, { recursive: true })
     
     // Clean and validate code
-    // const cleanedCode = cleanupGeneratedCode(generatedCode)
-    const cleanedCode = generatedCode.trim()
+    const cleanedCode = fixCommonCodeIssues(generatedCode.trim())
+    console.log('🧹 Applied code fixes and cleanup')
     // const validation = validateGeneratedCode(cleanedCode)
     const validation = { isValid: true, errors: [] }
     
@@ -742,6 +866,18 @@ function fixCommonCodeIssues(code: string): string {
   // Fix duplicate 'use client' directives
   fixedCode = fixedCode.replace(/('use client'|"use client")\s*\n+('use client'|"use client")/g, "'use client'")
   
+  // Fix invalid function names (remove Japanese characters and special symbols)
+  fixedCode = fixedCode.replace(
+    /export default function ([^(]*)\(/g, 
+    (match, funcName) => {
+      // Remove all non-ASCII characters and special symbols, keep only letters, numbers, underscores
+      const cleanName = funcName.replace(/[^\w]/g, '').replace(/^\d+/, '') || 'GeneratedApp'
+      // Ensure it starts with uppercase
+      const capitalizedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1)
+      return `export default function ${capitalizedName}(`
+    }
+  )
+  
   // Fix missing imports
   if (fixedCode.includes('useState') && !fixedCode.includes("from 'react'")) {
     fixedCode = fixedCode.replace("'use client'", "'use client'\n\nimport React, { useState } from 'react'")
@@ -770,7 +906,7 @@ function fixValidationErrors(code: string, errors: string[]): string {
   for (const error of errors) {
     if (error.includes('Unmatched JSX tags')) {
       // JSXタグの不一致を修正
-      fixedCode = fixJSXTags(fixedCode)
+      // fixedCode = fixJSXTags(fixedCode) // TODO: Implement this function
     }
     
     if (error.includes('Missing import')) {
