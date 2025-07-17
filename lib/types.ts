@@ -308,3 +308,11 @@ export interface GeneratedAppResult {
     componentsUsed: number
   } | null
 }
+
+export interface StructureData {
+  why: string
+  who: string
+  what: string[]
+  how: string
+  impact: string
+}

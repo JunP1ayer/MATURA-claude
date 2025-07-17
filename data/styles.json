@@ -1,0 +1,59 @@
+[
+  {
+    "id": "modern-minimal",
+    "name": "モダン・ミニマル",
+    "description": "白ベース、余白多め、クリーンなデザインで集中しやすい環境を提供",
+    "baseColor": "slate",
+    "tags": ["ミニマル", "クリーン", "プロフェッショナル"],
+    "previewColor": ["#000000", "#6b7280", "#f9fafb"],
+    "icon": "layout",
+    "themeConfig": {
+      "primary": "#000000",
+      "secondary": "#6b7280",
+      "background": "#ffffff",
+      "surface": "#f9fafb",
+      "text": "#111827",
+      "textSecondary": "#6b7280",
+      "border": "#e5e7eb",
+      "accent": "#3b82f6"
+    }
+  },
+  {
+    "id": "pop-colorful",
+    "name": "ポップ・カラフル",
+    "description": "アイコンとカラーで親しみやすさを重視した楽しいデザイン",
+    "baseColor": "pink",
+    "tags": ["カラフル", "親しみやすい", "楽しい"],
+    "previewColor": ["#ec4899", "#f97316", "#fef7ff"],
+    "icon": "heart",
+    "themeConfig": {
+      "primary": "#ec4899",
+      "secondary": "#f97316",
+      "background": "#fef7ff",
+      "surface": "#ffffff",
+      "text": "#1f2937",
+      "textSecondary": "#6b7280",
+      "border": "#fce7f3",
+      "accent": "#8b5cf6"
+    }
+  },
+  {
+    "id": "dark-cool",
+    "name": "ダーク・クール",
+    "description": "黒基調でスタイリッシュな洗練されたデザイン",
+    "baseColor": "blue",
+    "tags": ["ダーク", "スタイリッシュ", "洗練"],
+    "previewColor": ["#3b82f6", "#6366f1", "#0f172a"],
+    "icon": "moon",
+    "themeConfig": {
+      "primary": "#3b82f6",
+      "secondary": "#6366f1",
+      "background": "#0f172a",
+      "surface": "#1e293b",
+      "text": "#f1f5f9",
+      "textSecondary": "#94a3b8",
+      "border": "#334155",
+      "accent": "#06b6d4"
+    }
+  }
+]
