@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { selectOptimalDesignPattern, generateOptimizedUI } from '@/lib/smart-ui-selector';
 
 interface SimpleGenerateRequest {
   idea: string;
@@ -35,10 +36,13 @@ export async function POST(req: NextRequest) {
       throw new Error('スキーマが生成されませんでした');
     }
 
-    // Step 2: 生成されたコード文字列を作成
-    const generatedCode = generateCodeSample(schema, idea);
+    // Step 2: AIが最適なデザインパターンを選択
+    const optimalPattern = selectOptimalDesignPattern(idea.trim());
+    
+    // Step 3: 品質最適化されたコードを生成
+    const generatedCode = generateOptimizedUI(optimalPattern, idea.trim(), schema);
 
-    // Step 3: generated_appsテーブルに保存
+    // Step 4: generated_appsテーブルに保存（デザインパターン情報も含めて）
     const tableResponse = await fetch(`${req.nextUrl.origin}/api/create-table`, {
       method: 'POST',
       headers: {
@@ -47,7 +51,9 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ 
         schema, 
         user_idea: idea.trim(),
-        generated_code: generatedCode 
+        generated_code: generatedCode,
+        design_pattern: optimalPattern.name,
+        mvp_score: optimalPattern.mvpScore
       }),
     });
 
@@ -60,8 +66,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       code: generatedCode,
       schema: schema,
-      message: 'アプリが正常に生成されました',
+      message: `高品質MVPが生成されました (${optimalPattern.name})`,
       tableName: schema.tableName,
+      designPattern: optimalPattern.name,
+      mvpScore: optimalPattern.mvpScore
     });
 
   } catch (error) {

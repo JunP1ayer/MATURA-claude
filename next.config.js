@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    serverComponentsExternalPackages: ['openai']
+    serverComponentsExternalPackages: ['openai'],
   },
   typescript: {
     ignoreBuildErrors: true,

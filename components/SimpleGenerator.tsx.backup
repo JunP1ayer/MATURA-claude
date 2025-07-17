@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Database, RefreshCw, Eye, ExternalLink } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Logo } from '@/components/Logo';
+import { supabase } from '@/lib/supabase';
 
 interface GeneratedResult {
   code: string;
@@ -26,11 +26,7 @@ interface GeneratedApp {
   updated_at: string;
 }
 
-interface SimpleGeneratorProps {
-  showRecentApps?: boolean;
-}
-
-export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps = {}) {
+export function SimpleGenerator() {
   const [idea, setIdea] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GeneratedResult | null>(null);
@@ -56,6 +52,28 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
     }
   }, []);
 
+  // Supabase real-time subscription for generated apps
+  useEffect(() => {
+    const channel = supabase
+      .channel('generated_apps_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'generated_apps'
+        },
+        () => {
+          // Refetch apps when changes occur
+          queryClient.invalidateQueries({ queryKey: ['generatedApps'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const handleGenerate = async () => {
     if (!idea.trim()) return;
@@ -100,7 +118,14 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
       {/* Modern Header */}
       <div className="fixed top-0 left-0 right-0 p-4 md:p-6 z-10 bg-black/50 backdrop-blur-md border-b border-white/10">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <Logo variant="compact" />
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-white to-slate-300 rounded-xl shadow-lg">
+              <span className="text-black font-bold text-sm md:text-base">M</span>
+            </div>
+            <h1 className="text-lg md:text-xl font-semibold text-white">
+              MATURA
+            </h1>
+          </div>
           <div className="flex items-center gap-2">
             <a
               href="/table-manager"
@@ -265,9 +290,9 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
         </div>
       )}
 
-      {/* Modern Generated Apps List - Only show on main generator page */}
-      {showRecentApps && generatedApps && generatedApps.length > 0 && !result && (
-        <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-md border-t border-white/10 p-6 z-40">
+      {/* Modern Generated Apps List */}
+      {generatedApps && generatedApps.length > 0 && !result && (
+        <div className="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-md border-t border-white/10 p-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">
