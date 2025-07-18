@@ -17,11 +17,11 @@ export function SmartRefetchProvider({ children }: { children: React.ReactNode }
     ['appStats'],
   ];
 
-  // スマートrefetch機能を有効化
+  // スマートrefetch機能を有効化（プロダクション環境では安全な設定）
   useSmartRefetch({
     queryKeys: criticalQueryKeys,
-    enableVisibilityRefetch: true,
-    enableNetworkRefetch: true,
+    enableVisibilityRefetch: typeof document !== 'undefined',
+    enableNetworkRefetch: typeof window !== 'undefined',
   });
 
   // クエリキャッシュの監視とメモリ管理
@@ -58,7 +58,9 @@ export function SmartRefetchProvider({ children }: { children: React.ReactNode }
         console.log('🔄 React Query Status:', {
           totalQueries: queries.length,
           activeQueries: activeQueries.length,
-          memoryUsage: `${Math.round(performance.memory?.usedJSHeapSize / 1024 / 1024)}MB`,
+          memoryUsage: typeof performance !== 'undefined' && performance.memory 
+            ? `${Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)}MB` 
+            : 'N/A',
         });
       }, 30000); // 30秒ごと
 

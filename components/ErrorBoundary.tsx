@@ -36,21 +36,31 @@ export class ErrorBoundary extends Component<Props, State> {
     });
 
     // エラーレポートサービスに送信（実装例）
-    // this.reportError(error, errorInfo);
+    this.reportError(error, errorInfo);
   }
 
   private reportError = (error: Error, errorInfo: ErrorInfo) => {
     // エラーレポートの送信（例：Sentry、LogRocket等）
-    if (process.env.NODE_ENV === 'production') {
-      // プロダクション環境でのエラーレポート
-      console.error('Production error:', {
-        message: error.message,
-        stack: error.stack,
-        componentStack: errorInfo.componentStack,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        url: window.location.href,
-      });
+    const errorReport = {
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
+      url: typeof window !== 'undefined' ? window.location.href : 'Unknown',
+      environment: process.env.NODE_ENV,
+    };
+    
+    // プロダクション環境でもエラーを出力（Vercelログで確認するため）
+    console.error('🚨 React Error Boundary:', errorReport);
+    
+    // 可能であれば、Vercelのログに送信
+    if (typeof fetch !== 'undefined') {
+      fetch('/api/error-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorReport),
+      }).catch(err => console.error('Failed to send error report:', err));
     }
   };
 

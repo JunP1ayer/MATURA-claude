@@ -9,6 +9,8 @@ export function useVisibilityRefetch(queryKeys: string[][] = []) {
   const wasHidden = useRef(false);
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
     const handleVisibilityChange = () => {
       if (document.hidden) {
         wasHidden.current = true;
@@ -46,6 +48,8 @@ export function useNetworkRefetch(queryKeys: string[][] = []) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleOnline = () => {
       // オンラインに戻ったら重要なクエリを更新
       if (queryKeys.length > 0) {
