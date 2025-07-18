@@ -999,7 +999,7 @@ class UXStructureCodeGenerator {
   /**
    * フォールバックアプリ生成
    */
-  private static generateFallbackApp(insights: any, uiStyle: any): string {
+  public static generateFallbackApp(insights: any, uiStyle: any): string {
     return `<!DOCTYPE html>
 <html lang="ja">
 <head>

@@ -30,7 +30,7 @@ import { DataImporter } from '@/components/DataImporter';
 import { DataExporter } from '@/components/DataExporter';
 import { RecentAppsSection } from '@/components/RecentAppsSection';
 import { Input } from '@/components/ui/input';
-import { useQuery } from '@tanstack/react-query';
+import { useGeneratedAppsQuery } from '@/hooks/useSmartQuery';
 import Link from 'next/link';
 
 interface Column {
@@ -69,16 +69,8 @@ export default function TableManagerPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAppsModal, setShowAppsModal] = useState(false);
 
-  // React Query for fetching generated apps
-  const { data: generatedApps, isLoading: isLoadingApps } = useQuery({
-    queryKey: ['generatedApps'],
-    queryFn: async () => {
-      const response = await fetch('/api/crud/generated_apps');
-      if (!response.ok) throw new Error('Failed to fetch apps');
-      return response.json() as Promise<GeneratedApp[]>;
-    },
-    refetchInterval: 5000,
-  });
+  // スマートクエリで生成されたアプリを取得
+  const { data: generatedApps, isLoading: isLoadingApps } = useGeneratedAppsQuery();
 
   const handleTableCreated = (tableName: string, columns: Column[]) => {
     const newTable: TableSchema = {

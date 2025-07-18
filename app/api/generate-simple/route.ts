@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { selectOptimalDesignPattern, generateOptimizedUI } from '@/lib/smart-ui-selector';
+import { withErrorHandler, validateRequest, checkRateLimit, ApiError } from '@/lib/api-error-handler';
 
 interface SimpleGenerateRequest {
   idea: string;
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const { idea } = await req.json() as SimpleGenerateRequest;
+async function handlePOST(req: NextRequest) {
+  // レート制限チェック
+  checkRateLimit(req, 10, 60000); // 1分間に10リクエストまで
 
-    if (!idea || typeof idea !== 'string' || !idea.trim()) {
-      return NextResponse.json(
-        { error: 'アイデアの入力が必要です' },
-        { status: 400 }
-      );
-    }
+  const body = await req.json();
+  
+  // リクエストの検証
+  validateRequest(body, {
+    required: ['idea'],
+    maxLength: { idea: 1000 }
+  });
+
+  const { idea } = body as SimpleGenerateRequest;
+
+  if (!idea.trim()) {
+    throw new ApiError('アイデアの入力が必要です', 400, 'VALIDATION_ERROR');
+  }
 
     // Step 1: スキーマ推論
     const schemaResponse = await fetch(`${req.nextUrl.origin}/api/infer-schema`, {
@@ -71,17 +79,6 @@ export async function POST(req: NextRequest) {
       designPattern: optimalPattern.name,
       mvpScore: optimalPattern.mvpScore
     });
-
-  } catch (error) {
-    console.error('Simple generation error:', error);
-    return NextResponse.json(
-      { 
-        error: 'アプリ生成中にエラーが発生しました',
-        details: error instanceof Error ? error.message : '不明なエラー'
-      },
-      { status: 500 }
-    );
-  }
 }
 
 function generateCodeSample(schema: any, idea: string): string {
@@ -277,3 +274,6 @@ function getValueConverter(type: string): string {
       return 'e.target.value';
   }
 }
+
+// エラーハンドリングでラップしてエクスポート
+export const POST = withErrorHandler(handlePOST);

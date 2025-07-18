@@ -4,6 +4,7 @@ import './globals.css'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { ToastProvider } from '@/components/ui/interactive-feedback'
 import { Toaster } from 'sonner'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import ClientLayout from './client-layout'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -60,17 +61,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className={inter.className}>
-        <QueryProvider>
-          <ToastProvider>
-            <ClientLayout>
-              <div className="min-h-screen bg-gray-50">
-                {children}
-                <Toaster />
-              </div>
-            </ClientLayout>
-          </ToastProvider>
-        </QueryProvider>
+        <ErrorBoundary>
+          <QueryProvider>
+            <ToastProvider>
+              <ClientLayout>
+                <div className="min-h-screen bg-gray-50">
+                  {children}
+                  <Toaster />
+                </div>
+              </ClientLayout>
+            </ToastProvider>
+          </QueryProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

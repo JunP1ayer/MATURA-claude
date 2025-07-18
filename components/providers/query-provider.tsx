@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { toast } from 'sonner'
+import { handleApiError, errorToToast } from '@/lib/error-handler'
+import { SmartRefetchProvider } from '@/components/SmartRefetchProvider'
 
 // 高性能キャッシュ設定
 const queryClient = new QueryClient({
@@ -19,11 +22,12 @@ const queryClient = new QueryClient({
         return failureCount < 1
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      // バックグラウンドでの自動更新
-      refetchInterval: 10 * 60 * 1000, // 10分ごと
+      // インテリジェントなrefetch戦略
+      refetchOnWindowFocus: true,     // ウィンドウフォーカス時に更新
+      refetchOnMount: 'always',       // マウント時に常に更新
+      refetchOnReconnect: true,       // ネットワーク再接続時に更新
+      // デフォルトのrefetchIntervalは無効化（個別設定に委ねる）
+      refetchInterval: false,
       refetchIntervalInBackground: false,
     },
     mutations: {
@@ -34,6 +38,15 @@ const queryClient = new QueryClient({
       },
       onError: (error, variables, context) => {
         console.error('Mutation error:', error)
+        
+        // エラーをトーストで表示
+        const errorResponse = handleApiError(error);
+        const toastOptions = errorToToast(errorResponse);
+        
+        toast.error(toastOptions.title, {
+          description: toastOptions.description,
+          duration: toastOptions.duration,
+        });
       },
       onSuccess: () => {
         // 成功時の処理
@@ -225,24 +238,28 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   if (persister) {
     return (
       <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-        {children}
-        <ReactQueryDevtools 
-          initialIsOpen={false} 
-          toggleButtonProps={{
-            style: {
-              marginLeft: '5px',
-              transform: 'translateY(-5px)',
-            },
-          }}
-        />
+        <SmartRefetchProvider>
+          {children}
+          <ReactQueryDevtools 
+            initialIsOpen={false} 
+            toggleButtonProps={{
+              style: {
+                marginLeft: '5px',
+                transform: 'translateY(-5px)',
+              },
+            }}
+          />
+        </SmartRefetchProvider>
       </PersistQueryClientProvider>
     )
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <ReactQueryDevtools initialIsOpen={false} />
+      <SmartRefetchProvider>
+        {children}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </SmartRefetchProvider>
     </QueryClientProvider>
   )
 }

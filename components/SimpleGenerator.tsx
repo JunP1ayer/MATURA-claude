@@ -4,8 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Database, RefreshCw, Eye, ExternalLink } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { Logo } from '@/components/Logo';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { checkFetchResponse } from '@/lib/error-handler';
+import { useGeneratedAppsQuery } from '@/hooks/useSmartQuery';
 
 interface GeneratedResult {
   code: string;
@@ -37,17 +40,10 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
+  const { handleError, showSuccessToast, showErrorToast } = useErrorHandler();
 
-  // React Query for fetching generated apps
-  const { data: generatedApps, isLoading: isLoadingApps } = useQuery({
-    queryKey: ['generatedApps'],
-    queryFn: async () => {
-      const response = await fetch('/api/crud/generated_apps');
-      if (!response.ok) throw new Error('Failed to fetch apps');
-      return response.json() as Promise<GeneratedApp[]>;
-    },
-    refetchInterval: 5000, // Refetch every 5 seconds
-  });
+  // スマートクエリで生成されたアプリを取得
+  const { data: generatedApps, isLoading: isLoadingApps } = useGeneratedAppsQuery();
 
   // リロード時に入力欄をフォーカス
   useEffect(() => {
@@ -73,17 +69,25 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
         body: JSON.stringify({ idea: idea.trim() }),
       });
 
-      if (!response.ok) {
-        throw new Error('生成に失敗しました');
-      }
+      // レスポンスのチェック
+      await checkFetchResponse(response);
 
       const data = await response.json();
       setResult(data);
       
+      // 成功メッセージを表示
+      showSuccessToast('アプリが正常に生成されました！', 'プレビューで確認できます');
+      
       // アプリが正常に生成されたら、リストを更新
       queryClient.invalidateQueries({ queryKey: ['generatedApps'] });
     } catch (err) {
-      setError(err instanceof Error ? err.message : '予期しないエラーが発生しました');
+      // 統一されたエラーハンドリング
+      const errorResponse = handleError(err, {
+        customMessage: 'アプリの生成中にエラーが発生しました。もう一度お試しください。',
+        showToast: true,
+      });
+      
+      setError(errorResponse.message);
     } finally {
       setIsGenerating(false);
     }
