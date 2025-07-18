@@ -39,6 +39,8 @@ function useUserActivity() {
   const lastActivity = useRef(Date.now());
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
     const updateActivity = () => {
       isActive.current = true;
       lastActivity.current = Date.now();
@@ -151,6 +153,7 @@ export function useGeneratedAppsQuery() {
         isActive: (data: any[]) => {
           if (!data || data.length === 0) return false;
           const latestApp = data[0];
+          if (!latestApp || !latestApp.created_at) return false;
           const timeSinceLatest = Date.now() - new Date(latestApp.created_at).getTime();
           return timeSinceLatest < 5 * 60 * 1000;
         },
