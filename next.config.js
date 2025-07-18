@@ -6,10 +6,10 @@ const nextConfig = {
     serverComponentsExternalPackages: ['openai'],
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   env: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
