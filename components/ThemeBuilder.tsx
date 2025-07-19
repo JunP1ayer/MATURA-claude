@@ -40,7 +40,7 @@ export default function ThemeBuilder({ selectedStyle, onBack, onApplyTheme }: Th
             {IconComponent && (
               <IconComponent 
                 className="w-6 h-6" 
-                style={{ color: (safeStyle?.previewColor?.[1] || '#888888') }}
+                {...({ style: { color: (safeStyle?.previewColor?.[1] || '#888888') } } as any)}
               />
             )}
             {safeStyle.name} スタイル
