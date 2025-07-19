@@ -148,10 +148,12 @@ export async function DELETE(
 }
 
 // スキーマ管理用のヘルパー関数
-export function setTableSchema(tableName: string, schema: any) {
+function setTableSchema(tableName: string, schema: any) {
   virtualSchemas[tableName] = schema;
 }
 
-export function getTableSchema(tableName: string) {
+function getTableSchema(tableName: string) {
   return virtualSchemas[tableName];
 }
+
+export { setTableSchema, getTableSchema };
