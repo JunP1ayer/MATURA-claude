@@ -189,11 +189,11 @@ export default function CodePlayground() {
 </html>`
 
       // テスト用のcodeResponseをシミュレート
-      const codeResponse: Partial<GeneratedCode> | string = {
+      const codeResponse = {
         fullHtml: testHTML,
         title: 'テストアプリ',
         description: 'プレビュー機能のテスト用アプリケーション'
-      }
+      } as Partial<GeneratedCode>
 
       clearInterval(progressInterval)
       setProgress(100)
@@ -202,15 +202,7 @@ export default function CodePlayground() {
         console.log('🎯 [CODE-GENERATION] Raw response:', codeResponse)
         console.log('🎯 [CODE-GENERATION] Response type:', typeof codeResponse)
         
-        let responseLength: number | string = 'N/A'
-        if (typeof codeResponse === 'string') {
-          responseLength = codeResponse.length
-        } else if (codeResponse && typeof codeResponse === 'object' && 'fullHtml' in codeResponse) {
-          const htmlContent = codeResponse.fullHtml
-          if (typeof htmlContent === 'string') {
-            responseLength = htmlContent.length
-          }
-        }
+        const responseLength = codeResponse.fullHtml?.length || 'N/A'
         console.log('🎯 [CODE-GENERATION] Response length:', responseLength)
         
         // 🧠 ULTRA THINK: 新しいJSON形式に対応
