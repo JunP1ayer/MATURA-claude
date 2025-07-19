@@ -39,7 +39,7 @@ function useUserActivity() {
   const lastActivity = useRef(Date.now());
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined') return () => {};
     
     const updateActivity = () => {
       isActive.current = true;
