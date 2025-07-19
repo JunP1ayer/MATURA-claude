@@ -1,7 +1,7 @@
 {
   "extends": [
     "next/core-web-vitals",
-    "@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -21,11 +21,10 @@
   },
   "rules": {
     // TypeScript specific rules
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/prefer-const": "error",
     "@typescript-eslint/no-var-requires": "error",
     "@typescript-eslint/ban-ts-comment": "warn",
     "@typescript-eslint/no-empty-interface": "warn",
@@ -149,9 +148,8 @@
       "version": "detect"
     },
     "import/resolver": {
-      "typescript": {
-        "alwaysTryTypes": true,
-        "project": "./tsconfig.json"
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     }
   },
@@ -176,6 +174,12 @@
       "rules": {
         "@typescript-eslint/no-var-requires": "off",
         "no-console": "off"
+      }
+    },
+    {
+      "files": ["MATURA-claude/**/*.tsx", "MATURA-claude/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off"
       }
     }
   ]

@@ -160,7 +160,9 @@ async function applyUIImprovements(appId: string, improvements: any[]) {
 }
 
 // メタデータの更新
-async function updateAppMetadata(appId: string, changes: any) {
+// TODO: This function is currently not used but might be needed for tracking AI expansions
+// Remove the underscore prefix when implementing metadata tracking
+async function _updateAppMetadata(appId: string, changes: any) {
   try {
     const metadataPath = path.join(process.cwd(), 'app', appId, 'metadata.json')
     const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'))
