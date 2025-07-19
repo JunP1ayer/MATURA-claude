@@ -103,7 +103,7 @@ export const PrefetchManager = {
 
     // よくアクセスされるアプリのデータを事前読み込み
     const topApps = Object.entries(frequentlyAccessedApps)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 3)
 
     for (const [appId] of topApps) {
