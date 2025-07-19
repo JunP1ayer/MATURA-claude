@@ -5,7 +5,7 @@ export async function GET() {
     const figmaApiKey = process.env.FIGMA_API_KEY || process.env.FIGMA_ACCESS_TOKEN;
     const defaultFileId = process.env.DEFAULT_FIGMA_FILE_ID;
     
-    const status = {
+    const status: any = {
       hasApiKey: !!figmaApiKey,
       hasDefaultFileId: !!defaultFileId,
       apiKeyLength: figmaApiKey ? figmaApiKey.length : 0,
