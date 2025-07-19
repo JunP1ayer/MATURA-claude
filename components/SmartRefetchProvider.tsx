@@ -58,8 +58,8 @@ export function SmartRefetchProvider({ children }: { children: React.ReactNode }
         console.log('🔄 React Query Status:', {
           totalQueries: queries.length,
           activeQueries: activeQueries.length,
-          memoryUsage: typeof performance !== 'undefined' && performance.memory 
-            ? `${Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)}MB` 
+          memoryUsage: typeof performance !== 'undefined' && 'memory' in performance && (performance as any).memory 
+            ? `${Math.round((performance as any).memory.usedJSHeapSize / 1024 / 1024)}MB` 
             : 'N/A',
         });
       }, 30000); // 30秒ごと
