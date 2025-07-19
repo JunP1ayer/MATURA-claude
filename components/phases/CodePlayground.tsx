@@ -189,7 +189,7 @@ export default function CodePlayground() {
 </html>`
 
       // テスト用のcodeResponseをシミュレート
-      const codeResponse = {
+      const codeResponse: Partial<GeneratedCode> | string = {
         fullHtml: testHTML,
         title: 'テストアプリ',
         description: 'プレビュー機能のテスト用アプリケーション'
@@ -201,7 +201,7 @@ export default function CodePlayground() {
       if (codeResponse) {
         console.log('🎯 [CODE-GENERATION] Raw response:', codeResponse)
         console.log('🎯 [CODE-GENERATION] Response type:', typeof codeResponse)
-        console.log('🎯 [CODE-GENERATION] Response length:', typeof codeResponse === 'string' ? codeResponse.length : 'N/A')
+        console.log('🎯 [CODE-GENERATION] Response length:', typeof codeResponse === 'string' ? codeResponse.length : (codeResponse as Partial<GeneratedCode>)?.fullHtml?.length || 'N/A')
         
         // 🧠 ULTRA THINK: 新しいJSON形式に対応
         let parsedCode
@@ -210,7 +210,7 @@ export default function CodePlayground() {
           if (typeof codeResponse === 'string' && codeResponse.includes('fullHtml')) {
             parsedCode = JSON.parse(codeResponse)
             console.log('✅ [CODE-GENERATION] JSON parsed successfully:', parsedCode)
-          } else if (codeResponse.fullHtml) {
+          } else if (typeof codeResponse === 'object' && (codeResponse as Partial<GeneratedCode>).fullHtml) {
             parsedCode = codeResponse
             console.log('✅ [CODE-GENERATION] Object format detected:', parsedCode)
           } else {
@@ -222,13 +222,14 @@ export default function CodePlayground() {
           parsedCode = null
         }
 
+        const codeResponseObj = typeof codeResponse === 'object' ? codeResponse as Partial<GeneratedCode> : {};
         const code: GeneratedCode = {
           // 既存形式との互換性
-          html: parsedCode?.fullHtml || codeResponse.html || generateFallbackHTML(),
-          css: extractCSSFromHTML(parsedCode?.fullHtml) || codeResponse.css || generateFallbackCSS(),
-          javascript: extractJSFromHTML(parsedCode?.fullHtml) || codeResponse.javascript || generateFallbackJS(),
+          html: parsedCode?.fullHtml || codeResponseObj.html || generateFallbackHTML(),
+          css: extractCSSFromHTML(parsedCode?.fullHtml) || codeResponseObj.css || generateFallbackCSS(),
+          javascript: extractJSFromHTML(parsedCode?.fullHtml) || codeResponseObj.javascript || generateFallbackJS(),
           framework: 'Vanilla HTML/CSS/JS',
-          dependencies: codeResponse.dependencies || [],
+          dependencies: codeResponseObj.dependencies || [],
           // 新しいフィールド
           fullHtml: parsedCode?.fullHtml || generateCompleteHTML(codeResponse),
           title: parsedCode?.title || state.insights?.vision || 'Generated App',
