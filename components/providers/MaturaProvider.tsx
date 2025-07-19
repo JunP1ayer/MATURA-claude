@@ -8,7 +8,7 @@ import { useChatOptimized } from '@/hooks/useChatOptimized'
 interface MaturaContextType {
   // State management
   state: ReturnType<typeof useMaturaState>['state']
-  actions: Omit<ReturnType<typeof useMaturaState>, 'state'>
+  actions: any
   
   // History management
   history: ReturnType<typeof useMaturaHistory>
