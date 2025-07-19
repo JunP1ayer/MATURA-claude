@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-
-// インメモリデータストレージ（実際の実装では永続化データベースを使用）
-let virtualData: { [tableName: string]: any[] } = {};
-let virtualSchemas: { [tableName: string]: any } = {};
+import { 
+  getTableData, 
+  setTableData, 
+  initializeTable, 
+  addTableItem, 
+  updateTableItem, 
+  removeTableItem 
+} from '@/lib/virtualDataStore';
+import { setTableSchema, getTableSchema } from '@/lib/tableSchema';
 
 export async function GET(
   req: NextRequest,
@@ -15,7 +20,7 @@ export async function GET(
     const id = searchParams.get('id');
 
     // テーブルのデータを取得
-    const tableData = virtualData[table] || [];
+    const tableData = getTableData(table);
 
     if (id) {
       const item = tableData.find(item => item.id === id);
@@ -48,9 +53,7 @@ export async function POST(
     const body = await req.json();
 
     // テーブルが存在しない場合は初期化
-    if (!virtualData[table]) {
-      virtualData[table] = [];
-    }
+    initializeTable(table);
 
     const newItem = {
       id: uuidv4(),
@@ -59,7 +62,7 @@ export async function POST(
       updated_at: new Date().toISOString()
     };
 
-    virtualData[table].push(newItem);
+    addTableItem(table, newItem);
 
     return NextResponse.json({ data: newItem }, { status: 201 });
   } catch (error) {
@@ -85,7 +88,7 @@ export async function PUT(
       return NextResponse.json({ error: 'IDが必要です' }, { status: 400 });
     }
 
-    const tableData = virtualData[table] || [];
+    const tableData = getTableData(table);
     const itemIndex = tableData.findIndex(item => item.id === id);
 
     if (itemIndex === -1) {
@@ -103,7 +106,7 @@ export async function PUT(
     updatedItem.id = id;
     updatedItem.created_at = tableData[itemIndex].created_at;
 
-    virtualData[table][itemIndex] = updatedItem;
+    updateTableItem(table, itemIndex, updatedItem);
 
     return NextResponse.json({ data: updatedItem });
   } catch (error) {
@@ -128,14 +131,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'IDが必要です' }, { status: 400 });
     }
 
-    const tableData = virtualData[table] || [];
+    const tableData = getTableData(table);
     const itemIndex = tableData.findIndex(item => item.id === id);
 
     if (itemIndex === -1) {
       return NextResponse.json({ error: 'データが見つかりません' }, { status: 404 });
     }
 
-    virtualData[table].splice(itemIndex, 1);
+    removeTableItem(table, itemIndex);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -147,13 +150,3 @@ export async function DELETE(
   }
 }
 
-// スキーマ管理用のヘルパー関数
-function setTableSchema(tableName: string, schema: any) {
-  virtualSchemas[tableName] = schema;
-}
-
-function getTableSchema(tableName: string) {
-  return virtualSchemas[tableName];
-}
-
-export { setTableSchema, getTableSchema };
