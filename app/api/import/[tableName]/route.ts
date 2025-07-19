@@ -127,7 +127,7 @@ async function insertImportData(tableName: string, data: any[]): Promise<{ count
       const { error, count } = await supabase
         .from(tableName)
         .insert(batch)
-        .select('id', { count: 'exact' });
+        .select('id');
       
       if (error) {
         throw new Error(`データベースエラー: ${error.message}`);
