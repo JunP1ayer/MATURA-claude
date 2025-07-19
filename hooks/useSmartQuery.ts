@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
-interface SmartQueryOptions<TData> extends Omit<UseQueryOptions<TData>, 'refetchInterval'> {
+interface SmartQueryOptions<TData> extends Omit<UseQueryOptions<TData>, 'refetchInterval' | 'queryKey' | 'queryFn'> {
   /**
    * スマートrefetch設定
    */
@@ -88,14 +88,15 @@ export function useSmartQuery<TData = unknown>(
     queryKey,
     queryFn,
     ...queryOptions,
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
+      const data = query.state.data;
       // 条件付きrefetch: ユーザーがアクティブでない場合は停止
       if (conditionalRefetch?.onlyWhenActive && !isActive) {
         return false;
       }
 
       // 条件付きrefetch: カスタム条件
-      if (conditionalRefetch?.condition && data && !conditionalRefetch.condition(data)) {
+      if (conditionalRefetch?.condition && data !== undefined && !conditionalRefetch.condition(data)) {
         return false;
       }
 
@@ -118,7 +119,7 @@ export function useSmartQuery<TData = unknown>(
       }
 
       // カスタムアクティビティ判定
-      if (isActiveCheck) {
+      if (isActiveCheck && data !== undefined) {
         const active = isActiveCheck(data);
         const interval = active ? activeInterval : normalInterval;
         return Math.max(minInterval, Math.min(interval, maxInterval));
@@ -174,7 +175,7 @@ export function useConditionalQuery<TData = unknown>(
   queryKey: string[],
   queryFn: () => Promise<TData>,
   condition: boolean,
-  options: UseQueryOptions<TData> = {}
+  options: Omit<UseQueryOptions<TData>, 'queryKey' | 'queryFn'> = {}
 ) {
   return useQuery({
     queryKey,
@@ -191,7 +192,7 @@ export function useDependentQuery<TData = unknown>(
   queryKey: string[],
   queryFn: () => Promise<TData>,
   dependency: any,
-  options: UseQueryOptions<TData> = {}
+  options: Omit<UseQueryOptions<TData>, 'queryKey' | 'queryFn'> = {}
 ) {
   return useQuery({
     queryKey,
