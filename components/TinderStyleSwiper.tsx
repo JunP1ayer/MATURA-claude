@@ -29,6 +29,10 @@ export default function TinderStyleSwiper({ styles, onStyleSelect, onStyleReject
 
   const currentStyle = createSafeStyle(styles[currentIndex])
   const nextStyle = createSafeStyle(styles[currentIndex + 1])
+  
+  // Create safe versions for consistent naming
+  const safeCurrentStyle = currentStyle
+  const safeNextStyle = nextStyle
 
   const handleDragEnd = async (event: any, info: PanInfo) => {
     const threshold = 100
