@@ -201,7 +201,7 @@ export default function CodePlayground() {
       if (codeResponse) {
         console.log('🎯 [CODE-GENERATION] Raw response:', codeResponse)
         console.log('🎯 [CODE-GENERATION] Response type:', typeof codeResponse)
-        console.log('🎯 [CODE-GENERATION] Response length:', typeof codeResponse === 'string' ? codeResponse.length : (codeResponse as Partial<GeneratedCode>)?.fullHtml?.length || 'N/A')
+        console.log('🎯 [CODE-GENERATION] Response length:', typeof codeResponse === 'string' ? codeResponse.length : typeof codeResponse === 'object' && codeResponse?.fullHtml ? codeResponse.fullHtml.length : 'N/A')
         
         // 🧠 ULTRA THINK: 新しいJSON形式に対応
         let parsedCode
