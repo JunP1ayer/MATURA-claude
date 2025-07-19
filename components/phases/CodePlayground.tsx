@@ -201,11 +201,16 @@ export default function CodePlayground() {
       if (codeResponse) {
         console.log('🎯 [CODE-GENERATION] Raw response:', codeResponse)
         console.log('🎯 [CODE-GENERATION] Response type:', typeof codeResponse)
-        const responseLength = typeof codeResponse === 'string' 
-          ? codeResponse.length 
-          : (codeResponse && typeof codeResponse === 'object' && 'fullHtml' in codeResponse && codeResponse.fullHtml)
-            ? codeResponse.fullHtml.length 
-            : 'N/A'
+        
+        let responseLength: number | string = 'N/A'
+        if (typeof codeResponse === 'string') {
+          responseLength = codeResponse.length
+        } else if (codeResponse && typeof codeResponse === 'object' && 'fullHtml' in codeResponse) {
+          const htmlContent = codeResponse.fullHtml
+          if (typeof htmlContent === 'string') {
+            responseLength = htmlContent.length
+          }
+        }
         console.log('🎯 [CODE-GENERATION] Response length:', responseLength)
         
         // 🧠 ULTRA THINK: 新しいJSON形式に対応
