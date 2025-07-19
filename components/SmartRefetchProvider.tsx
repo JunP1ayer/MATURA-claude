@@ -66,6 +66,7 @@ export function SmartRefetchProvider({ children }: { children: React.ReactNode }
 
       return () => clearInterval(logInterval);
     }
+    return undefined;
   }, [queryClient]);
 
   return <>{children}</>;
