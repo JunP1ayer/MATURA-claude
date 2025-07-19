@@ -209,10 +209,7 @@ export default function CodePlayground() {
         let parsedCode
         try {
           // OpenAIからのレスポンスがJSONかチェック
-          if (typeof codeResponse === 'string' && codeResponse.includes('fullHtml')) {
-            parsedCode = JSON.parse(codeResponse)
-            console.log('✅ [CODE-GENERATION] JSON parsed successfully:', parsedCode)
-          } else if (typeof codeResponse === 'object' && (codeResponse as Partial<GeneratedCode>).fullHtml) {
+          if (typeof codeResponse === 'object' && codeResponse.fullHtml) {
             parsedCode = codeResponse
             console.log('✅ [CODE-GENERATION] Object format detected:', parsedCode)
           } else {
@@ -224,7 +221,7 @@ export default function CodePlayground() {
           parsedCode = null
         }
 
-        const codeResponseObj = typeof codeResponse === 'object' ? codeResponse as Partial<GeneratedCode> : {};
+        const codeResponseObj = codeResponse;
         const code: GeneratedCode = {
           // 既存形式との互換性
           html: parsedCode?.fullHtml || codeResponseObj.html || generateFallbackHTML(),
@@ -233,7 +230,7 @@ export default function CodePlayground() {
           framework: 'Vanilla HTML/CSS/JS',
           dependencies: codeResponseObj.dependencies || [],
           // 新しいフィールド
-          fullHtml: parsedCode?.fullHtml || generateCompleteHTML(codeResponse),
+          fullHtml: parsedCode?.fullHtml || codeResponseObj.fullHtml || generateCompleteHTML(codeResponseObj),
           title: parsedCode?.title || state.insights?.vision || 'Generated App',
           description: parsedCode?.description || 'AI generated web application',
           isComplete: !!parsedCode?.fullHtml
