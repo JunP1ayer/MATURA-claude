@@ -50,20 +50,29 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
 
   // URLパラメータからプロンプトを読み取り、入力欄をフォーカス
   useEffect(() => {
-    // URLパラメータからプロンプトを取得
-    const urlParams = new URLSearchParams(window.location.search);
-    const promptParam = urlParams.get('prompt');
-    
-    if (promptParam) {
-      const decodedPrompt = decodeURIComponent(promptParam);
-      setIdea(decodedPrompt);
-      // 初期プロンプトも業界判定
-      const template = findTemplateByKeywords(decodedPrompt);
-      setDetectedTemplate(template);
-    }
-    
-    if (textareaRef.current) {
-      textareaRef.current.focus();
+    try {
+      // URLパラメータからプロンプトを取得
+      const urlParams = new URLSearchParams(window.location.search);
+      const promptParam = urlParams.get('prompt');
+      
+      if (promptParam) {
+        const decodedPrompt = decodeURIComponent(promptParam);
+        setIdea(decodedPrompt);
+        // 初期プロンプトも業界判定
+        try {
+          const template = findTemplateByKeywords(decodedPrompt);
+          setDetectedTemplate(template);
+        } catch (templateError) {
+          console.error('テンプレート検索エラー:', templateError);
+          setDetectedTemplate(null);
+        }
+      }
+      
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    } catch (error) {
+      console.error('初期化エラー:', error);
     }
   }, []);
 
@@ -71,11 +80,16 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
   const handleIdeaChange = (value: string) => {
     setIdea(value);
     
-    // 入力が3文字以上の場合に業界判定を実行
-    if (value.length >= 3) {
-      const template = findTemplateByKeywords(value);
-      setDetectedTemplate(template);
-    } else {
+    // 入力が3文字以上の場合に業界判定を実行（一時的に無効化）
+    try {
+      if (value.length >= 3) {
+        const template = findTemplateByKeywords(value);
+        setDetectedTemplate(template);
+      } else {
+        setDetectedTemplate(null);
+      }
+    } catch (error) {
+      console.error('業界判定エラー:', error);
       setDetectedTemplate(null);
     }
   };
