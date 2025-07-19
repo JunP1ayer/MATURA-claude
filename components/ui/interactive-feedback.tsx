@@ -26,7 +26,7 @@ interface Toast {
 
 // トーストマネージャーのコンテキスト
 interface ToastContextType {
-  addToast: (toast: Omit<Toast, 'id'>) => void
+  addToast: (toast: Omit<Toast, 'id'>) => string
   removeToast: (id: string) => void
   toasts: Toast[]
 }
@@ -49,6 +49,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         removeToast(id)
       }, toast.duration || 5000)
     }
+    
+    return id
   }
 
   const removeToast = (id: string) => {
