@@ -3,12 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowRight, Database, RefreshCw, Eye, ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, ArrowRight, Database, RefreshCw, Eye, ExternalLink, Sparkles, Factory, Scissors, ShoppingCart } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Logo } from '@/components/Logo';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { checkFetchResponse } from '@/lib/error-handler';
 import { useGeneratedAppsQuery } from '@/hooks/useSmartQuery';
+import { findTemplateByKeywords, IndustryTemplate } from '@/lib/industry-templates';
 
 interface GeneratedResult {
   code: string;
@@ -38,6 +40,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [detectedTemplate, setDetectedTemplate] = useState<IndustryTemplate | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { handleError, showSuccessToast, showErrorToast } = useErrorHandler();
@@ -45,12 +48,37 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
   // スマートクエリで生成されたアプリを取得
   const { data: generatedApps, isLoading: isLoadingApps } = useGeneratedAppsQuery();
 
-  // リロード時に入力欄をフォーカス
+  // URLパラメータからプロンプトを読み取り、入力欄をフォーカス
   useEffect(() => {
+    // URLパラメータからプロンプトを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const promptParam = urlParams.get('prompt');
+    
+    if (promptParam) {
+      const decodedPrompt = decodeURIComponent(promptParam);
+      setIdea(decodedPrompt);
+      // 初期プロンプトも業界判定
+      const template = findTemplateByKeywords(decodedPrompt);
+      setDetectedTemplate(template);
+    }
+    
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
   }, []);
+
+  // 入力内容変更時の業界自動判定
+  const handleIdeaChange = (value: string) => {
+    setIdea(value);
+    
+    // 入力が3文字以上の場合に業界判定を実行
+    if (value.length >= 3) {
+      const template = findTemplateByKeywords(value);
+      setDetectedTemplate(template);
+    } else {
+      setDetectedTemplate(null);
+    }
+  };
 
 
   const handleGenerate = async () => {
@@ -124,14 +152,14 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
           {/* Hero Typography */}
           <div className="mb-12 md:mb-16">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              What do you want to
+              どんなアプリを
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                build?
+                作りたいですか？
               </span>
             </h1>
             <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
-              Describe your app idea and we'll generate a complete, functional MVP in seconds.
+              アプリのアイデアを説明してください。数秒で完全に動作するMVPを生成します。
             </p>
           </div>
 
@@ -140,21 +168,59 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
             <div className="relative group">
               <Textarea
                 ref={textareaRef}
-                placeholder="A task management app for teams..."
+                placeholder="チーム向けのタスク管理アプリ..."
                 value={idea}
-                onChange={(e) => setIdea(e.target.value)}
+                onChange={(e) => handleIdeaChange(e.target.value)}
                 className={`min-h-32 md:min-h-40 text-base md:text-lg bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-6 focus:ring-2 focus:ring-white/30 focus:border-white/40 transition-all duration-300 resize-none placeholder:text-white/50 text-white shadow-2xl ${
                   idea.length > 0 ? 'bg-white/15 border-white/30' : ''
                 }`}
                 disabled={isGenerating}
               />
               <div className="absolute bottom-4 right-6 text-xs text-white/40 font-medium">
-                {idea.length} characters
+                {idea.length} 文字
               </div>
               {idea.length > 0 && (
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl -z-10 blur-xl animate-pulse" />
               )}
             </div>
+
+            {/* 業界判定結果の表示 */}
+            {detectedTemplate && (
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-purple-600/20 rounded-lg">
+                    <Sparkles className="h-5 w-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white text-sm">業界特化テンプレートを検出</h3>
+                    <p className="text-white/60 text-xs">{detectedTemplate.industry}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30 text-xs">
+                      {detectedTemplate.name}
+                    </Badge>
+                    <Badge className="bg-green-600/20 text-green-300 border-green-600/30 text-xs">
+                      {detectedTemplate.estimatedTime}で完成
+                    </Badge>
+                  </div>
+                  <p className="text-white/70 text-sm">{detectedTemplate.description}</p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {detectedTemplate.features.slice(0, 3).map((feature, index) => (
+                      <Badge key={index} variant="outline" className="border-white/20 text-white/60 text-xs">
+                        {feature}
+                      </Badge>
+                    ))}
+                    {detectedTemplate.features.length > 3 && (
+                      <Badge variant="outline" className="border-white/20 text-white/60 text-xs">
+                        +{detectedTemplate.features.length - 3}個の機能
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
@@ -165,11 +231,11 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                    <span>Building your app...</span>
+                    <span>アプリを生成中...</span>
                   </>
                 ) : (
                   <>
-                    <span>Create App</span>
+                    <span>アプリを作成</span>
                     <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
                   </>
                 )}
@@ -181,7 +247,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                   variant="outline"
                   className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg border-white/20 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 backdrop-blur-sm"
                 >
-                  Reset
+                  リセット
                 </Button>
               )}
             </div>
@@ -205,10 +271,10 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                 <div className="w-8 h-8 bg-white rounded-full animate-pulse"></div>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                Your app is ready
+                アプリが完成しました
               </h2>
               <p className="text-white/70 text-lg">
-                Generated database schema and React components
+                データベーススキーマとReactコンポーネントを生成しました
               </p>
             </div>
 
@@ -220,7 +286,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                     <Database className="h-5 w-5 text-blue-400" />
                   </div>
                   <h3 className="font-semibold text-white">
-                    Database Schema
+                    データベース設計
                   </h3>
                 </div>
                 <pre className="bg-black/40 text-green-400 p-4 rounded-xl text-xs overflow-auto max-h-72 font-mono border border-white/10">
@@ -235,7 +301,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                     <Database className="h-5 w-5 text-purple-400" />
                   </div>
                   <h3 className="font-semibold text-white">
-                    React Components
+                    Reactコンポーネント
                   </h3>
                 </div>
                 <pre className="bg-black/40 text-blue-400 p-4 rounded-xl text-xs overflow-auto max-h-72 font-mono border border-white/10">
@@ -262,7 +328,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                 variant="outline"
                 className="px-8 py-3 border-white/20 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-all duration-300 backdrop-blur-sm"
               >
-                Close
+                閉じる
               </Button>
             </div>
           </div>
@@ -275,7 +341,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">
-                Recent Apps ({generatedApps.length})
+                最近のアプリ ({generatedApps.length})
               </h2>
               <Button
                 onClick={() => queryClient.invalidateQueries({ queryKey: ['generatedApps'] })}
@@ -284,7 +350,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                 className="text-white/70 hover:text-white border-white/20 bg-white/10 hover:bg-white/20"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
+                更新
               </Button>
             </div>
             
