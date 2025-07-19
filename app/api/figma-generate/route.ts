@@ -15,13 +15,14 @@ export async function POST(request: Request) {
 
     let uiPattern;
     let generatedCode = '';
+    let figmaDesign = null;
     
     try {
       // Figma URLが提供されている場合はFigmaから取得
       if (figmaUrl) {
         console.log('Figma URLからデザインを取得中:', figmaUrl);
         
-        const figmaDesign = await figmaExtractor.fetchDesignFromUrl(figmaUrl);
+        figmaDesign = await figmaExtractor.fetchDesignFromUrl(figmaUrl);
         
         if (figmaDesign) {
           // FigmaデザインをUIパターンに変換
