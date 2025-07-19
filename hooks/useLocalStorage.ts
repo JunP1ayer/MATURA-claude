@@ -34,7 +34,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   // 他のタブでの変更を監視
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return () => {}
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === key && e.newValue) {
