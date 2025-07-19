@@ -298,7 +298,8 @@ export function InteractiveButton({
 }
 
 // インタラクティブカードコンポーネント
-interface InteractiveCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface InteractiveCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
+  'onDrag' | 'onDragEnd' | 'onDragStart' | 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration'> {
   hover?: boolean
   clickable?: boolean
   children: React.ReactNode
