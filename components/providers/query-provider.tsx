@@ -242,12 +242,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           {children}
           <ReactQueryDevtools 
             initialIsOpen={false} 
-            toggleButtonProps={{
-              style: {
-                marginLeft: '5px',
-                transform: 'translateY(-5px)',
-              },
-            }}
           />
         </SmartRefetchProvider>
       </PersistQueryClientProvider>
