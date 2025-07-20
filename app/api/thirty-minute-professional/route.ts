@@ -1039,11 +1039,11 @@ function generateAppConfig(idea: string) {
       actionLabel: 'メニューを追加',
       listTitle: 'メニュー一覧',
       itemName: 'メニュー',
-      itemDisplay: \`<div>
-                      <h3 className="font-bold text-lg">{item.name}</h3>
-                      <p className="text-orange-600 font-semibold">¥{item.price}</p>
-                      <p className="text-sm text-gray-600">{item.category}</p>
-                    </div>\`
+      itemDisplay: '<div>' +
+                    '<h3 className="font-bold text-lg">{item.name}</h3>' +
+                    '<p className="text-orange-600 font-semibold">¥{item.price}</p>' +
+                    '<p className="text-sm text-gray-600">{item.category}</p>' +
+                  '</div>'
     };
   }
   
@@ -1068,11 +1068,11 @@ function generateAppConfig(idea: string) {
       actionLabel: '予約を作成',
       listTitle: '予約一覧',
       itemName: '予約',
-      itemDisplay: \`<div>
-                      <h3 className="font-bold text-lg">{item.guest_name}</h3>
-                      <p className="text-blue-600">{item.check_in}</p>
-                      <p className="text-sm text-gray-600">{item.room_type}</p>
-                    </div>\`
+      itemDisplay: '<div>' +
+                    '<h3 className="font-bold text-lg">{item.guest_name}</h3>' +
+                    '<p className="text-blue-600">{item.check_in}</p>' +
+                    '<p className="text-sm text-gray-600">{item.room_type}</p>' +
+                  '</div>'
     };
   }
   
@@ -1097,11 +1097,11 @@ function generateAppConfig(idea: string) {
       actionLabel: 'イベントを追加',
       listTitle: 'イベント一覧',
       itemName: 'イベント',
-      itemDisplay: \`<div>
-                      <h3 className="font-bold text-lg">{item.title}</h3>
-                      <p className="text-purple-600">{item.date}</p>
-                      <p className="text-sm text-gray-600">{item.venue}</p>
-                    </div>\`
+      itemDisplay: '<div>' +
+                    '<h3 className="font-bold text-lg">{item.title}</h3>' +
+                    '<p className="text-purple-600">{item.date}</p>' +
+                    '<p className="text-sm text-gray-600">{item.venue}</p>' +
+                  '</div>'
     };
   }
   
@@ -1126,11 +1126,11 @@ function generateAppConfig(idea: string) {
       actionLabel: 'タスクを追加',
       listTitle: 'タスク一覧',
       itemName: 'タスク',
-      itemDisplay: \`<div>
-                      <h3 className="font-bold text-lg">{item.title}</h3>
-                      <p className="text-green-600">{item.priority}優先度</p>
-                      <p className="text-sm text-gray-600">期限: {item.due_date}</p>
-                    </div>\`
+      itemDisplay: '<div>' +
+                    '<h3 className="font-bold text-lg">{item.title}</h3>' +
+                    '<p className="text-green-600">{item.priority}優先度</p>' +
+                    '<p className="text-sm text-gray-600">期限: {item.due_date}</p>' +
+                  '</div>'
     };
   }
   
@@ -1155,11 +1155,11 @@ function generateAppConfig(idea: string) {
       actionLabel: 'デバイスを追加',
       listTitle: 'デバイス一覧',
       itemName: 'デバイス',
-      itemDisplay: \`<div>
-                      <h3 className="font-bold text-lg">{item.device_name}</h3>
-                      <p className="text-slate-600">{item.room}</p>
-                      <p className="text-sm text-gray-600">状態: {item.status}</p>
-                    </div>\`
+      itemDisplay: '<div>' +
+                    '<h3 className="font-bold text-lg">{item.device_name}</h3>' +
+                    '<p className="text-slate-600">{item.room}</p>' +
+                    '<p className="text-sm text-gray-600">状態: {item.status}</p>' +
+                  '</div>'
     };
   }
   
@@ -1182,10 +1182,10 @@ function generateAppConfig(idea: string) {
     actionLabel: 'アイテムを追加',
     listTitle: 'アイテム一覧',
     itemName: 'アイテム',
-    itemDisplay: \`<div>
-                    <h3 className="font-bold text-lg">{item.name}</h3>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                  </div>\`
+    itemDisplay: '<div>' +
+                  '<h3 className="font-bold text-lg">{item.name}</h3>' +
+                  '<p className="text-sm text-gray-600">{item.description}</p>' +
+                '</div>'
   };
 }`;
 }
