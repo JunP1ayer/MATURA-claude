@@ -59,28 +59,34 @@ export class DynamicSchemaGenerator {
    * LLMを使った意味分析
    */
   private async analyzeIdea(userInput: string): Promise<any> {
-    const prompt = `以下のアプリアイデアを分析して、JSON形式で返してください：
+    const prompt = `You are a JSON generator. Analyze the app idea and return ONLY valid JSON without any explanation, markdown, or code blocks.
 
-アイデア: "${userInput}"
+App Idea: "${userInput}"
 
-分析内容:
+Return this exact JSON structure:
 {
-  "category": "アプリのカテゴリ（例: productivity, social, ecommerce, creative, utility, finance, health, education, entertainment）",
-  "dataType": "管理するデータの種類（例: users, products, transactions, content, records, events）",
-  "primaryActions": ["主要な操作1", "主要な操作2", "主要な操作3"],
-  "targetUser": "想定ユーザー",
-  "keyFeatures": ["機能1", "機能2", "機能3"],
+  "category": "one of: productivity, social, ecommerce, creative, utility, finance, health, education, entertainment",
+  "dataType": "data type to manage (snake_case, english)",
+  "primaryActions": ["action1", "action2", "action3"],
+  "targetUser": "target user description",
+  "keyFeatures": ["feature1", "feature2", "feature3"],
   "requiredFields": [
     {
-      "name": "フィールド名",
-      "type": "データ型",
-      "description": "説明",
-      "required": true/false
+      "name": "field_name",
+      "type": "text",
+      "description": "field description",
+      "required": true
+    },
+    {
+      "name": "field_name2", 
+      "type": "number",
+      "description": "field description2",
+      "required": false
     }
   ]
 }
 
-純粋なJSONのみを返してください。説明は不要です。`;
+IMPORTANT: Return ONLY the JSON object. No explanation, no markdown formatting, no code blocks.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4",
@@ -91,7 +97,8 @@ export class DynamicSchemaGenerator {
     const content = response.choices[0]?.message?.content;
     if (!content) throw new Error('No analysis received');
     
-    return JSON.parse(content);
+    // JSON解析の改善：複数の方法で試行
+    return this.parseJsonSafely(content);
   }
 
   /**
@@ -155,6 +162,59 @@ export class DynamicSchemaGenerator {
         actionLabel: 'データを追加'
       }
     };
+  }
+
+  /**
+   * 安全なJSON解析
+   */
+  private parseJsonSafely(content: string): any {
+    try {
+      // 1. 直接パース
+      return JSON.parse(content);
+    } catch (error) {
+      console.log('Direct JSON parse failed, trying cleanup...');
+      
+      try {
+        // 2. コードブロックマーカー除去
+        let cleaned = content.replace(/```json\s*|\s*```/g, '');
+        
+        // 3. 先頭・末尾の余分な文字除去
+        cleaned = cleaned.trim();
+        
+        // 4. JSONオブジェクトの抽出
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          cleaned = jsonMatch[0];
+        }
+        
+        // 5. 不正な改行やタブを修正
+        cleaned = cleaned.replace(/\n\s*/g, ' ').replace(/\t/g, ' ');
+        
+        // 6. 単一引用符を二重引用符に変換
+        cleaned = cleaned.replace(/'/g, '"');
+        
+        // 7. 重複する空白を除去
+        cleaned = cleaned.replace(/\s+/g, ' ');
+        
+        return JSON.parse(cleaned);
+      } catch (secondError) {
+        console.log('JSON cleanup failed, using fallback structure...');
+        
+        // 8. フォールバック：基本構造を返す
+        return {
+          category: 'utility',
+          dataType: 'app_data',
+          primaryActions: ['作成', '編集', '削除'],
+          targetUser: '一般ユーザー',
+          keyFeatures: ['データ管理', 'CRUD操作', 'リスト表示'],
+          requiredFields: [
+            { name: 'title', type: 'text', description: 'タイトル', required: true },
+            { name: 'description', type: 'text', description: '説明', required: false },
+            { name: 'status', type: 'text', description: 'ステータス', required: true }
+          ]
+        };
+      }
+    }
   }
 
   // ヘルパー関数
