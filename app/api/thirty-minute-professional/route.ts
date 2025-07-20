@@ -738,7 +738,7 @@ export async function POST(request: NextRequest) {
       app: savedApp,
       appUrl: savedApp ? `/apps/${savedApp.id}` : undefined,
       previewUrl: savedApp ? `/preview/${savedApp.id}` : undefined,
-      code: implementation.pages[0]?.code || '',
+      code: mainPageCode,
       schema: systemArchitecture.databaseSchema[0] || {},
       message: `30分で${requirementsAnalysis.estimatedComplexity}レベルのエンタープライズアプリケーションが完成しました`,
       
