@@ -690,9 +690,10 @@ export async function POST(request: NextRequest) {
 
     // アプリをデータベースに保存
     let savedApp = null;
+    // 実際に使用可能なコードを確実に生成
+    const mainPageCode = implementation.pages[0]?.code || generateFallbackPageCode(idea);
+    
     try {
-      // 実際に使用可能なコードを確実に生成
-      const mainPageCode = implementation.pages[0]?.code || generateFallbackPageCode(idea);
       
       const appData = {
         name: `${idea.slice(0, 50)}${idea.length > 50 ? '...' : ''}`,
