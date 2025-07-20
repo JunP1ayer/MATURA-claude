@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeRequirementsWithGPT4, designSystemArchitecture } from '@/lib/gpt4-analyzer';
 import { generateUIDesignSystem, implementApplication } from '@/lib/enhanced-gemini-generator';
+import { DynamicSchemaGenerator } from '@/lib/dynamic-schema-generator';
 
 interface ThirtyMinuteRequest {
   idea: string;
@@ -696,7 +697,7 @@ export async function POST(request: NextRequest) {
     let savedApp = null;
     // 実際に使用可能なコードを確実に生成
     console.log('🔧 Generating fallback code for idea:', idea);
-    const mainPageCode = generateFallbackPageCode(idea);
+    const mainPageCode = await generateFallbackPageCode(idea);
     
     try {
       
@@ -851,10 +852,54 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * アイデアに基づくアプリ設定生成
+ * アイデアに基づくアプリ設定生成（動的生成対応）
  */
-function generateAppConfig(idea: string) {
+async function generateAppConfig(idea: string) {
   const lowerIdea = idea.toLowerCase();
+  
+  // 1. 動的スキーマ生成を最優先で試行
+  try {
+    console.log('🔄 Attempting dynamic schema generation for:', idea);
+    const dynamicGenerator = new DynamicSchemaGenerator();
+    const dynamicSchema = await dynamicGenerator.generateSchema({ userInput: idea });
+    
+    if (dynamicSchema && dynamicSchema.fields.length > 3) {
+      console.log('✅ Dynamic schema generated successfully');
+      
+      // 動的スキーマを標準フォーマットに変換
+      const dynamicFields = dynamicSchema.fields
+        .filter(field => !['id', 'created_at', 'updated_at'].includes(field.name))
+        .slice(0, 3)
+        .map(field => ({
+          name: field.name,
+          label: field.label,
+          type: field.type,
+          placeholder: field.placeholder || `${field.label}を入力`,
+          required: field.required || false
+        }));
+
+      if (dynamicFields.length > 0) {
+        return {
+          tableName: dynamicSchema.tableName,
+          fields: dynamicFields,
+          icon: dynamicSchema.uiConfig.icon,
+          background: `bg-gradient-to-br from-${dynamicSchema.uiConfig.primaryColor}-50 to-${dynamicSchema.uiConfig.primaryColor}-100`,
+          cardStyle: `border-${dynamicSchema.uiConfig.primaryColor}-200 shadow-${dynamicSchema.uiConfig.primaryColor}-100`,
+          headerStyle: `bg-gradient-to-r from-${dynamicSchema.uiConfig.primaryColor}-500 to-${dynamicSchema.uiConfig.primaryColor}-600 text-white`,
+          titleColor: 'text-white',
+          subtitleColor: `text-${dynamicSchema.uiConfig.primaryColor}-100`,
+          iconColor: 'text-white',
+          buttonStyle: `bg-${dynamicSchema.uiConfig.primaryColor}-600 hover:bg-${dynamicSchema.uiConfig.primaryColor}-700`,
+          description: dynamicSchema.uiConfig.description,
+          actionLabel: dynamicSchema.uiConfig.actionLabel,
+          listTitle: `${dynamicSchema.description}一覧`,
+          itemName: dynamicSchema.category
+        };
+      }
+    }
+  } catch (error) {
+    console.log('⚠️ Dynamic schema generation failed, using predefined patterns:', error);
+  }
   
   // レストラン・飲食関連
   if (lowerIdea.includes('レストラン') || lowerIdea.includes('飲食') || lowerIdea.includes('料理') || lowerIdea.includes('メニュー')) {
@@ -1004,9 +1049,9 @@ function generateAppConfig(idea: string) {
 /**
  * フォールバック用ページコード生成 - アイデア特化
  */
-function generateFallbackPageCode(idea: string): string {
+async function generateFallbackPageCode(idea: string): Promise<string> {
   // アイデアに基づいて適切なフィールドとUIを生成
-  const appConfig = generateAppConfig(idea);
+  const appConfig = await generateAppConfig(idea);
   
   // 簡単なフィールドマッピング
   const firstField = appConfig.fields[0];
