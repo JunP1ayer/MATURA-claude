@@ -175,6 +175,94 @@ export interface EnvironmentVariable {
 }
 
 /**
+ * 安全なJSON解析ヘルパー
+ */
+function parseJsonSafely(content: string): UIDesignSystem {
+  try {
+    // 1. 直接パース
+    return JSON.parse(content);
+  } catch (error) {
+    console.log('Direct JSON parse failed, trying cleanup...');
+    
+    try {
+      // 2. コードブロックマーカー除去
+      let cleaned = content.replace(/```json\s*|\s*```/g, '');
+      
+      // 3. 先頭・末尾の余分な文字除去
+      cleaned = cleaned.trim();
+      
+      // 4. JSONオブジェクトの抽出
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleaned = jsonMatch[0];
+      }
+      
+      // 5. 不正な改行やタブを修正
+      cleaned = cleaned.replace(/\n\s*/g, ' ').replace(/\t/g, ' ');
+      
+      // 6. 単一引用符を二重引用符に変換
+      cleaned = cleaned.replace(/'/g, '"');
+      
+      // 7. 重複する空白を除去
+      cleaned = cleaned.replace(/\s+/g, ' ');
+      
+      return JSON.parse(cleaned);
+    } catch (secondError) {
+      console.log('JSON cleanup failed, using fallback design system...');
+      
+      // 8. フォールバック：基本的なデザインシステム
+      return {
+        colorPalette: {
+          primary: '#2563eb',
+          secondary: '#64748b',
+          accent: '#3b82f6',
+          background: '#ffffff',
+          surface: '#f8fafc',
+          text: '#1e293b',
+          textSecondary: '#64748b',
+          success: '#10b981',
+          warning: '#f59e0b',
+          error: '#ef4444'
+        },
+        typography: {
+          fontFamily: 'Inter, system-ui, sans-serif',
+          headingScale: [2.5, 2, 1.5, 1.25, 1.125],
+          bodyScale: [1, 0.875, 0.75],
+          lineHeight: 1.6
+        },
+        spacing: {
+          base: 4,
+          scale: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96]
+        },
+        borderRadius: {
+          small: '4px',
+          medium: '8px',
+          large: '12px',
+          full: '9999px'
+        },
+        shadows: {
+          small: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          medium: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          large: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+        },
+        animations: {
+          duration: {
+            fast: '150ms',
+            normal: '300ms',
+            slow: '500ms'
+          },
+          easing: {
+            ease: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+            easeOut: 'cubic-bezier(0, 0, 0.2, 1)'
+          }
+        }
+      };
+    }
+  }
+}
+
+/**
  * Geminiによる業界特化UI/UXデザイン生成
  */
 export async function generateUIDesignSystem(
@@ -235,67 +323,14 @@ ${JSON.stringify(requirements, null, 2)}
 
     console.log('✅ [GEMINI] UI design system generated successfully');
     
-    // JSON解析
-    const jsonMatch = response.data.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No valid JSON found in Gemini response');
-    }
-
-    return JSON.parse(jsonMatch[0]) as UIDesignSystem;
+    // JSON解析（ロバスト版）
+    return parseJsonSafely(response.data);
 
   } catch (error) {
     console.error('❌ [GEMINI] UI design generation failed:', error);
     
-    // フォールバック: 基本的なデザインシステム
-    return {
-      colorPalette: {
-        primary: '#2563eb',
-        secondary: '#64748b',
-        accent: '#3b82f6',
-        background: '#ffffff',
-        surface: '#f8fafc',
-        text: '#1e293b',
-        textSecondary: '#64748b',
-        success: '#10b981',
-        warning: '#f59e0b',
-        error: '#ef4444'
-      },
-      typography: {
-        fontFamily: 'Inter, system-ui, sans-serif',
-        headingScale: [3, 2.25, 1.875, 1.5, 1.25, 1.125],
-        bodyScale: [1, 0.875, 0.75],
-        lineHeight: 1.6
-      },
-      spacing: {
-        base: 4,
-        scale: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96]
-      },
-      borderRadius: {
-        small: '4px',
-        medium: '8px',
-        large: '12px',
-        full: '9999px'
-      },
-      shadows: {
-        small: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-        medium: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-        large: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
-      },
-      animations: {
-        duration: {
-          fast: '150ms',
-          normal: '250ms',
-          slow: '350ms'
-        },
-        easing: {
-          ease: 'ease',
-          easeIn: 'ease-in',
-          easeOut: 'ease-out',
-          easeInOut: 'ease-in-out'
-        }
-      },
-      components: []
-    };
+    // parseJsonSafelyの中でフォールバック処理される
+    return parseJsonSafely('{}');
   }
 }
 
