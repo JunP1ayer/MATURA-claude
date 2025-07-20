@@ -8,7 +8,7 @@ export async function GET() {
     console.log('OpenAI API Key exists:', !!openaiKey);
     console.log('OpenAI API Key length:', openaiKey?.length || 0);
     console.log('OpenAI API Key prefix:', openaiKey?.substring(0, 15));
-    console.log('OpenAI API Key suffix:', openaiKey?.substring(-15));
+    console.log('OpenAI API Key suffix:', openaiKey?.slice(-15));
     
     if (!openaiKey) {
       return NextResponse.json({
@@ -40,7 +40,7 @@ export async function GET() {
           exists: !!openaiKey,
           length: openaiKey?.length || 0,
           prefix: openaiKey?.substring(0, 15),
-          suffix: openaiKey?.substring(-15)
+          suffix: openaiKey?.slice(-15)
         }
       });
     }
