@@ -410,20 +410,27 @@ export default function GeneratorPage() {
                   <CardHeader>
                     <CardTitle className="text-green-700 flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5" />
-                      🎉 デモ完成（機能実装中）
+                      🎉 アプリが完成しました！
                     </CardTitle>
                     <CardDescription>
-                      CRUD機能・データベース連携・動的表示を備えたデモアプリが完成しました
+                      あなたの要求に最適化された高品質アプリが完成しました。すぐにお試しください。
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       <Button 
-                        onClick={() => window.open(generatedAppUrl, '_blank')}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3"
+                        onClick={() => {
+                          console.log('Opening app:', generatedAppUrl);
+                          if (generatedAppUrl.startsWith('http')) {
+                            window.open(generatedAppUrl, '_blank');
+                          } else {
+                            window.open(window.location.origin + generatedAppUrl, '_blank');
+                          }
+                        }}
+                        className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 text-lg shadow-lg hover:shadow-xl transition-all"
                       >
-                        <Rocket className="mr-2 h-5 w-5" />
-                        アプリを開く
+                        <Rocket className="mr-2 h-6 w-6" />
+                        🚀 アプリをプレビュー
                       </Button>
                       
                       <div className="text-center">

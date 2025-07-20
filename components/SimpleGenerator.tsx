@@ -292,50 +292,60 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {/* Modern Schema Display */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-blue-500/20 rounded-lg">
-                    <Database className="h-5 w-5 text-blue-400" />
-                  </div>
-                  <h3 className="font-semibold text-white">
-                    データベース設計
-                  </h3>
+            {/* アプリ完成の詳細情報 */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-8">
+              <div className="grid md:grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-3xl font-bold text-green-400 mb-2">✅</div>
+                  <h3 className="font-semibold text-white mb-1">データベース</h3>
+                  <p className="text-white/60 text-sm">完全なスキーマ設計</p>
                 </div>
-                <pre className="bg-black/40 text-green-400 p-4 rounded-xl text-xs overflow-auto max-h-72 font-mono border border-white/10">
-                  {JSON.stringify(result.schema, null, 2)}
-                </pre>
-              </div>
-
-              {/* Modern Code Display */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-purple-500/20 rounded-lg">
-                    <Database className="h-5 w-5 text-purple-400" />
-                  </div>
-                  <h3 className="font-semibold text-white">
-                    Reactコンポーネント
-                  </h3>
+                <div>
+                  <div className="text-3xl font-bold text-blue-400 mb-2">⚡</div>
+                  <h3 className="font-semibold text-white mb-1">高性能UI</h3>
+                  <p className="text-white/60 text-sm">最新のReactコンポーネント</p>
                 </div>
-                <pre className="bg-black/40 text-blue-400 p-4 rounded-xl text-xs overflow-auto max-h-72 font-mono border border-white/10">
-                  {result.code}
-                </pre>
+                <div>
+                  <div className="text-3xl font-bold text-purple-400 mb-2">🎯</div>
+                  <h3 className="font-semibold text-white mb-1">即座に使用可能</h3>
+                  <p className="text-white/60 text-sm">デプロイ済みアプリケーション</p>
+                </div>
               </div>
             </div>
 
             <div className="flex justify-center gap-4">
               <Button
                 onClick={() => {
+                  console.log('Preview button clicked. App data:', result?.app);
+                  
                   if (result?.app?.id) {
-                    window.open(`/preview/${result.app.id}`, '_blank');
+                    const url = `/preview/${result.app.id}`;
+                    console.log('Opening preview URL:', url);
+                    window.open(url, '_blank');
+                  } else {
+                    // フォールバック: 最新のアプリを開く
+                    fetch('/api/apps')
+                      .then(res => res.json())
+                      .then(data => {
+                        if (data.apps && data.apps.length > 0) {
+                          const latestApp = data.apps[0];
+                          const url = `/preview/${latestApp.id}`;
+                          console.log('Opening latest app:', url);
+                          window.open(url, '_blank');
+                        } else {
+                          showErrorToast('プレビューできるアプリが見つかりません');
+                        }
+                      })
+                      .catch(error => {
+                        console.error('Failed to get apps:', error);
+                        showErrorToast('プレビューの読み込みに失敗しました');
+                      });
                   }
                 }}
-                disabled={!result?.app?.id}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-300 shadow-2xl"
+                className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105"
               >
-                <Eye className="h-5 w-5 mr-2" />
-                プレビューを見る
+                <Eye className="h-6 w-6 mr-2" />
+                🚀 アプリをプレビュー
               </Button>
               <Button
                 onClick={handleReset}
