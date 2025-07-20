@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { industryPatternSelector } from '@/lib/industry-specialized-patterns';
+import { DynamicSchemaGenerator } from '@/lib/dynamic-schema-generator';
 
 interface SimpleGenerateRequest {
   idea: string;
 }
 
-// 基本的なスキーマ生成関数（業界特化パターンを考慮）
-function generateBasicSchema(idea: string) {
-  // 業界特化パターンをチェック
+// 基本的なスキーマ生成関数（動的生成対応）
+async function generateBasicSchema(idea: string) {
+  // 1. 業界特化パターンをチェック
   const industryPattern = industryPatternSelector.selectBestPattern(idea, { what: idea });
   
   if (industryPattern) {
@@ -15,10 +16,33 @@ function generateBasicSchema(idea: string) {
     return generateIndustrySpecificSchema(industryPattern, idea);
   }
   
-  // フォールバック: 従来のスキーマ生成
-  const tableName = idea.includes('タスク') || idea.includes('task') ? 'tasks' :
+  // 2. 動的スキーマ生成を試行（クリエイティブなアイデア対応）
+  try {
+    const dynamicGenerator = new DynamicSchemaGenerator();
+    const dynamicSchema = await dynamicGenerator.generateSchema({ userInput: idea });
+    
+    if (dynamicSchema && dynamicSchema.fields.length > 3) {
+      console.log('✅ Dynamic schema generated successfully');
+      return {
+        tableName: dynamicSchema.tableName,
+        columns: dynamicSchema.fields.map(field => ({
+          name: field.name,
+          type: field.type,
+          primaryKey: field.name === 'id',
+          required: field.required
+        }))
+      };
+    }
+  } catch (error) {
+    console.log('⚠️ Dynamic schema generation failed, using keyword fallback');
+  }
+  
+  // 3. キーワードフォールバック（最後の手段）
+  const tableName = idea.includes('扶養') || idea.includes('収入') || idea.includes('年収') || idea.includes('103万') || idea.includes('130万') ? 'income_records' :
+                   idea.includes('家計簿') || idea.includes('支出') || idea.includes('budget') || idea.includes('expense') ? 'expenses' :
+                   idea.includes('在庫') || idea.includes('商品') || idea.includes('inventory') || idea.includes('product') ? 'inventory' :
+                   idea.includes('タスク') || idea.includes('task') ? 'tasks' :
                    idea.includes('ユーザー') || idea.includes('user') ? 'users' :
-                   idea.includes('商品') || idea.includes('product') ? 'products' :
                    idea.includes('予約') || idea.includes('reservation') ? 'reservations' :
                    'items';
 
@@ -361,8 +385,8 @@ async function intelligenceAnalysis(idea: string) {
 async function architectureDesign(analysisResult: any, idea: string) {
   console.log('🏗️ Phase 2: Architecture Design started');
   
-  // Generate schema (existing logic)
-  const schema = generateBasicSchema(idea);
+  // Generate schema (dynamic generation enabled)
+  const schema = await generateBasicSchema(idea);
   
   // Add realistic delay
   await new Promise(resolve => setTimeout(resolve, 20000));

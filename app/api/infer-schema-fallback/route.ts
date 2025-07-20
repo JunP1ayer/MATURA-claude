@@ -7,6 +7,24 @@ function inferSchemaFromKeywords(userInput: string) {
   // キーワードベースのパターンマッチング
   const patterns = [
     {
+      keywords: ['扶養', '収入', '年収', '103万', '130万', '扶養控除', '所得制限'],
+      schema: {
+        tableName: 'income_records',
+        columns: [
+          { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+          { name: 'amount', type: 'number', nullable: false, primaryKey: false },
+          { name: 'source', type: 'text', nullable: false, primaryKey: false },
+          { name: 'income_type', type: 'text', nullable: false, primaryKey: false },
+          { name: 'date', type: 'date', nullable: false, primaryKey: false },
+          { name: 'year', type: 'number', nullable: false, primaryKey: false },
+          { name: 'threshold_type', type: 'text', nullable: false, primaryKey: false, defaultValue: '103万' },
+          { name: 'notes', type: 'text', nullable: true, primaryKey: false },
+          { name: 'created_at', type: 'timestamp', nullable: false, primaryKey: false },
+          { name: 'updated_at', type: 'timestamp', nullable: false, primaryKey: false }
+        ]
+      }
+    },
+    {
       keywords: ['ブログ', 'blog', '記事', 'article', '投稿', 'post'],
       schema: {
         tableName: 'blog_posts',

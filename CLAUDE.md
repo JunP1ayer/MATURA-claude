@@ -129,6 +129,23 @@ The platform uses AI to select optimal design patterns:
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
 
+## Security Guidelines
+
+### API Key Management
+- **NEVER commit API keys** to version control
+- Store all API keys in `.env.local` (gitignored by default)
+- Use environment variables only, never hardcode keys
+- Limit API key logging to first 7 and last 4 characters only
+- Rotate API keys regularly
+- Use different keys for development and production
+
+### Best Practices
+- All `.env*` files are excluded from git via `.gitignore`
+- API keys are validated before use with graceful fallbacks
+- Error messages never expose full API keys
+- Use HTTPS only for all API communications
+- Implement rate limiting for API endpoints
+
 ## Code Quality Standards
 
 ### TypeScript Configuration

@@ -880,6 +880,81 @@ function generateAppConfig(idea: string) {
     };
   }
   
+  // 扶養・収入管理
+  if (lowerIdea.includes('扶養') || lowerIdea.includes('収入') || lowerIdea.includes('年収') || lowerIdea.includes('103万') || lowerIdea.includes('130万')) {
+    return {
+      tableName: 'income_records',
+      fields: [
+        { name: 'amount', label: '収入金額', type: 'number', placeholder: '例: 80000', required: true },
+        { name: 'source', label: '収入源', type: 'text', placeholder: '例: アルバイト', required: true },
+        { name: 'date', label: '収入日', type: 'date', placeholder: '', required: true },
+        { name: 'category', label: 'カテゴリ', type: 'text', placeholder: '例: バイト', required: false }
+      ],
+      icon: 'TrendingUp',
+      background: 'bg-gradient-to-br from-blue-50 to-cyan-50',
+      cardStyle: 'border-blue-200 shadow-blue-100',
+      headerStyle: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
+      titleColor: 'text-white',
+      subtitleColor: 'text-blue-100',
+      iconColor: 'text-white',
+      buttonStyle: 'bg-blue-600 hover:bg-blue-700',
+      description: '扶養ライン管理システム',
+      actionLabel: '収入を記録',
+      listTitle: '収入一覧',
+      itemName: '収入記録'
+    };
+  }
+
+  // 家計簿・支出管理
+  if (lowerIdea.includes('家計簿') || lowerIdea.includes('支出') || lowerIdea.includes('budget') || lowerIdea.includes('expense')) {
+    return {
+      tableName: 'expenses',
+      fields: [
+        { name: 'amount', label: '金額', type: 'number', placeholder: '例: 1500', required: true },
+        { name: 'category', label: 'カテゴリ', type: 'text', placeholder: '例: 食費', required: true },
+        { name: 'description', label: '内容', type: 'text', placeholder: '例: ランチ', required: false },
+        { name: 'date', label: '日付', type: 'date', placeholder: '', required: true }
+      ],
+      icon: 'CreditCard',
+      background: 'bg-gradient-to-br from-red-50 to-pink-50',
+      cardStyle: 'border-red-200 shadow-red-100',
+      headerStyle: 'bg-gradient-to-r from-red-500 to-pink-500 text-white',
+      titleColor: 'text-white',
+      subtitleColor: 'text-red-100',
+      iconColor: 'text-white',
+      buttonStyle: 'bg-red-600 hover:bg-red-700',
+      description: '家計簿管理システム',
+      actionLabel: '支出を記録',
+      listTitle: '支出一覧',
+      itemName: '支出記録'
+    };
+  }
+
+  // 在庫・商品管理
+  if (lowerIdea.includes('在庫') || lowerIdea.includes('商品') || lowerIdea.includes('inventory') || lowerIdea.includes('product')) {
+    return {
+      tableName: 'inventory',
+      fields: [
+        { name: 'name', label: '商品名', type: 'text', placeholder: '例: iPhone 15', required: true },
+        { name: 'quantity', label: '在庫数', type: 'number', placeholder: '例: 50', required: true },
+        { name: 'price', label: '価格', type: 'number', placeholder: '例: 120000', required: true },
+        { name: 'category', label: 'カテゴリ', type: 'text', placeholder: '例: スマートフォン', required: false }
+      ],
+      icon: 'Package',
+      background: 'bg-gradient-to-br from-purple-50 to-violet-50',
+      cardStyle: 'border-purple-200 shadow-purple-100',
+      headerStyle: 'bg-gradient-to-r from-purple-500 to-violet-500 text-white',
+      titleColor: 'text-white',
+      subtitleColor: 'text-purple-100',
+      iconColor: 'text-white',
+      buttonStyle: 'bg-purple-600 hover:bg-purple-700',
+      description: '在庫管理システム',
+      actionLabel: '商品を追加',
+      listTitle: '在庫一覧',
+      itemName: '商品'
+    };
+  }
+
   // タスク・プロジェクト管理
   if (lowerIdea.includes('タスク') || lowerIdea.includes('プロジェクト') || lowerIdea.includes('todo')) {
     return {

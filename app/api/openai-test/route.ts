@@ -7,8 +7,8 @@ export async function GET() {
     const openaiKey = process.env.OPENAI_API_KEY;
     console.log('OpenAI API Key exists:', !!openaiKey);
     console.log('OpenAI API Key length:', openaiKey?.length || 0);
-    console.log('OpenAI API Key prefix:', openaiKey?.substring(0, 15));
-    console.log('OpenAI API Key suffix:', openaiKey?.slice(-15));
+    console.log('OpenAI API Key prefix:', openaiKey?.substring(0, 7) + '...');
+    console.log('OpenAI API Key suffix:', '...' + openaiKey?.slice(-4));
     
     if (!openaiKey) {
       return NextResponse.json({
@@ -39,8 +39,8 @@ export async function GET() {
         keyInfo: {
           exists: !!openaiKey,
           length: openaiKey?.length || 0,
-          prefix: openaiKey?.substring(0, 15),
-          suffix: openaiKey?.slice(-15)
+          prefix: openaiKey?.substring(0, 7) + '...',
+          suffix: '...' + openaiKey?.slice(-4)
         }
       });
     }
@@ -55,8 +55,8 @@ export async function GET() {
       keyInfo: {
         exists: !!openaiKey,
         length: openaiKey?.length || 0,
-        prefix: openaiKey?.substring(0, 15),
-        suffix: openaiKey?.substring(-15)
+        prefix: openaiKey?.substring(0, 7) + '...',
+        suffix: '...' + openaiKey?.slice(-4)
       }
     });
 
