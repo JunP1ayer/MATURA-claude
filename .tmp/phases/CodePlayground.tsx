@@ -16,7 +16,8 @@ export default function CodePlayground() {
   const conversationSummary = {
     why: state.insights?.vision || "学生のアルバイト収入を効率的に管理し、目標達成をサポートするため",
     who: state.insights?.target || "大学生・専門学校生（18-25歳）、アルバイトをしている学生", 
-    what: state.insights?.description || "時給計算、シフト管理、収入目標設定、支出記録ができるWebアプリ"
+    what: state.insights?.description || "時給計算、シフト管理、収入目標設定、支出記録ができるWebアプリ",
+    messageCount: 0
   }
 
   // 選択されたUIスタイルデータを使用
@@ -34,7 +35,7 @@ export default function CodePlayground() {
   const uxPoints = [
     { 
       category: "レイアウト", 
-      points: uxDesign?.layout?.principles || [
+      points: (uxDesign?.structure?.designSystem?.layout ? [uxDesign.structure.designSystem.layout] : null) || [
         "直感的なダッシュボード構成", 
         "モバイルファーストデザイン", 
         "重要情報の視覚的優先度"
@@ -42,7 +43,7 @@ export default function CodePlayground() {
     },
     { 
       category: "配色", 
-      points: uxDesign?.colorScheme?.guidelines || [
+      points: (uxDesign?.structure?.designSystem?.colorUsage ? [uxDesign.structure.designSystem.colorUsage.usage] : null) || [
         "ブルー系をメインカラーに採用", 
         "グリーンをアクセントカラーに", 
         "高いコントラストで読みやすさ重視"
@@ -50,7 +51,7 @@ export default function CodePlayground() {
     },
     { 
       category: "ナビゲーション", 
-      points: uxDesign?.navigation?.strategy || [
+      points: (uxDesign?.navigation ? [uxDesign.navigation] : null) || [
         "タブベースの直感的な操作", 
         "パンくずリストで現在位置を明示", 
         "ワンクリックでメイン機能にアクセス"
@@ -58,7 +59,7 @@ export default function CodePlayground() {
     },
     { 
       category: "タイポグラフィ", 
-      points: uxDesign?.typography?.guidelines || [
+      points: (uxDesign?.structure?.designSystem?.typography ? [uxDesign.structure.designSystem.typography.heading, uxDesign.structure.designSystem.typography.body] : null) || [
         "見出しは太めのフォントで視認性向上", 
         "本文は読みやすいサイズと行間", 
         "重要な数値は大きく強調表示"
@@ -66,7 +67,7 @@ export default function CodePlayground() {
     },
     { 
       category: "アニメーション", 
-      points: uxDesign?.animations?.principles || [
+      points: (uxDesign?.animations ? [uxDesign.animations] : null) || [
         "スムーズなページ遷移", 
         "ホバー時の軽やかなフィードバック", 
         "データ更新時の自然な変化"
@@ -308,8 +309,7 @@ ${generatedCode}
   // 対話の要約を生成
   const getConversationSummary = () => {
     const conversations = state.conversations
-    if (conversations.length === 0) return conversationSummary
-
+    
     // 最新の対話から重要な情報を抽出
     const recentMessages = conversations.slice(-10)
     const userMessages = recentMessages.filter(msg => msg.role === 'user')

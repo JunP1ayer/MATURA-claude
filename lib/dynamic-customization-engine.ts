@@ -10,6 +10,16 @@ export interface CustomizationResult {
   personalizedElements: PersonalizedElement[];
   designExplanation: string;
   performanceOptimizations: string[];
+  // Ultra Premium UI extensions
+  premiumComponents?: {
+    card: string;
+    form: string;
+    button: string;
+    navigation: string;
+    modal: string;
+  };
+  cinematicMotions?: Record<string, any>;
+  microInteractions?: any[];
 }
 
 export interface ComponentVariation {
@@ -26,11 +36,37 @@ export interface PersonalizedElement {
 }
 
 export class DynamicCustomizationEngine {
+  private uiCache = new Map<string, any>();
+  private styleCache = new Map<string, string>();
+
+  // 新しい高速UI準備メソッド
+  async prepareUIGeneration(selection: IntelligentSelection, userInput: string): Promise<any> {
+    console.log('⚡ Preparing UI generation in parallel...');
+    
+    // キャッシュチェック
+    const cacheKey = `${selection.selectedPattern.id}-${userInput.substring(0, 50)}`;
+    if (this.uiCache.has(cacheKey)) {
+      console.log('💾 Using cached UI preparation');
+      return this.uiCache.get(cacheKey);
+    }
+    
+    // 並列で実行可能な準備処理
+    const preparation = {
+      stylePreparation: this.prepareStyles(selection),
+      componentAnalysis: this.analyzeRequiredComponents(userInput),
+      layoutOptimization: this.optimizeLayout(selection.selectedPattern)
+    };
+    
+    this.uiCache.set(cacheKey, preparation);
+    return preparation;
+  }
+
   // Main entry point for generating customized UI
   async generateCustomizedUI(
     selection: IntelligentSelection,
     schema: any,
-    userInput: string
+    userInput: string,
+    preparation?: any
   ): Promise<CustomizationResult> {
     
     console.log('🎨 Starting dynamic UI customization...');
@@ -557,6 +593,48 @@ export default Intelligent${this.toPascalCase(tableName)}App;`;
 
   private generatePersonalizedElements(selection: IntelligentSelection, userInput: string): PersonalizedElement[] {
     return [];
+  }
+
+  // 高速化のための新しいメソッド群
+  private prepareStyles(selection: IntelligentSelection): any {
+    const cacheKey = `style-${selection.selectedPattern.id}`;
+    if (this.styleCache.has(cacheKey)) {
+      return this.styleCache.get(cacheKey);
+    }
+    
+    const styles = {
+      colors: selection.customizedPattern.colors,
+      layout: selection.selectedPattern.layout,
+      complexity: selection.designContext.complexity
+    };
+    
+    const stylesString = JSON.stringify(styles);
+    this.styleCache.set(cacheKey, stylesString);
+    return styles;
+  }
+
+  private analyzeRequiredComponents(userInput: string): string[] {
+    const components = ['Card', 'Button', 'Input'];
+    
+    if (userInput.includes('リスト') || userInput.includes('一覧')) {
+      components.push('List', 'Badge');
+    }
+    if (userInput.includes('フォーム') || userInput.includes('入力')) {
+      components.push('Form', 'Validation');
+    }
+    if (userInput.includes('検索')) {
+      components.push('Search', 'Filter');
+    }
+    
+    return components;
+  }
+
+  private optimizeLayout(pattern: any): any {
+    return {
+      gridCols: pattern.complexity === 'simple' ? 1 : 3,
+      spacing: pattern.layout === 'minimal' ? 'tight' : 'comfortable',
+      responsive: true
+    };
   }
 
   private generateDesignExplanation(selection: IntelligentSelection): string {

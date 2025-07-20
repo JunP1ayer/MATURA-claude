@@ -13,6 +13,10 @@ export interface Insight {
   features: string[]
   value: string
   motivation: string
+  // Missing properties for CodePlayground
+  description?: string
+  appName?: string
+  messageCount?: number
 }
 
 export interface UIDesign {
@@ -44,6 +48,10 @@ export interface UIStyle {
   spacing: 'tight' | 'comfortable' | 'spacious'
   personality: string[]
   svgPreview?: string
+  // Missing properties for CodePlayground
+  primaryColor?: string
+  accentColor?: string
+  cardStyle?: string
 }
 
 // トップページデザイン案の型定義（新しい構造）
@@ -67,6 +75,8 @@ export interface TopPageDesign {
     how: string // どうやって実現するか
     impact: string // どんな影響を与えるか
   }
+  // Missing properties for CodePlayground
+  name?: string
 }
 
 export interface UXDesign {
@@ -76,6 +86,35 @@ export interface UXDesign {
   navigation: string
   components: string[]
   interactions: string[]
+  // Missing properties for CodePlayground
+  animations?: string
+  siteArchitecture?: {
+    topPage: { purpose: string; elements: string[] }
+    mainFeatures: Array<{
+      name: string
+      description: string
+      uiElements: string[]
+      userInteractions: string[]
+    }>
+    userFlow: string[]
+  }
+  designSystem?: {
+    layout: string
+    colorUsage: {
+      primary: string
+      secondary: string
+      accent: string
+      usage: string
+    }
+    typography: {
+      heading: string
+      body: string
+      accent: string
+    }
+    spacing: string
+    interactions: string[]
+  }
+  keyScreens?: any
 }
 
 export interface GeneratedCode {
@@ -97,6 +136,8 @@ export interface GeneratedCode {
   qualityScore?: number
   featureCompleteness?: number
   testResults?: any
+  // Missing properties for CodePlayground
+  htmlPreview?: string
 }
 
 export interface ReleaseInfo {
@@ -183,7 +224,17 @@ export interface UnifiedUXDesign {
       events: string[]
       state: Record<string, any>
     }>
+    keyScreens?: any  // Add missing property for CodePlayground
   }
+  
+  // UXDesignとの互換性のため追加
+  layout?: string
+  colorScheme?: string
+  typography?: string
+  navigation?: string
+  animations?: string
+  components?: string[]
+  interactions?: string[]
   
   // 実装ガイド
   implementation: {

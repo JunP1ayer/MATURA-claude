@@ -8,7 +8,34 @@ import { useChatOptimized } from '@/hooks/useChatOptimized'
 interface MaturaContextType {
   // State management
   state: ReturnType<typeof useMaturaState>['state']
-  actions: any
+  actions: {
+    updateState: any
+    batchUpdateState: any
+    addMessage: any
+    nextPhase: any
+    setLoading: any
+    setError: any
+    setInsights: any
+    setSelectedUI: any
+    setUXDesign: any
+    setGeneratedCode: any
+    setReleaseInfo: any
+    resetState: any
+    getCurrentPhaseData: any
+    incrementMessageCount: any
+    setExtractedStructure: any
+    resetChat: any
+    setInsightAndNextPhase: any
+    setUIAndNextPhase: any
+    setUXAndNextPhase: any
+    setCodeAndNextPhase: any
+    // Additional missing properties
+    userMessageCount?: number
+    assistantMessageCount?: number
+    phaseMessages?: any[]
+    hasCompletedPhase?: boolean[]
+    generateUnifiedUX?: () => Promise<any>
+  }
   
   // History management
   history: ReturnType<typeof useMaturaHistory>
@@ -62,6 +89,12 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
         setUIAndNextPhase: maturaState.setUIAndNextPhase,
         setUXAndNextPhase: maturaState.setUXAndNextPhase,
         setCodeAndNextPhase: maturaState.setCodeAndNextPhase,
+        // Missing properties for compatibility
+        userMessageCount: 0,
+        assistantMessageCount: 0,
+        phaseMessages: [],
+        hasCompletedPhase: [false, false, false, false, false, false],
+        generateUnifiedUX: async () => ({})
       },
       history,
       chat,

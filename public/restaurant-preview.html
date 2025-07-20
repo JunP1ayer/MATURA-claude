@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レストラン予約システム - MATURA生成</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        .button-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        }
+        .button-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+        }
+        .input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+        .reservation-card {
+            border: 2px solid #f1f3f4;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+        .reservation-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+        .status-confirmed {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .status-pending {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .restaurant-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto max-w-5xl">
+        <!-- レストランヘッダー -->
+        <div class="restaurant-header fade-in">
+            <h1 class="text-4xl font-bold mb-4">🍽️ Bella Vista レストラン</h1>
+            <p class="text-xl opacity-90">オンライン予約システム</p>
+            <p class="text-sm opacity-75 mt-2">MATURA自動生成アプリケーション</p>
+        </div>
+
+        <!-- 予約フォーム -->
+        <div class="card p-8 mb-8 fade-in">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">📅 新規予約</h2>
+                <p class="text-gray-600">お客様の情報をご入力ください</p>
+            </div>
+            
+            <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">お名前</label>
+                    <input
+                        type="text"
+                        class="input"
+                        placeholder="田中太郎"
+                        id="customerName"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">電話番号</label>
+                    <input
+                        type="tel"
+                        class="input"
+                        placeholder="090-1234-5678"
+                        id="customerPhone"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">予約日</label>
+                    <input
+                        type="date"
+                        class="input"
+                        id="reservationDate"
+                        required
+                    />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">予約時間</label>
+                    <select class="input" id="reservationTime" required>
+                        <option value="">時間を選択</option>
+                        <option value="18:00">18:00</option>
+                        <option value="18:30">18:30</option>
+                        <option value="19:00">19:00</option>
+                        <option value="19:30">19:30</option>
+                        <option value="20:00">20:00</option>
+                        <option value="20:30">20:30</option>
+                        <option value="21:00">21:00</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">人数</label>
+                    <select class="input" id="partySize" required>
+                        <option value="">人数を選択</option>
+                        <option value="1">1名</option>
+                        <option value="2">2名</option>
+                        <option value="3">3名</option>
+                        <option value="4">4名</option>
+                        <option value="5">5名</option>
+                        <option value="6">6名以上</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">特別なご要望</label>
+                    <input
+                        type="text"
+                        class="input"
+                        placeholder="窓際の席希望、誕生日など"
+                        id="specialRequests"
+                    />
+                </div>
+                <div class="md:col-span-2 pt-4">
+                    <button type="button" class="button w-full text-lg" onclick="createReservation()">
+                        🎉 予約を確定する
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 予約一覧 -->
+        <div class="card p-8 fade-in">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">📋 予約一覧</h2>
+                <p class="text-gray-600">現在の予約状況 (<span id="reservationCount">3</span>件)</p>
+            </div>
+            
+            <div id="reservationList">
+                <!-- サンプル予約1 -->
+                <div class="reservation-card status-confirmed">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-4 mb-3">
+                                <h3 class="text-lg font-bold">佐藤花子様</h3>
+                                <span class="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">確定</span>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span class="font-semibold">📅 日時:</span><br>
+                                    2025/01/25 19:00
+                                </div>
+                                <div>
+                                    <span class="font-semibold">👥 人数:</span><br>
+                                    4名様
+                                </div>
+                                <div>
+                                    <span class="font-semibold">📞 電話:</span><br>
+                                    090-1111-2222
+                                </div>
+                                <div>
+                                    <span class="font-semibold">📝 要望:</span><br>
+                                    窓際の席希望
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 ml-4">
+                            <button class="button button-success" onclick="confirmReservation(this)">
+                                ✅ 確認済
+                            </button>
+                            <button class="button button-danger" onclick="cancelReservation(this)">
+                                ❌ キャンセル
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- サンプル予約2 -->
+                <div class="reservation-card status-pending">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-4 mb-3">
+                                <h3 class="text-lg font-bold">田中一郎様</h3>
+                                <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full">未確認</span>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span class="font-semibold">📅 日時:</span><br>
+                                    2025/01/26 20:00
+                                </div>
+                                <div>
+                                    <span class="font-semibold">👥 人数:</span><br>
+                                    2名様
+                                </div>
+                                <div>
+                                    <span class="font-semibold">📞 電話:</span><br>
+                                    080-3333-4444
+                                </div>
+                                <div>
+                                    <span class="font-semibold">📝 要望:</span><br>
+                                    誕生日祝い
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 ml-4">
+                            <button class="button button-success" onclick="confirmReservation(this)">
+                                ✅ 確認
+                            </button>
+                            <button class="button button-danger" onclick="cancelReservation(this)">
+                                ❌ キャンセル
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- サンプル予約3 -->
+                <div class="reservation-card status-confirmed">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-4 mb-3">
+                                <h3 class="text-lg font-bold">山田次郎様</h3>
+                                <span class="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">確定</span>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div>
+                                    <span class="font-semibold">📅 日時:</span><br>
+                                    2025/01/27 18:30
+                                </div>
+                                <div>
+                                    <span class="font-semibold">👥 人数:</span><br>
+                                    6名様
+                                </div>
+                                <div>
+                                    <span class="font-semibold">📞 電話:</span><br>
+                                    070-5555-6666
+                                </div>
+                                <div>
+                                    <span class="font-semibold">📝 要望:</span><br>
+                                    会社宴会
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 ml-4">
+                            <button class="button button-success" onclick="confirmReservation(this)">
+                                ✅ 確認済
+                            </button>
+                            <button class="button button-danger" onclick="cancelReservation(this)">
+                                ❌ キャンセル
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 空の状態（初期は非表示） -->
+                <div id="emptyState" class="text-center py-12" style="display: none;">
+                    <div class="text-6xl mb-4">🍽️</div>
+                    <p class="text-gray-500 text-lg">
+                        予約がありません。<br>上のフォームから新規予約を作成してください。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API情報 -->
+        <div class="card p-6 mt-8 fade-in">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">🔧 自動生成API</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <div class="font-bold text-blue-700">GET /api/crud/reservations</div>
+                    <div class="text-blue-600">全予約データ取得</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="font-bold text-green-700">POST /api/crud/reservations</div>
+                    <div class="text-green-600">新規予約作成</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <div class="font-bold text-red-700">DELETE /api/crud/reservations</div>
+                    <div class="text-red-600">予約キャンセル</div>
+                </div>
+            </div>
+            <div class="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+                <strong>データベーステーブル:</strong> reservations<br>
+                <strong>カラム:</strong> id, customer_name, phone, reservation_date, reservation_time, party_size, special_requests, status, created_at
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let reservationCounter = 3;
+
+        function createReservation() {
+            const name = document.getElementById('customerName').value;
+            const phone = document.getElementById('customerPhone').value;
+            const date = document.getElementById('reservationDate').value;
+            const time = document.getElementById('reservationTime').value;
+            const size = document.getElementById('partySize').value;
+            const requests = document.getElementById('specialRequests').value;
+            
+            if (!name || !phone || !date || !time || !size) {
+                alert('必須項目をすべて入力してください');
+                return;
+            }
+
+            const reservationList = document.getElementById('reservationList');
+            const emptyState = document.getElementById('emptyState');
+            
+            emptyState.style.display = 'none';
+            
+            const reservationDiv = document.createElement('div');
+            reservationDiv.className = 'reservation-card status-pending fade-in';
+            reservationDiv.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-3">
+                            <h3 class="text-lg font-bold">${name}様</h3>
+                            <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-bold rounded-full">未確認</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                                <span class="font-semibold">📅 日時:</span><br>
+                                ${date} ${time}
+                            </div>
+                            <div>
+                                <span class="font-semibold">👥 人数:</span><br>
+                                ${size}名様
+                            </div>
+                            <div>
+                                <span class="font-semibold">📞 電話:</span><br>
+                                ${phone}
+                            </div>
+                            <div>
+                                <span class="font-semibold">📝 要望:</span><br>
+                                ${requests || 'なし'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 ml-4">
+                        <button class="button button-success" onclick="confirmReservation(this)">
+                            ✅ 確認
+                        </button>
+                        <button class="button button-danger" onclick="cancelReservation(this)">
+                            ❌ キャンセル
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            reservationList.insertBefore(reservationDiv, emptyState);
+            
+            // フォームをクリア
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('reservationDate').value = '';
+            document.getElementById('reservationTime').value = '';
+            document.getElementById('partySize').value = '';
+            document.getElementById('specialRequests').value = '';
+            
+            reservationCounter++;
+            updateReservationCount();
+            
+            // 成功メッセージ
+            alert('🎉 予約が正常に作成されました！');
+        }
+
+        function confirmReservation(button) {
+            const card = button.closest('.reservation-card');
+            const statusSpan = card.querySelector('span');
+            
+            card.className = 'reservation-card status-confirmed fade-in';
+            statusSpan.className = 'px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full';
+            statusSpan.textContent = '確定';
+            
+            button.textContent = '✅ 確認済';
+            button.disabled = true;
+            button.style.opacity = '0.6';
+            
+            alert('✅ 予約が確認されました');
+        }
+
+        function cancelReservation(button) {
+            if (confirm('本当にこの予約をキャンセルしますか？')) {
+                const card = button.closest('.reservation-card');
+                card.style.animation = 'fadeOut 0.5s ease-out';
+                
+                setTimeout(() => {
+                    card.remove();
+                    reservationCounter--;
+                    updateReservationCount();
+                    checkEmpty();
+                }, 500);
+                
+                alert('❌ 予約がキャンセルされました');
+            }
+        }
+
+        function updateReservationCount() {
+            document.getElementById('reservationCount').textContent = reservationCounter;
+        }
+
+        function checkEmpty() {
+            const reservationList = document.getElementById('reservationList');
+            const emptyState = document.getElementById('emptyState');
+            const reservations = reservationList.querySelectorAll('.reservation-card');
+            
+            if (reservations.length === 0) {
+                emptyState.style.display = 'block';
+            }
+        }
+
+        // 今日の日付を最小値に設定
+        document.getElementById('reservationDate').min = new Date().toISOString().split('T')[0];
+
+        // CSS animation for fade out
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(-100px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -123,7 +123,7 @@ export function validateRequest(data: unknown, schema: any): void {
   // 文字列長のチェック
   if (schema.maxLength) {
     for (const [field, maxLength] of Object.entries(schema.maxLength)) {
-      if (dataObj[field] && typeof dataObj[field] === 'string' && dataObj[field].length > maxLength) {
+      if (dataObj[field] && typeof dataObj[field] === 'string' && dataObj[field].length > (maxLength as number)) {
         throw new ApiError(`Field ${field} exceeds maximum length of ${maxLength}`, 400, 'VALIDATION_ERROR');
       }
     }

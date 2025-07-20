@@ -13,6 +13,8 @@ export interface IndustryTemplate {
   features: string[]
   estimatedTime: string
   difficulty: 'beginner' | 'intermediate' | 'advanced'
+  sampleData?: Record<string, any[]>
+  placeholders?: Record<string, string>
 }
 
 export const industryTemplates: IndustryTemplate[] = [
@@ -82,7 +84,26 @@ export const industryTemplates: IndustryTemplate[] = [
       '売上集計機能'
     ],
     estimatedTime: '30分',
-    difficulty: 'beginner'
+    difficulty: 'beginner',
+    sampleData: {
+      customers: [
+        { name: '田中花子', phone: '090-1234-5678', email: 'hanako@example.com', birthday: '1985-05-15', notes: 'カラーアレルギーなし' },
+        { name: '佐藤太郎', phone: '080-9876-5432', email: 'taro@example.com', birthday: '1992-10-20', notes: '肌が敏感' },
+        { name: '山田美咲', phone: '070-1111-2222', email: 'misaki@example.com', birthday: '1990-03-08', notes: 'ロングヘア希望' }
+      ],
+      services: [
+        { name: 'カット', description: 'シャンプー・ブロー込み', duration_minutes: 60, price: 4500, category: 'ベーシック' },
+        { name: 'カラー', description: 'リタッチカラー', duration_minutes: 90, price: 6500, category: 'カラー' },
+        { name: 'パーマ', description: 'デジタルパーマ', duration_minutes: 120, price: 9800, category: 'パーマ' },
+        { name: 'トリートメント', description: 'ケラチントリートメント', duration_minutes: 30, price: 3000, category: 'ケア' }
+      ]
+    },
+    placeholders: {
+      customerName: '例：田中花子',
+      phone: '例：090-1234-5678',
+      serviceName: '例：カット・シャンプー・ブロー',
+      notes: '例：アレルギー情報、特別な要望など'
+    }
   },
   {
     id: 'inventory-management',
