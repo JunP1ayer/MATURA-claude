@@ -691,7 +691,8 @@ export async function POST(request: NextRequest) {
     // アプリをデータベースに保存
     let savedApp = null;
     // 実際に使用可能なコードを確実に生成
-    const mainPageCode = implementation.pages[0]?.code || generateFallbackPageCode(idea);
+    console.log('🔧 Generating fallback code for idea:', idea);
+    const mainPageCode = generateFallbackPageCode(idea);
     
     try {
       
