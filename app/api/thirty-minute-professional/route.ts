@@ -847,175 +847,8 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * フォールバック用ページコード生成 - アイデア特化
+ * アイデアに基づくアプリ設定生成
  */
-function generateFallbackPageCode(idea: string): string {
-  // アイデアに基づいて適切なフィールドとUIを生成
-  const appConfig = generateAppConfig(idea);
-  
-  const fieldsJSX = appConfig.fields.map(field => `
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ${field.label}
-                </label>
-                <Input
-                  type="${field.type}"
-                  value={formData.${field.name}}
-                  onChange={(e) => setFormData({...formData, ${field.name}: e.target.value})}
-                  placeholder="${field.placeholder}"
-                  ${field.required ? 'required' : ''}
-                  className="w-full"
-                />
-              </div>`).join('');
-
-  const formStateFields = appConfig.fields.map(field => `${field.name}: ''`).join(', ');
-  const submitData = appConfig.fields.map(field => `${field.name}: formData.${field.name}.trim()`).join(', ');
-  const resetFields = appConfig.fields.map(field => `${field.name}: ''`).join(', ');
-
-  return `'use client';
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ${appConfig.icon} } from 'lucide-react';
-
-export default function MainPage() {
-  const [items, setItems] = useState([]);
-  const [formData, setFormData] = useState({ ${formStateFields} });
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  const fetchItems = async () => {
-    try {
-      const response = await fetch('/api/crud/${appConfig.tableName}');
-      if (response.ok) {
-        const data = await response.json();
-        setItems(data);
-      }
-    } catch (error) {
-      console.error('データ取得エラー:', error);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    setLoading(true);
-    try {
-      const response = await fetch('/api/crud/${appConfig.tableName}', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ${submitData} }),
-      });
-      
-      if (response.ok) {
-        setFormData({ ${resetFields} });
-        fetchItems();
-      }
-    } catch (error) {
-      console.error('作成エラー:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await fetch(\`/api/crud/${appConfig.tableName}?id=\${id}\`, {
-        method: 'DELETE',
-      });
-      
-      if (response.ok) {
-        fetchItems();
-      }
-    } catch (error) {
-      console.error('削除エラー:', error);
-    }
-  };
-
-  return (
-    <div className="min-h-screen ${appConfig.background} p-6">
-      <div className="max-w-6xl mx-auto">
-        <Card className="mb-8 ${appConfig.cardStyle}">
-          <CardHeader className="${appConfig.headerStyle}">
-            <div className="flex items-center gap-3">
-              <${appConfig.icon} className="w-8 h-8 ${appConfig.iconColor}" />
-              <CardTitle className="text-3xl ${appConfig.titleColor}">
-                ${idea}
-              </CardTitle>
-            </div>
-            <p className="${appConfig.subtitleColor}">${appConfig.description}</p>
-          </CardHeader>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              ${fieldsJSX}
-              <Button 
-                type="submit" 
-                disabled={loading}
-                className="w-full ${appConfig.buttonStyle}"
-              >
-                {loading ? '保存中...' : '${appConfig.actionLabel}'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card className="${appConfig.cardStyle}">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <${appConfig.icon} className="w-5 h-5" />
-              ${appConfig.listTitle} ({items.length}件)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {items.length === 0 ? (
-                <div className="text-center py-12">
-                  <${appConfig.icon} className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-lg">
-                    まだ${appConfig.itemName}がありません
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    上のフォームから最初の${appConfig.itemName}を作成してください
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {items.map((item: any) => (
-                    <Card key={item.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
-                        ${appConfig.itemDisplay}
-                        <div className="flex justify-between items-center mt-3 pt-3 border-t">
-                          <span className="text-xs text-gray-500">
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </span>
-                          <Button
-                            onClick={() => handleDelete(item.id)}
-                            variant="outline"
-                            size="sm"
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            削除
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-// アプリ固有の設定を生成
 function generateAppConfig(idea: string) {
   const lowerIdea = idea.toLowerCase();
   
@@ -1039,70 +872,7 @@ function generateAppConfig(idea: string) {
       description: 'プロフェッショナルなレストラン管理システム',
       actionLabel: 'メニューを追加',
       listTitle: 'メニュー一覧',
-      itemName: 'メニュー',
-      itemDisplay: '<div>' +
-                    '<h3 className="font-bold text-lg">{item.name}</h3>' +
-                    '<p className="text-orange-600 font-semibold">¥{item.price}</p>' +
-                    '<p className="text-sm text-gray-600">{item.category}</p>' +
-                  '</div>'
-    };
-  }
-  
-  // 予約・ホテル関連
-  if (lowerIdea.includes('予約') || lowerIdea.includes('ホテル') || lowerIdea.includes('宿泊')) {
-    return {
-      tableName: 'reservations',
-      fields: [
-        { name: 'guest_name', label: 'お客様名', type: 'text', placeholder: '例: 田中太郎', required: true },
-        { name: 'check_in', label: 'チェックイン日', type: 'date', placeholder: '', required: true },
-        { name: 'room_type', label: '部屋タイプ', type: 'text', placeholder: '例: デラックスルーム', required: true }
-      ],
-      icon: 'Calendar',
-      background: 'bg-gradient-to-br from-blue-50 to-cyan-50',
-      cardStyle: 'border-blue-200 shadow-blue-100',
-      headerStyle: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
-      titleColor: 'text-white',
-      subtitleColor: 'text-blue-100',
-      iconColor: 'text-white',
-      buttonStyle: 'bg-blue-600 hover:bg-blue-700',
-      description: 'スマートな予約管理システム',
-      actionLabel: '予約を作成',
-      listTitle: '予約一覧',
-      itemName: '予約',
-      itemDisplay: '<div>' +
-                    '<h3 className="font-bold text-lg">{item.guest_name}</h3>' +
-                    '<p className="text-blue-600">{item.check_in}</p>' +
-                    '<p className="text-sm text-gray-600">{item.room_type}</p>' +
-                  '</div>'
-    };
-  }
-  
-  // イベント関連
-  if (lowerIdea.includes('イベント') || lowerIdea.includes('コンサート') || lowerIdea.includes('会議')) {
-    return {
-      tableName: 'events',
-      fields: [
-        { name: 'title', label: 'イベント名', type: 'text', placeholder: '例: 技術カンファレンス2025', required: true },
-        { name: 'date', label: '開催日', type: 'date', placeholder: '', required: true },
-        { name: 'venue', label: '会場', type: 'text', placeholder: '例: 東京国際フォーラム', required: true }
-      ],
-      icon: 'Calendar',
-      background: 'bg-gradient-to-br from-purple-50 to-pink-50',
-      cardStyle: 'border-purple-200 shadow-purple-100',
-      headerStyle: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
-      titleColor: 'text-white',
-      subtitleColor: 'text-purple-100',
-      iconColor: 'text-white',
-      buttonStyle: 'bg-purple-600 hover:bg-purple-700',
-      description: 'プロフェッショナルなイベント管理',
-      actionLabel: 'イベントを追加',
-      listTitle: 'イベント一覧',
-      itemName: 'イベント',
-      itemDisplay: '<div>' +
-                    '<h3 className="font-bold text-lg">{item.title}</h3>' +
-                    '<p className="text-purple-600">{item.date}</p>' +
-                    '<p className="text-sm text-gray-600">{item.venue}</p>' +
-                  '</div>'
+      itemName: 'メニュー'
     };
   }
   
@@ -1126,41 +896,7 @@ function generateAppConfig(idea: string) {
       description: '効率的なタスク管理システム',
       actionLabel: 'タスクを追加',
       listTitle: 'タスク一覧',
-      itemName: 'タスク',
-      itemDisplay: '<div>' +
-                    '<h3 className="font-bold text-lg">{item.title}</h3>' +
-                    '<p className="text-green-600">{item.priority}優先度</p>' +
-                    '<p className="text-sm text-gray-600">期限: {item.due_date}</p>' +
-                  '</div>'
-    };
-  }
-  
-  // スマートホーム・IoT
-  if (lowerIdea.includes('スマート') || lowerIdea.includes('ホーム') || lowerIdea.includes('iot')) {
-    return {
-      tableName: 'devices',
-      fields: [
-        { name: 'device_name', label: 'デバイス名', type: 'text', placeholder: '例: リビングエアコン', required: true },
-        { name: 'room', label: '部屋', type: 'text', placeholder: '例: リビング', required: true },
-        { name: 'status', label: 'ステータス', type: 'text', placeholder: '例: オン', required: true }
-      ],
-      icon: 'Home',
-      background: 'bg-gradient-to-br from-slate-50 to-gray-50',
-      cardStyle: 'border-slate-200 shadow-slate-100',
-      headerStyle: 'bg-gradient-to-r from-slate-600 to-gray-600 text-white',
-      titleColor: 'text-white',
-      subtitleColor: 'text-slate-100',
-      iconColor: 'text-white',
-      buttonStyle: 'bg-slate-600 hover:bg-slate-700',
-      description: 'インテリジェントなホーム管理',
-      actionLabel: 'デバイスを追加',
-      listTitle: 'デバイス一覧',
-      itemName: 'デバイス',
-      itemDisplay: '<div>' +
-                    '<h3 className="font-bold text-lg">{item.device_name}</h3>' +
-                    '<p className="text-slate-600">{item.room}</p>' +
-                    '<p className="text-sm text-gray-600">状態: {item.status}</p>' +
-                  '</div>'
+      itemName: 'タスク'
     };
   }
   
@@ -1182,11 +918,145 @@ function generateAppConfig(idea: string) {
     description: 'カスタマイズ可能な管理システム',
     actionLabel: 'アイテムを追加',
     listTitle: 'アイテム一覧',
-    itemName: 'アイテム',
-    itemDisplay: '<div>' +
-                  '<h3 className="font-bold text-lg">{item.name}</h3>' +
-                  '<p className="text-sm text-gray-600">{item.description}</p>' +
-                '</div>'
+    itemName: 'アイテム'
   };
+}
+
+/**
+ * フォールバック用ページコード生成 - アイデア特化
+ */
+function generateFallbackPageCode(idea: string): string {
+  // アイデアに基づいて適切なフィールドとUIを生成
+  const appConfig = generateAppConfig(idea);
+  
+  // 簡単なフィールドマッピング
+  const firstField = appConfig.fields[0];
+  const fieldName = firstField.name;
+  const fieldLabel = firstField.label;
+
+  return `'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export default function MainPage() {
+  const [items, setItems] = useState([]);
+  const [${fieldName}, set${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const fetchItems = async () => {
+    try {
+      const response = await fetch('/api/crud/${appConfig.tableName}');
+      if (response.ok) {
+        const data = await response.json();
+        setItems(data);
+      }
+    } catch (error) {
+      console.error('データ取得エラー:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!${fieldName}.trim()) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch('/api/crud/${appConfig.tableName}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ${fieldName}: ${fieldName}.trim() }),
+      });
+      
+      if (response.ok) {
+        set${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}('');
+        fetchItems();
+      }
+    } catch (error) {
+      console.error('作成エラー:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen ${appConfig.background} p-6">
+      <div className="max-w-6xl mx-auto">
+        <Card className="mb-8 ${appConfig.cardStyle}">
+          <CardHeader className="${appConfig.headerStyle}">
+            <CardTitle className="text-3xl ${appConfig.titleColor}">
+              ${idea}
+            </CardTitle>
+            <p className="${appConfig.subtitleColor}">${appConfig.description}</p>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ${fieldLabel}
+                </label>
+                <Input
+                  type="${firstField.type}"
+                  value={${fieldName}}
+                  onChange={(e) => set${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}(e.target.value)}
+                  placeholder="${firstField.placeholder}"
+                  required
+                  className="w-full"
+                />
+              </div>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="w-full ${appConfig.buttonStyle}"
+              >
+                {loading ? '保存中...' : '${appConfig.actionLabel}'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card className="${appConfig.cardStyle}">
+          <CardHeader>
+            <CardTitle>
+              ${appConfig.listTitle} ({items.length}件)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {items.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">
+                    まだ${appConfig.itemName}がありません
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    上のフォームから最初の${appConfig.itemName}を作成してください
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {items.map((item: any) => (
+                    <Card key={item.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4">
+                        <h3 className="font-bold text-lg">{item.${fieldName}}</h3>
+                        <div className="text-xs text-gray-500 mt-2">
+                          {new Date(item.created_at).toLocaleDateString()}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 }`;
 }
