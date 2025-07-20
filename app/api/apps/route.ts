@@ -9,8 +9,23 @@ export async function GET(request: NextRequest) {
   try {
     console.log('📱 Fetching apps list...')
     
-    const appDir = path.join(process.cwd(), 'app')
-    const entries = await fs.readdir(appDir, { withFileTypes: true })
+    // Vercel対応: tmpディレクトリを確認
+    const appsDir = path.join('/tmp', 'apps')
+    try {
+      await fs.mkdir(appsDir, { recursive: true })
+      const entries = await fs.readdir(appsDir, { withFileTypes: true })
+    } catch (error) {
+      // tmpディレクトリが存在しない場合は空の配列を返す
+      console.log('📂 No apps directory found, returning empty list')
+      return NextResponse.json({
+        success: true,
+        count: 0,
+        apps: [],
+        timestamp: new Date().toISOString()
+      })
+    }
+    
+    const entries = await fs.readdir(appsDir, { withFileTypes: true })
     
     // app[数字] または具体的なアプリ名のディレクトリを検索
     const appDirectories = entries
@@ -28,8 +43,8 @@ export async function GET(request: NextRequest) {
     
     for (const appId of appDirectories) {
       try {
-        const metadataPath = path.join(appDir, appId, 'metadata.json')
-        const pagePath = path.join(appDir, appId, 'page.tsx')
+        const metadataPath = path.join(appsDir, appId, 'metadata.json')
+        const pagePath = path.join(appsDir, appId, 'page.tsx')
         
         // ファイルの存在確認
         await fs.access(metadataPath)
@@ -109,8 +124,8 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     const appId = `app${timestamp}`
     
-    // アプリディレクトリを作成
-    const appDir = path.join(process.cwd(), 'app', appId)
+    // Vercel対応: tmpディレクトリを使用
+    const appDir = path.join('/tmp', 'apps', appId)
     await fs.mkdir(appDir, { recursive: true })
     
     // メタデータを保存
@@ -174,7 +189,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    const appDir = path.join(process.cwd(), 'app', appId)
+    const appDir = path.join('/tmp', 'apps', appId)
     
     // セキュリティチェック: 安全なアプリIDのみ削除可能
     if (!/^app\d+$/.test(appId) && !appId.includes('-app')) {

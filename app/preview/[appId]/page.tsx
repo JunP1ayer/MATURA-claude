@@ -12,7 +12,7 @@ interface PageProps {
 
 async function getAppFromFileSystem(appId: string) {
   try {
-    const appDir = path.join(process.cwd(), 'app', appId);
+    const appDir = path.join('/tmp', 'apps', appId);
     const metadataPath = path.join(appDir, 'metadata.json');
     const pagePath = path.join(appDir, 'page.tsx');
     
