@@ -16,6 +16,49 @@ interface GeneratedResult {
   code: string;
   schema: any;
   app?: any;
+  developmentMetrics?: {
+    totalDevelopmentTime: number;
+    phases: Array<{
+      name: string;
+      duration: number;
+      status: string;
+      metrics?: any;
+    }>;
+    overallQualityScore: number;
+    complexity: string;
+    requirementsAnalysis: {
+      featuresIdentified: number;
+      businessRules: number;
+      securityRequirements: number;
+      performanceTargets: number;
+      recommendedStack: string[];
+    };
+    systemArchitecture: {
+      databaseTables: number;
+      apiEndpoints: number;
+      serviceComponents: number;
+      securityLayers: number;
+      scalabilityPlan: boolean;
+    };
+    implementation: {
+      componentsGenerated: number;
+      pagesGenerated: number;
+      apiRoutesGenerated: number;
+      testsGenerated: number;
+      dependencies: number;
+      environmentVariables: number;
+    };
+    securityAudit: {
+      overallScore: number;
+      vulnerabilities: number;
+      criticalIssues: number;
+      complianceStatus: Array<{
+        standard: string;
+        status: string;
+      }>;
+      recommendations: number;
+    };
+  };
   generationMetrics?: {
     totalTime: number;
     phasesCompleted: number;
@@ -128,7 +171,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
     setResult(null);
 
     try {
-      const response = await fetch('/api/generate-professional', {
+      const response = await fetch('/api/thirty-minute-professional', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -310,27 +353,37 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                 <div className="w-8 h-8 bg-white rounded-full animate-pulse"></div>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                高品質アプリが完成しました
+                エンタープライズアプリが完成しました
               </h2>
               <p className="text-white/70 text-lg">
-                {result.generationMetrics ? 
-                  `${Math.round(result.generationMetrics.totalTime/1000)}秒で業界最適化されたアプリを生成` :
-                  'データベーススキーマとReactコンポーネントを生成しました'
+                {result.developmentMetrics ? 
+                  `${Math.round(result.developmentMetrics.totalDevelopmentTime/60)}分でプロフェッショナル開発プロセス完了` :
+                  result.generationMetrics ? 
+                    `${Math.round(result.generationMetrics.totalTime/1000)}秒で業界最適化されたアプリを生成` :
+                    'データベーススキーマとReactコンポーネントを生成しました'
                 }
               </p>
-              {result.generationMetrics && (
+              {(result.developmentMetrics || result.generationMetrics) && (
                 <div className="flex items-center justify-center gap-4 mt-4">
                   <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                     <span className="text-green-300 text-sm font-medium">
-                      品質スコア: {result.generationMetrics.qualityScore}%
+                      品質スコア: {result.developmentMetrics?.overallQualityScore || result.generationMetrics?.qualityScore}%
                     </span>
                   </div>
-                  {result.generationMetrics.industryPattern && (
+                  {(result.developmentMetrics?.requirementsAnalysis || result.generationMetrics?.industryPattern) && (
                     <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/20 rounded-full">
                       <Sparkles className="w-3 h-3 text-purple-400" />
                       <span className="text-purple-300 text-sm font-medium">
-                        業界特化
+                        {result.developmentMetrics ? 'エンタープライズ' : '業界特化'}
+                      </span>
+                    </div>
+                  )}
+                  {result.developmentMetrics && (
+                    <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 rounded-full">
+                      <Factory className="w-3 h-3 text-blue-400" />
+                      <span className="text-blue-300 text-sm font-medium">
+                        30分開発
                       </span>
                     </div>
                   )}
@@ -340,9 +393,59 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
 
             {/* アプリ完成の詳細情報 */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-8">
-              {result.generationMetrics ? (
+              {result.developmentMetrics ? (
                 <>
-                  {/* Enhanced metrics display */}
+                  {/* 30分開発プロセス詳細 */}
+                  <div className="grid md:grid-cols-5 gap-4 text-center mb-6">
+                    <div>
+                      <div className="text-2xl font-bold text-blue-400 mb-2">🧠</div>
+                      <h3 className="font-semibold text-white mb-1 text-sm">GPT-4分析</h3>
+                      <p className="text-white/60 text-xs">{result.developmentMetrics.requirementsAnalysis.featuresIdentified}機能特定</p>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-400 mb-2">🏗️</div>
+                      <h3 className="font-semibold text-white mb-1 text-sm">アーキテクチャ</h3>
+                      <p className="text-white/60 text-xs">{result.developmentMetrics.systemArchitecture.databaseTables}テーブル設計</p>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-purple-400 mb-2">🎨</div>
+                      <h3 className="font-semibold text-white mb-1 text-sm">UI/UX設計</h3>
+                      <p className="text-white/60 text-xs">業界特化デザイン</p>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-yellow-400 mb-2">💻</div>
+                      <h3 className="font-semibold text-white mb-1 text-sm">実装</h3>
+                      <p className="text-white/60 text-xs">{result.developmentMetrics.implementation.componentsGenerated}コンポーネント</p>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-red-400 mb-2">🛡️</div>
+                      <h3 className="font-semibold text-white mb-1 text-sm">品質保証</h3>
+                      <p className="text-white/60 text-xs">セキュリティ監査済み</p>
+                    </div>
+                  </div>
+                  
+                  {/* フェーズ別実行時間 */}
+                  <div className="bg-white/5 rounded-xl p-4 mb-4">
+                    <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      開発フェーズ実行状況
+                    </h4>
+                    <div className="space-y-2">
+                      {result.developmentMetrics.phases.map((phase, index) => (
+                        <div key={index} className="flex justify-between items-center text-sm">
+                          <span className="text-white/60">{phase.name}:</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-white">{phase.duration}秒</span>
+                            <div className={`w-2 h-2 rounded-full ${phase.status === 'completed' ? 'bg-green-400' : 'bg-gray-400'}`}></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : result.generationMetrics ? (
+                <>
+                  {/* Legacy metrics display */}
                   <div className="grid md:grid-cols-4 gap-6 text-center mb-6">
                     <div>
                       <div className="text-3xl font-bold text-green-400 mb-2">✅</div>

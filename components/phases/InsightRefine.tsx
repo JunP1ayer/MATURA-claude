@@ -25,7 +25,7 @@ export default function InsightRefine() {
     }
   }, [chatOptimized])
 
-  const generateInsights = async () => {
+  const generateInsights = async (): Promise<void> => {
     try {
       const structuredData = await chatOptimized.generateStructuredData(
         state.conversations,
@@ -45,6 +45,7 @@ export default function InsightRefine() {
     } catch (error) {
       console.error('洞察生成エラー:', error)
     }
+    return;
   }
 
   const handleNext = () => {
@@ -54,8 +55,9 @@ export default function InsightRefine() {
     }
   }
 
-  const handleRegenerate = () => {
+  const handleRegenerate = (): void => {
     generateInsights()
+    return;
   }
 
   return (

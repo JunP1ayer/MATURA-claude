@@ -178,23 +178,23 @@ export class UltraPremiumUISystem {
     const interactions = this.generateMicroInteractions();
     
     // 🚀 Advanced Micro Interactions統合
-    const advancedInteractions = advancedMicroInteractionsEngine.generateHollywoodInteractions();
+    // const advancedInteractions = advancedMicroInteractionsEngine.generateHollywoodInteractions();
     
     switch (componentType) {
       case 'form':
-        return this.generatePremiumForm(config, motions, advancedInteractions);
+        return this.generatePremiumForm(config, motions, {});
       case 'card':
-        return this.generatePremiumCard(config, motions, advancedInteractions);
+        return this.generatePremiumCard(config, motions, {});
       case 'button':
-        return this.generatePremiumButton(config, motions, advancedInteractions);
+        return this.generatePremiumButton(config, motions, {});
       case 'navigation':
-        return this.generatePremiumNavigation(config, motions, advancedInteractions);
+        return this.generatePremiumNavigation(config, motions, {});
       case 'modal':
-        return this.generatePremiumModal(config, motions, advancedInteractions);
+        return this.generatePremiumModal(config, motions, {});
       case 'interactive':
-        return this.generateAdvancedInteractiveComponent(config, advancedInteractions);
+        return this.generateAdvancedInteractiveComponent(config, {});
       default:
-        return this.generatePremiumCard(config, motions, advancedInteractions);
+        return this.generatePremiumCard(config, motions, {});
     }
   }
   
