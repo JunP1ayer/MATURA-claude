@@ -89,6 +89,77 @@ export async function GET(request: NextRequest) {
 }
 
 /**
+ * 新しいアプリを保存する
+ */
+export async function POST(request: NextRequest) {
+  try {
+    console.log('💾 Saving new app...')
+    
+    const body = await request.json()
+    const { name, description, user_idea, schema, generated_code, status } = body
+    
+    if (!name || !generated_code) {
+      return NextResponse.json(
+        { error: 'Name and generated_code are required' },
+        { status: 400 }
+      )
+    }
+    
+    // アプリIDを生成
+    const timestamp = Date.now()
+    const appId = `app${timestamp}`
+    
+    // アプリディレクトリを作成
+    const appDir = path.join(process.cwd(), 'app', appId)
+    await fs.mkdir(appDir, { recursive: true })
+    
+    // メタデータを保存
+    const metadata = {
+      appType: name,
+      description: description || '',
+      timestamp: new Date().toISOString(),
+      user_idea: user_idea || '',
+      schema: schema || {},
+      status: status || 'active'
+    }
+    
+    const metadataPath = path.join(appDir, 'metadata.json')
+    await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2))
+    
+    // ページコードを保存
+    const pagePath = path.join(appDir, 'page.tsx')
+    await fs.writeFile(pagePath, generated_code)
+    
+    console.log(`✅ App saved successfully: ${appId}`)
+    
+    const savedApp = {
+      id: appId,
+      name: name,
+      description: description,
+      url: `/apps/${appId}`,
+      previewUrl: `/preview/${appId}`,
+      timestamp: metadata.timestamp
+    }
+    
+    return NextResponse.json({
+      success: true,
+      app: savedApp,
+      message: 'App saved successfully'
+    })
+    
+  } catch (error: any) {
+    console.error('❌ Error saving app:', error)
+    return NextResponse.json(
+      { 
+        error: 'アプリの保存に失敗しました',
+        details: error.message
+      },
+      { status: 500 }
+    )
+  }
+}
+
+/**
  * 特定のアプリを削除する（将来の機能）
  */
 export async function DELETE(request: NextRequest) {
