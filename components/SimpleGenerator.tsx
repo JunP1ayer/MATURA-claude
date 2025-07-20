@@ -16,6 +16,31 @@ interface GeneratedResult {
   code: string;
   schema: any;
   app?: any;
+  generationMetrics?: {
+    totalTime: number;
+    phasesCompleted: number;
+    qualityScore: number;
+    industryPattern: any;
+    technicalDetails: {
+      codeQuality: string;
+      security: string;
+      performance: string;
+      accessibility: string;
+      typeScript: string;
+    };
+  };
+  instructions?: {
+    howToUse: string;
+    apiEndpoints: any;
+    note: string;
+    qualityAssurance?: {
+      overall: string;
+      security: string;
+      performance: string;
+      maintainability: string;
+      recommendations: string[];
+    };
+  };
 }
 
 interface GeneratedApp {
@@ -103,7 +128,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
     setResult(null);
 
     try {
-      const response = await fetch('/api/generate-simple', {
+      const response = await fetch('/api/generate-professional', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -285,32 +310,123 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
                 <div className="w-8 h-8 bg-white rounded-full animate-pulse"></div>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                アプリが完成しました
+                高品質アプリが完成しました
               </h2>
               <p className="text-white/70 text-lg">
-                データベーススキーマとReactコンポーネントを生成しました
+                {result.generationMetrics ? 
+                  `${Math.round(result.generationMetrics.totalTime/1000)}秒で業界最適化されたアプリを生成` :
+                  'データベーススキーマとReactコンポーネントを生成しました'
+                }
               </p>
+              {result.generationMetrics && (
+                <div className="flex items-center justify-center gap-4 mt-4">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span className="text-green-300 text-sm font-medium">
+                      品質スコア: {result.generationMetrics.qualityScore}%
+                    </span>
+                  </div>
+                  {result.generationMetrics.industryPattern && (
+                    <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/20 rounded-full">
+                      <Sparkles className="w-3 h-3 text-purple-400" />
+                      <span className="text-purple-300 text-sm font-medium">
+                        業界特化
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* アプリ完成の詳細情報 */}
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-8">
-              <div className="grid md:grid-cols-3 gap-6 text-center">
-                <div>
-                  <div className="text-3xl font-bold text-green-400 mb-2">✅</div>
-                  <h3 className="font-semibold text-white mb-1">データベース</h3>
-                  <p className="text-white/60 text-sm">完全なスキーマ設計</p>
+              {result.generationMetrics ? (
+                <>
+                  {/* Enhanced metrics display */}
+                  <div className="grid md:grid-cols-4 gap-6 text-center mb-6">
+                    <div>
+                      <div className="text-3xl font-bold text-green-400 mb-2">✅</div>
+                      <h3 className="font-semibold text-white mb-1">データベース</h3>
+                      <p className="text-white/60 text-sm">最適化されたスキーマ</p>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-blue-400 mb-2">⚡</div>
+                      <h3 className="font-semibold text-white mb-1">高性能UI</h3>
+                      <p className="text-white/60 text-sm">TypeScript完全対応</p>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-purple-400 mb-2">🛡️</div>
+                      <h3 className="font-semibold text-white mb-1">セキュリティ</h3>
+                      <p className="text-white/60 text-sm">SQL注入防御済み</p>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-yellow-400 mb-2">🚀</div>
+                      <h3 className="font-semibold text-white mb-1">最適化</h3>
+                      <p className="text-white/60 text-sm">{result.generationMetrics.technicalDetails.performance}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Technical details */}
+                  <div className="bg-white/5 rounded-xl p-4 mb-4">
+                    <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      技術的詳細
+                    </h4>
+                    <div className="grid md:grid-cols-2 gap-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-white/60">コード品質:</span>
+                        <span className="text-white">{result.generationMetrics.technicalDetails.codeQuality}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-white/60">セキュリティ:</span>
+                        <span className="text-white">{result.generationMetrics.technicalDetails.security}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-white/60">アクセシビリティ:</span>
+                        <span className="text-white">{result.generationMetrics.technicalDetails.accessibility}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-white/60">TypeScript:</span>
+                        <span className="text-white">{result.generationMetrics.technicalDetails.typeScript}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quality recommendations */}
+                  {result.instructions?.qualityAssurance?.recommendations && (
+                    <div className="bg-green-500/10 rounded-xl p-4">
+                      <h4 className="font-semibold text-green-300 mb-3">品質保証レポート</h4>
+                      <div className="space-y-2">
+                        {result.instructions.qualityAssurance.recommendations.map((rec, index) => (
+                          <div key={index} className="text-sm text-green-200 flex items-center gap-2">
+                            <div className="w-1 h-1 bg-green-400 rounded-full"></div>
+                            {rec}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Fallback display for legacy results
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                  <div>
+                    <div className="text-3xl font-bold text-green-400 mb-2">✅</div>
+                    <h3 className="font-semibold text-white mb-1">データベース</h3>
+                    <p className="text-white/60 text-sm">完全なスキーマ設計</p>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-blue-400 mb-2">⚡</div>
+                    <h3 className="font-semibold text-white mb-1">高性能UI</h3>
+                    <p className="text-white/60 text-sm">最新のReactコンポーネント</p>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-purple-400 mb-2">🎯</div>
+                    <h3 className="font-semibold text-white mb-1">即座に使用可能</h3>
+                    <p className="text-white/60 text-sm">デプロイ済みアプリケーション</p>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-3xl font-bold text-blue-400 mb-2">⚡</div>
-                  <h3 className="font-semibold text-white mb-1">高性能UI</h3>
-                  <p className="text-white/60 text-sm">最新のReactコンポーネント</p>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-purple-400 mb-2">🎯</div>
-                  <h3 className="font-semibold text-white mb-1">即座に使用可能</h3>
-                  <p className="text-white/60 text-sm">デプロイ済みアプリケーション</p>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="flex justify-center gap-4">
