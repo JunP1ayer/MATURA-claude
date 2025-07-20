@@ -101,6 +101,9 @@ export async function POST(request: NextRequest) {
     progress.currentPhase = 1;
 
     console.log('🧠 [PHASE 1] Starting GPT-4 requirements analysis...');
+    console.log('🔑 [PHASE 1] API Keys check:');
+    console.log('  OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
+    console.log('  GEMINI_API_KEY exists:', !!process.env.GEMINI_API_KEY);
     
     let requirementsAnalysis;
     try {
@@ -129,6 +132,7 @@ export async function POST(request: NextRequest) {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : 'No stack trace'
       });
+      console.error('❌ [PHASE 1] Full error object:', JSON.stringify(error, null, 2));
       
       // フォールバック処理（エラー時は基本的な分析結果を使用）
       requirementsAnalysis = {
