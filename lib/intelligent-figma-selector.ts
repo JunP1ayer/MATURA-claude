@@ -2,6 +2,7 @@
 import { intelligentDesignAnalyzer, StructuredData, DesignContext, ColorPersonality } from './intelligent-design-analyzer';
 import { PREMIUM_DESIGN_PATTERNS, UIDesignPattern } from './smart-ui-selector';
 import { figmaExtractor, FigmaDesignData } from './figma-api';
+import { industryPatternSelector, IndustryPattern } from './industry-specialized-patterns';
 
 export interface IntelligentSelection {
   selectedPattern: UIDesignPattern;
@@ -12,6 +13,8 @@ export interface IntelligentSelection {
   structuredData: StructuredData;
   designContext: DesignContext;
   colorPersonality: ColorPersonality;
+  industryPattern?: IndustryPattern;
+  industryMatch: boolean;
 }
 
 export interface CustomizationOptions {
@@ -37,40 +40,62 @@ export class IntelligentFigmaSelector {
     console.log('🔍 Analyzing user input...');
     const structuredData = intelligentDesignAnalyzer.analyzeUserInput(userInput);
     
-    // Step 2: Derive design context
+    // Step 2: Try industry-specific pattern matching first
+    console.log('🏭 Checking industry-specific patterns...');
+    const industryPattern = industryPatternSelector.selectBestPattern(userInput, structuredData);
+    let industryMatch = false;
+    let selectedPattern: UIDesignPattern;
+    
+    if (industryPattern) {
+      console.log(`🎯 Industry match found: ${industryPattern.name}`);
+      industryMatch = true;
+      
+      // Convert industry pattern to UI design pattern
+      selectedPattern = this.convertIndustryPatternToUIPattern(industryPattern);
+    } else {
+      console.log('📋 Using general pattern matching...');
+      
+      // Step 3: Derive design context for general patterns
+      console.log('🎨 Deriving design context...');
+      const designContext = intelligentDesignAnalyzer.deriveDesignContext(structuredData);
+      
+      // Step 4: Score and rank templates
+      console.log('📊 Scoring templates...');
+      const rankedTemplates = this.scoreAndRankTemplates(designContext, structuredData);
+      selectedPattern = rankedTemplates[0];
+    }
+    
+    console.log(`✅ Selected template: ${selectedPattern.name}`);
+    
+    // Step 5: Derive design context
     console.log('🎨 Deriving design context...');
     const designContext = intelligentDesignAnalyzer.deriveDesignContext(structuredData);
     
-    // Step 3: Generate color personality
+    // Step 6: Generate color personality
     console.log('🌈 Generating color personality...');
     const colorPersonality = intelligentDesignAnalyzer.generateColorPersonality(structuredData, designContext);
     
-    // Step 4: Score and rank templates
-    console.log('📊 Scoring templates...');
-    const rankedTemplates = this.scoreAndRankTemplates(designContext, structuredData);
-    
-    // Step 5: Select best template
-    const selectedPattern = rankedTemplates[0];
-    console.log(`✅ Selected template: ${selectedPattern.name}`);
-    
-    // Step 6: Customize template based on analysis
+    // Step 7: Customize template based on analysis
     console.log('🔧 Customizing template...');
     const customizedPattern = await this.customizeTemplate(
       selectedPattern, 
       designContext, 
       colorPersonality, 
-      options
+      options,
+      industryPattern
     );
     
-    // Step 7: Generate reasoning
+    // Step 8: Generate reasoning
     const designReasoning = this.generateDesignReasoning(
       structuredData, 
       designContext, 
       selectedPattern, 
-      customizedPattern
+      customizedPattern,
+      industryPattern
     );
     
-    // Step 8: Get alternatives
+    // Step 9: Get alternatives
+    const rankedTemplates = this.scoreAndRankTemplates(designContext, structuredData);
     const alternatives = rankedTemplates.slice(1, 4);
     
     return {
@@ -81,7 +106,9 @@ export class IntelligentFigmaSelector {
       alternatives,
       structuredData,
       designContext,
-      colorPersonality
+      colorPersonality,
+      industryPattern,
+      industryMatch
     };
   }
 
@@ -134,12 +161,27 @@ export class IntelligentFigmaSelector {
     return scoredTemplates.map(st => st.template);
   }
 
+  // Convert industry pattern to UI design pattern
+  private convertIndustryPatternToUIPattern(industryPattern: IndustryPattern): UIDesignPattern {
+    return {
+      id: `industry-${industryPattern.id}`,
+      name: industryPattern.name,
+      category: industryPattern.category as UIDesignPattern['category'],
+      complexity: industryPattern.complexity,
+      colors: industryPattern.colors,
+      components: industryPattern.components,
+      layout: industryPattern.layout as UIDesignPattern['layout'],
+      mvpScore: industryPattern.mvpScore
+    };
+  }
+
   // Customize selected template based on context
   private async customizeTemplate(
     template: UIDesignPattern,
     context: DesignContext,
     colorPersonality: ColorPersonality,
-    options: CustomizationOptions
+    options: CustomizationOptions,
+    industryPattern?: IndustryPattern
   ): Promise<UIDesignPattern> {
     
     const customized: UIDesignPattern = {
@@ -148,15 +190,20 @@ export class IntelligentFigmaSelector {
       name: this.generateCustomizedName(template.name, context)
     };
     
-    // Adapt colors
+    // Adapt colors (prefer industry colors if available)
     if (options.adaptColors) {
-      customized.colors = {
-        primary: colorPersonality.primary,
-        secondary: colorPersonality.secondary,
-        accent: colorPersonality.accent,
-        background: colorPersonality.background,
-        text: colorPersonality.text
-      };
+      if (industryPattern && !options.adaptColors) {
+        // Keep industry-specific colors
+        customized.colors = industryPattern.colors;
+      } else {
+        customized.colors = {
+          primary: colorPersonality.primary,
+          secondary: colorPersonality.secondary,
+          accent: colorPersonality.accent,
+          background: colorPersonality.background,
+          text: colorPersonality.text
+        };
+      }
     }
     
     // Adapt complexity
@@ -200,12 +247,19 @@ export class IntelligentFigmaSelector {
     structured: StructuredData,
     context: DesignContext,
     original: UIDesignPattern,
-    customized: UIDesignPattern
+    customized: UIDesignPattern,
+    industryPattern?: IndustryPattern
   ): string {
     const reasons = [];
     
-    // Category reasoning
-    reasons.push(`「${context.category}」カテゴリーに最適化されたテンプレートを選択`);
+    // Industry-specific reasoning
+    if (industryPattern) {
+      reasons.push(`「${industryPattern.industry}」業界に特化した${industryPattern.name}を選択`);
+      reasons.push(`${industryPattern.useCase}の要件に最適化された専用デザインパターンを適用`);
+    } else {
+      // Category reasoning
+      reasons.push(`「${context.category}」カテゴリーに最適化されたテンプレートを選択`);
+    }
     
     // Complexity reasoning
     if (context.complexity !== 'moderate') {
