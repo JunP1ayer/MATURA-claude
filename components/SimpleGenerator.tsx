@@ -171,7 +171,7 @@ export function SimpleGenerator({ showRecentApps = true }: SimpleGeneratorProps 
     setResult(null);
 
     try {
-      const response = await fetch('/api/thirty-minute-professional', {
+      const response = await fetch('/api/universal-generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
