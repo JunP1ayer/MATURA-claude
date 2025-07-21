@@ -59,43 +59,29 @@ export class DynamicSchemaGenerator {
    * LLMを使った意味分析
    */
   private async analyzeIdea(userInput: string): Promise<any> {
-    const prompt = `You are a JSON generator. Analyze the app idea and return ONLY valid JSON without any explanation, markdown, or code blocks.
+    const prompt = `Parse this app idea and return valid JSON. Reply with ONLY the JSON object, nothing else.
 
-App Idea: "${userInput}"
+"${userInput}"
 
-Return this exact JSON structure:
-{
-  "category": "one of: productivity, social, ecommerce, creative, utility, finance, health, education, entertainment",
-  "dataType": "data type to manage (snake_case, english)",
-  "primaryActions": ["action1", "action2", "action3"],
-  "targetUser": "target user description",
-  "keyFeatures": ["feature1", "feature2", "feature3"],
-  "requiredFields": [
-    {
-      "name": "field_name",
-      "type": "text",
-      "description": "field description",
-      "required": true
-    },
-    {
-      "name": "field_name2", 
-      "type": "number",
-      "description": "field description2",
-      "required": false
-    }
-  ]
-}
-
-IMPORTANT: Return ONLY the JSON object. No explanation, no markdown formatting, no code blocks.`;
+Format:
+{"category":"finance","dataType":"income_records","primaryActions":["record","track","alert"],"targetUser":"students and part-time workers","keyFeatures":["income tracking","threshold alerts","automatic calculation"],"requiredFields":[{"name":"amount","type":"number","description":"income amount","required":true},{"name":"source","type":"text","description":"income source","required":true},{"name":"date","type":"date","description":"income date","required":true}]}`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.3,
+      messages: [
+        { role: "system", content: "You are a JSON formatter. Return only valid JSON objects, no other text." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.1,
+      max_tokens: 1000,
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) throw new Error('No analysis received');
+    
+    // レスポンス内容をログ出力
+    console.log('🔍 OpenAI Raw Response:', content);
+    console.log('🔍 Response Length:', content.length);
     
     // JSON解析の改善：複数の方法で試行
     return this.parseJsonSafely(content);
@@ -172,7 +158,8 @@ IMPORTANT: Return ONLY the JSON object. No explanation, no markdown formatting, 
       // 1. 直接パース
       return JSON.parse(content);
     } catch (error) {
-      console.log('Direct JSON parse failed, trying cleanup...');
+      console.log('❌ Direct JSON parse failed:', error.message);
+      console.log('🔍 Content preview:', content.substring(0, 200));
       
       try {
         // 2. コードブロックマーカー除去
@@ -185,6 +172,7 @@ IMPORTANT: Return ONLY the JSON object. No explanation, no markdown formatting, 
         const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           cleaned = jsonMatch[0];
+          console.log('🔧 Extracted JSON object');
         }
         
         // 5. 不正な改行やタブを修正
@@ -196,6 +184,7 @@ IMPORTANT: Return ONLY the JSON object. No explanation, no markdown formatting, 
         // 7. 重複する空白を除去
         cleaned = cleaned.replace(/\s+/g, ' ');
         
+        console.log('🔧 Cleaned JSON:', cleaned.substring(0, 200));
         return JSON.parse(cleaned);
       } catch (secondError) {
         console.log('JSON cleanup failed, using fallback structure...');
