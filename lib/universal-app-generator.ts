@@ -4,6 +4,9 @@
  */
 
 import { openai } from '@/lib/openai';
+import { enhancedCodeGenerator } from './enhanced-code-generator';
+import { figmaEnhancedUIGenerator } from './figma-enhanced-ui-generator';
+import { robustLLMSystem } from './robust-llm-system';
 
 // 意図理解の結果
 export interface AppIntent {
@@ -55,39 +58,86 @@ export class UniversalAppGenerator {
   
   /**
    * メイン生成関数 - 任意のアイデアからアプリを生成
+   * 強化されたLLMシステム、Figma連携、高品質コード生成を統合
    */
   async generateApp(userIdea: string): Promise<GeneratedApp> {
-    console.log('🚀 [UNIVERSAL] Starting universal app generation for:', userIdea);
+    console.log('🚀 [UNIVERSAL] Starting enhanced universal app generation for:', userIdea);
+    
+    // システムヘルスチェック
+    const health = await robustLLMSystem.healthCheck();
+    console.log('🏥 [UNIVERSAL] System health:', health.overall ? 'Healthy' : 'Degraded');
     
     try {
-      // Step 1: 意図理解
-      const intent = await this.analyzeIntent(userIdea);
-      console.log('✅ [UNIVERSAL] Intent analyzed:', intent.category);
+      // Step 1: 意図理解（強化されたLLMシステム使用）
+      const intentResponse = await robustLLMSystem.callFunctionWithFallback<AppIntent>(
+        'analyze_app_intent',
+        this.getIntentAnalysisSchema(),
+        `Analyze this app idea: "${userIdea}"`,
+        'You are an expert app analyst. Analyze user ideas and extract structured information about their intent.'
+      );
       
-      // Step 2: スキーマ生成
-      const schema = await this.generateSchema(intent, userIdea);
-      console.log('✅ [UNIVERSAL] Schema generated:', schema.tableName);
+      if (!intentResponse.success || !intentResponse.data) {
+        throw new Error('Intent analysis failed completely');
+      }
       
-      // Step 3: UI設定生成
-      const ui = await this.generateUI(intent, schema);
-      console.log('✅ [UNIVERSAL] UI configured:', ui.theme.primaryColor);
+      const intent = intentResponse.data;
+      console.log('✅ [UNIVERSAL] Intent analyzed:', intent.category, `(confidence: ${intentResponse.confidence})`);
       
-      // Step 4: コード生成
-      const code = await this.generateCode(intent, schema, ui, userIdea);
-      console.log('✅ [UNIVERSAL] Code generated:', code.length, 'characters');
+      // Step 2: スキーマ生成（強化されたLLMシステム使用）
+      const schemaResponse = await robustLLMSystem.callFunctionWithFallback<GeneratedSchema>(
+        'generate_database_schema',
+        this.getSchemaGenerationSchema(),
+        this.buildSchemaPrompt(intent, userIdea),
+        'You are a database schema expert. Generate optimal database schemas for apps.'
+      );
       
-      const confidence = this.calculateConfidence(intent, schema, ui);
+      if (!schemaResponse.success || !schemaResponse.data) {
+        throw new Error('Schema generation failed completely');
+      }
+      
+      const schema = schemaResponse.data;
+      console.log('✅ [UNIVERSAL] Schema generated:', schema.tableName, `(confidence: ${schemaResponse.confidence})`);
+      
+      // Step 3: UI設定生成（Figma連携強化版）
+      const ui = await figmaEnhancedUIGenerator.generateEnhancedUI(intent, schema, userIdea);
+      console.log('✅ [UNIVERSAL] Enhanced UI configured with Figma integration');
+      
+      // Step 4: コード生成（機能性強化版）
+      const functionalCode = await enhancedCodeGenerator.generateFunctionalCode(intent, schema, ui, userIdea);
+      console.log('✅ [UNIVERSAL] Functional code generated with business logic');
+      
+      // 総合信頼度計算
+      const confidence = this.calculateEnhancedConfidence(
+        intentResponse,
+        schemaResponse,
+        ui,
+        functionalCode
+      );
       
       return {
         intent,
         schema,
         ui,
-        code,
-        confidence
+        code: functionalCode.mainComponent,
+        confidence,
+        metadata: {
+          enhancedFeatures: {
+            businessLogic: functionalCode.businessLogicFunctions.length,
+            testCases: functionalCode.testCases.length,
+            figmaIntegration: !!ui.figmaDesignSystem,
+            accessibilityFeatures: ui.accessibilityFeatures?.length || 0
+          },
+          systemHealth: health,
+          processingDetails: {
+            intentProvider: intentResponse.provider,
+            schemaProvider: schemaResponse.provider,
+            totalAttempts: intentResponse.attempts + schemaResponse.attempts
+          }
+        }
       };
       
     } catch (error) {
-      console.error('❌ [UNIVERSAL] Generation failed:', error);
+      console.error('❌ [UNIVERSAL] Enhanced generation failed:', error);
       throw error;
     }
   }
@@ -360,7 +410,141 @@ Generate ONLY the main page component code.`;
   }
 
   /**
-   * 信頼度計算
+   * 強化された信頼度計算
+   */
+  private calculateEnhancedConfidence(
+    intentResponse: any,
+    schemaResponse: any,
+    ui: any,
+    functionalCode: any
+  ): number {
+    let confidence = 70; // Base confidence
+    
+    // LLMレスポンスの信頼度
+    confidence += intentResponse.confidence * 15;
+    confidence += schemaResponse.confidence * 15;
+    
+    // 機能の充実度
+    if (functionalCode.businessLogicFunctions.length > 0) confidence += 5;
+    if (functionalCode.testCases.length > 0) confidence += 5;
+    
+    // UI/UXの品質
+    if (ui.figmaDesignSystem) confidence += 10;
+    if (ui.accessibilityFeatures?.length > 3) confidence += 5;
+    
+    // システム信頼性
+    if (intentResponse.provider === 'openai') confidence += 5;
+    if (schemaResponse.provider === 'openai') confidence += 5;
+    
+    return Math.min(confidence, 100);
+  }
+
+  /**
+   * スキーマプロンプト構築
+   */
+  private buildSchemaPrompt(intent: AppIntent, userIdea: string): string {
+    return `Generate a database schema for this app:
+          
+Original Idea: "${userIdea}"
+Category: ${intent.category}
+Purpose: ${intent.primaryPurpose}
+Data to Manage: ${intent.dataToManage}
+Key Features: ${intent.keyFeatures.join(', ')}
+
+Create an optimal schema with 3-6 fields that capture the essential data.`;
+  }
+
+  /**
+   * 意図分析スキーマ定義
+   */
+  private getIntentAnalysisSchema() {
+    return {
+      description: "Extract structured information about the user's app idea",
+      parameters: {
+        type: "object",
+        properties: {
+          category: {
+            type: "string",
+            enum: ["productivity", "finance", "health", "social", "ecommerce", "creative", "utility", "education", "entertainment"],
+            description: "Primary category of the app"
+          },
+          primaryPurpose: {
+            type: "string",
+            description: "Main purpose or goal of the app"
+          },
+          targetUsers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Target user groups"
+          },
+          keyFeatures: {
+            type: "array",
+            items: { type: "string" },
+            description: "Key features the app should have"
+          },
+          dataToManage: {
+            type: "string",
+            description: "Type of data the app will manage"
+          },
+          urgency: {
+            type: "string",
+            enum: ["low", "medium", "high"],
+            description: "Urgency level of the problem being solved"
+          },
+          complexity: {
+            type: "string",
+            enum: ["simple", "moderate", "complex"],
+            description: "Expected complexity of the app"
+          }
+        },
+        required: ["category", "primaryPurpose", "targetUsers", "keyFeatures", "dataToManage", "urgency", "complexity"]
+      }
+    };
+  }
+
+  /**
+   * スキーマ生成スキーマ定義
+   */
+  private getSchemaGenerationSchema() {
+    return {
+      description: "Generate a database schema for the app",
+      parameters: {
+        type: "object",
+        properties: {
+          tableName: {
+            type: "string",
+            description: "Table name in snake_case"
+          },
+          description: {
+            type: "string",
+            description: "Brief description of what this table stores"
+          },
+          fields: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                label: { type: "string" },
+                type: { 
+                  type: "string",
+                  enum: ["text", "number", "date", "email", "tel", "url", "boolean"]
+                },
+                required: { type: "boolean" },
+                placeholder: { type: "string" },
+                validation: { type: "string" }
+              },
+              required: ["name", "label", "type", "required"]
+            }
+          }
+        },
+        required: ["tableName", "description", "fields"]
+      }
+    };
+  }
+
+  /**
+   * 信頼度計算（旧版・互換性のため残存）
    */
   private calculateConfidence(intent: AppIntent, schema: GeneratedSchema, ui: UIConfiguration): number {
     let confidence = 70; // Base confidence
