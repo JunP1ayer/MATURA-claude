@@ -863,13 +863,15 @@ async function generateAppConfig(idea: string) {
     const dynamicGenerator = new DynamicSchemaGenerator();
     const dynamicSchema = await dynamicGenerator.generateSchema({ userInput: idea });
     
-    if (dynamicSchema && dynamicSchema.fields.length > 3) {
+    if (dynamicSchema && dynamicSchema.fields.length > 0) {
       console.log('✅ Dynamic schema generated successfully');
+      console.log('📊 Total fields:', dynamicSchema.fields.length);
+      console.log('📊 Table name:', dynamicSchema.tableName);
       
       // 動的スキーマを標準フォーマットに変換
       const dynamicFields = dynamicSchema.fields
         .filter(field => !['id', 'created_at', 'updated_at'].includes(field.name))
-        .slice(0, 3)
+        .slice(0, 5)  // 最大5フィールドまで取得
         .map(field => ({
           name: field.name,
           label: field.label,
@@ -878,8 +880,11 @@ async function generateAppConfig(idea: string) {
           required: field.required || false
         }));
 
+      console.log('📊 Dynamic fields after filtering:', dynamicFields.length);
+      
       if (dynamicFields.length > 0) {
-        return {
+        console.log('🎯 Using dynamic schema for app generation');
+        const appConfig = {
           tableName: dynamicSchema.tableName,
           fields: dynamicFields,
           icon: dynamicSchema.uiConfig.icon,
@@ -895,7 +900,13 @@ async function generateAppConfig(idea: string) {
           listTitle: `${dynamicSchema.description}一覧`,
           itemName: dynamicSchema.category
         };
+        console.log('🎯 App config table:', appConfig.tableName);
+        return appConfig;
+      } else {
+        console.log('⚠️ No dynamic fields found after filtering');
       }
+    } else {
+      console.log('⚠️ Dynamic schema invalid or empty');
     }
   } catch (error) {
     console.log('⚠️ Dynamic schema generation failed, using predefined patterns:', error);
@@ -926,7 +937,9 @@ async function generateAppConfig(idea: string) {
   }
   
   // 扶養・収入管理
+  console.log('📋 Checking for income management keywords in:', lowerIdea.substring(0, 50) + '...');
   if (lowerIdea.includes('扶養') || lowerIdea.includes('収入') || lowerIdea.includes('年収') || lowerIdea.includes('103万') || lowerIdea.includes('130万')) {
+    console.log('✅ Income management app selected!');
     return {
       tableName: 'income_records',
       fields: [
@@ -1001,7 +1014,9 @@ async function generateAppConfig(idea: string) {
   }
 
   // タスク・プロジェクト管理
+  console.log('📋 Checking for task management keywords...');
   if (lowerIdea.includes('タスク') || lowerIdea.includes('プロジェクト') || lowerIdea.includes('todo')) {
+    console.log('✅ Task management app selected!');
     return {
       tableName: 'tasks',
       fields: [
@@ -1025,6 +1040,7 @@ async function generateAppConfig(idea: string) {
   }
   
   // デフォルト（汎用）
+  console.log('⚠️ No specific keywords found, using default app template');
   return {
     tableName: 'items',
     fields: [
@@ -1052,6 +1068,11 @@ async function generateAppConfig(idea: string) {
 async function generateFallbackPageCode(idea: string): Promise<string> {
   // アイデアに基づいて適切なフィールドとUIを生成
   const appConfig = await generateAppConfig(idea);
+  console.log('🎯 [generateFallbackPageCode] Selected app config:', {
+    tableName: appConfig.tableName,
+    fieldsCount: appConfig.fields.length,
+    description: appConfig.description
+  });
   
   // 簡単なフィールドマッピング
   const firstField = appConfig.fields[0];
