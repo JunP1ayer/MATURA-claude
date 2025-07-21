@@ -912,31 +912,7 @@ async function generateAppConfig(idea: string) {
     console.log('⚠️ Dynamic schema generation failed, using predefined patterns:', error);
   }
   
-  // レストラン・飲食関連
-  if (lowerIdea.includes('レストラン') || lowerIdea.includes('飲食') || lowerIdea.includes('料理') || lowerIdea.includes('メニュー')) {
-    return {
-      tableName: 'menu_items',
-      fields: [
-        { name: 'name', label: '料理名', type: 'text', placeholder: '例: パスタカルボナーラ', required: true },
-        { name: 'price', label: '価格', type: 'number', placeholder: '例: 1200', required: true },
-        { name: 'category', label: 'カテゴリ', type: 'text', placeholder: '例: パスタ', required: true }
-      ],
-      icon: 'ChefHat',
-      background: 'bg-gradient-to-br from-orange-50 to-red-50',
-      cardStyle: 'border-orange-200 shadow-orange-100',
-      headerStyle: 'bg-gradient-to-r from-orange-500 to-red-500 text-white',
-      titleColor: 'text-white',
-      subtitleColor: 'text-orange-100',
-      iconColor: 'text-white',
-      buttonStyle: 'bg-orange-600 hover:bg-orange-700',
-      description: 'プロフェッショナルなレストラン管理システム',
-      actionLabel: 'メニューを追加',
-      listTitle: 'メニュー一覧',
-      itemName: 'メニュー'
-    };
-  }
-  
-  // 扶養・収入管理
+  // 扶養・収入管理（優先度高）
   console.log('📋 Checking for income management keywords in:', lowerIdea.substring(0, 50) + '...');
   if (lowerIdea.includes('扶養') || lowerIdea.includes('収入') || lowerIdea.includes('年収') || lowerIdea.includes('103万') || lowerIdea.includes('130万')) {
     console.log('✅ Income management app selected!');
@@ -960,6 +936,35 @@ async function generateAppConfig(idea: string) {
       actionLabel: '収入を記録',
       listTitle: '収入一覧',
       itemName: '収入記録'
+    };
+  }
+  
+  // レストラン・飲食関連
+  console.log('📋 Checking for restaurant keywords...');
+  const restaurantKeywords = ['レストラン', '飲食店', '料理店', 'メニュー管理', 'カフェ', 'レシピ管理'];
+  const foundRestaurantKeywords = restaurantKeywords.filter(keyword => lowerIdea.includes(keyword));
+  
+  if (foundRestaurantKeywords.length > 0) {
+    console.log('✅ Restaurant app selected! Found keywords:', foundRestaurantKeywords);
+    return {
+      tableName: 'menu_items',
+      fields: [
+        { name: 'name', label: '料理名', type: 'text', placeholder: '例: パスタカルボナーラ', required: true },
+        { name: 'price', label: '価格', type: 'number', placeholder: '例: 1200', required: true },
+        { name: 'category', label: 'カテゴリ', type: 'text', placeholder: '例: パスタ', required: true }
+      ],
+      icon: 'ChefHat',
+      background: 'bg-gradient-to-br from-orange-50 to-red-50',
+      cardStyle: 'border-orange-200 shadow-orange-100',
+      headerStyle: 'bg-gradient-to-r from-orange-500 to-red-500 text-white',
+      titleColor: 'text-white',
+      subtitleColor: 'text-orange-100',
+      iconColor: 'text-white',
+      buttonStyle: 'bg-orange-600 hover:bg-orange-700',
+      description: 'プロフェッショナルなレストラン管理システム',
+      actionLabel: 'メニューを追加',
+      listTitle: 'メニュー一覧',
+      itemName: 'メニュー'
     };
   }
 
