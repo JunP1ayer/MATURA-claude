@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
       progress.phases[2].endTime = Date.now();
       progress.phases[2].progress = 100;
       progress.phases[2].result = {
-        designComponents: designSystem.components.length,
+        designComponents: designSystem.components?.length || 0,
         colorPalette: 'industry-optimized',
         accessibilityScore: 'WCAG AA compliant',
         responsiveDesign: true
@@ -389,7 +389,7 @@ export async function POST(request: NextRequest) {
         brandConsistency: 'excellent'
       };
       
-      console.log(`✅ [PHASE 3] UI/UX design completed - ${designSystem.components.length} components designed`);
+      console.log(`✅ [PHASE 3] UI/UX design completed - ${designSystem.components?.length || 0} components designed`);
     } catch (error) {
       console.error('❌ [PHASE 3] UI/UX design failed:', error);
       console.error('❌ [PHASE 3] Error details:', {
