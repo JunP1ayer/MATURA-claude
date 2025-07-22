@@ -858,29 +858,49 @@ IMPORTANT:
   private inferCategoryFromIdea(userIdea: string): string {
     const idea = userIdea.toLowerCase();
     
-    // キーワードベース分類（優先順位順）
-    if (idea.includes('レシピ') || idea.includes('料理') || idea.includes('食事') || idea.includes('cooking')) {
-      return 'creative';
-    }
-    if (idea.includes('ゲーム') || idea.includes('game') || idea.includes('遊び') || idea.includes('エンターテイン')) {
-      return 'entertainment'; 
-    }
-    if (idea.includes('学習') || idea.includes('教育') || idea.includes('勉強') || idea.includes('スクール')) {
-      return 'education';
-    }
-    if (idea.includes('健康') || idea.includes('運動') || idea.includes('フィットネス') || idea.includes('医療')) {
-      return 'health';
-    }
-    if (idea.includes('金融') || idea.includes('銀行') || idea.includes('投資') || idea.includes('家計')) {
+    // 金融・税制関連（最優先）
+    if (idea.includes('扶養') || idea.includes('控除') || idea.includes('税金') || idea.includes('年収')) {
       return 'finance';
     }
-    if (idea.includes('ショッピング') || idea.includes('EC') || idea.includes('売買') || idea.includes('商品')) {
+    if (idea.includes('家計') || idea.includes('収入') || idea.includes('給与') || idea.includes('投資')) {
+      return 'finance';
+    }
+    
+    // 医療・健康関連
+    if (idea.includes('病院') || idea.includes('患者') || idea.includes('診療') || idea.includes('医療')) {
+      return 'health';
+    }
+    if (idea.includes('健康') || idea.includes('運動') || idea.includes('フィットネス')) {
+      return 'health';
+    }
+    
+    // 教育関連
+    if (idea.includes('学習') || idea.includes('教育') || idea.includes('勉強') || idea.includes('学校')) {
+      return 'education';
+    }
+    
+    // クリエイティブ関連
+    if (idea.includes('レシピ') || idea.includes('料理') || idea.includes('写真') || idea.includes('デザイン')) {
+      return 'creative';
+    }
+    
+    // エンターテイメント
+    if (idea.includes('ゲーム') || idea.includes('音楽') || idea.includes('動画') || idea.includes('エンタメ')) {
+      return 'entertainment';
+    }
+    
+    // EC・商取引
+    if (idea.includes('ショッピング') || idea.includes('EC') || idea.includes('購入') || idea.includes('販売')) {
       return 'ecommerce';
     }
+    
+    // ソーシャル
     if (idea.includes('SNS') || idea.includes('コミュニティ') || idea.includes('チャット') || idea.includes('友達')) {
       return 'social';
     }
-    if (idea.includes('タスク') || idea.includes('TODO') || idea.includes('管理') || idea.includes('スケジュール')) {
+    
+    // タスク管理（最後の手段として限定）
+    if (idea.includes('TODO') && idea.includes('タスク')) {
       return 'productivity';
     }
     
@@ -972,7 +992,7 @@ IMPORTANT:
       enhanced: `${keyTerms.slice(0, 2).join('・')}に特化したソリューション`,
       category: category,
       targetUsers: ['専門ユーザー', '業界関係者'],
-      keyFeatures: keyTerms.slice(0, 3).map(term => `${term}管理`),
+      keyFeatures: keyTerms.slice(0, 3).map(term => `${term}機能`),
       uniqueValue: `${category}分野の専門的アプローチ`,
       businessPotential: 'medium',
       insights: [`${category}業界に特化`, '実用性重視の設計']
