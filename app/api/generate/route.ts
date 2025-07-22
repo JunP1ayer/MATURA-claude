@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { hybridAI } from '@/lib/hybrid-ai-orchestrator';
 
 interface GenerateRequest {
-  userInput: string;
+  idea: string;
+  mode?: 'creative' | 'professional' | 'experimental' | 'balanced';
+  // Legacy support
+  userInput?: string;
   autonomous?: boolean;
   figmaFileId?: string;
   structureData?: any;
@@ -16,27 +19,25 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     console.log('Request body:', body);
-    const { userInput, autonomous = false, figmaFileId, structureData, optimizedPrompt } = body as GenerateRequest;
+    const { idea, userInput, mode = 'balanced' } = body as GenerateRequest;
+    const inputIdea = idea || userInput; // Legacy support
 
-    if (!userInput) {
+    if (!inputIdea || !inputIdea.trim()) {
       return NextResponse.json(
-        { error: 'ユーザー入力が必要です' },
+        { error: 'アイデアの入力が必要です' },
         { status: 400 }
       );
     }
 
-    console.log('🎭 [GENERATE-API] Starting hybrid AI generation for:', userInput);
+    console.log('🎭 [GENERATE-API] Starting hybrid AI generation for:', inputIdea);
 
-    // 自律モードやFigmaファイルIDに基づく設定調整
-    const hybridConfig = {
-      mode: autonomous ? 'experimental' : 'balanced',
-      useDesignSystem: !!figmaFileId,
-      creativityLevel: autonomous ? 'high' : 'medium',
-      qualityPriority: 'quality'
-    } as const;
-
-    // Hybrid AI システム実行
-    const generatedApp = await hybridAI.generateApp(userInput.trim(), hybridConfig);
+    // ハイブリッドAIシステム実行
+    const generatedApp = await hybridAI.generateApp(inputIdea.trim(), {
+      mode,
+      useDesignSystem: true,
+      creativityLevel: 'medium',
+      qualityPriority: 'quality' as const
+    });
     
     console.log('✅ [GENERATE-API] Generation completed with category:', generatedApp.idea.category);
 
