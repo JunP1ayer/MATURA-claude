@@ -145,6 +145,12 @@ export class FigmaEnhancedUIGenerator {
     // コンポーネント抽出
     const components = this.extractComponentsFromFigma(figmaData);
 
+    console.log('📐 [FIGMA-UI] Extracted design tokens:');
+    console.log('  - Colors:', Object.keys(colorPalette).length, 'color tokens');
+    console.log('  - Typography:', typography.headingSizes.length, 'heading sizes');
+    console.log('  - Spacing:', spacing.scale.length, 'spacing values');
+    console.log('  - Components:', Object.keys(components).reduce((sum, key) => sum + components[key].length, 0), 'total components');
+
     return {
       colorPalette,
       typography,

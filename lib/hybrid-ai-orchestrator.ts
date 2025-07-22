@@ -845,65 +845,92 @@ Focus on utility and user experience over complexity.`,
     console.log('🔄 [OPENAI] Starting Function Calling for component generation');
     console.log('🔄 [OPENAI] Category:', ideaData.category);
     console.log('🔄 [OPENAI] Enhanced idea:', ideaData.enhanced);
+    console.log('🔄 [OPENAI] Key Features:', ideaData.keyFeatures);
     
     const tableName = (schemaData as any)?.tableName || 'app_data';
     const fields = ((schemaData as any)?.fields || []).slice(0, 5);
     const colors = designInspiration.colorPalette || designSystem?.colorPalette || ['#6366f1', '#8b5cf6'];
     
-    const prompt = `Create a high-quality React TypeScript component for: "${ideaData.enhanced || ideaData.original}"
+    // カテゴリ別のUI指示を生成
+    const categoryUIGuidelines = this.getCategorySpecificUIGuidelines(ideaData.category, ideaData.keyFeatures);
+    
+    // Figmaデザイントークンを完全に活用
+    const figmaDesignSpecs = designSystem?.figmaTokens ? `
+Figma Design System Integration:
+- Spacing: ${designSystem.spacing?.join(', ') || '8px, 16px, 24px, 32px'}
+- Border Radius: ${designSystem.borderRadius?.join(', ') || '8px, 12px, 16px'}
+- Shadows: ${designSystem.shadows?.join(' | ') || 'standard elevation'}
+- Components: ${designSystem.components?.join(', ') || 'Card, Button, Input'}
+- Layout System: ${designSystem.layout || 'responsive grid'}` : '';
+    
+    const prompt = `Create a HIGHLY SPECIFIC React TypeScript component for: "${ideaData.enhanced || ideaData.original}"
 
-Application Details:
+🎯 Application Context:
 - Category: ${ideaData.category}
 - Component Name: ${this.generateComponentName(ideaData.original)}
-- Database Table: ${tableName}
-- Key Fields: ${fields.map((f: any) => `${f.name} (${f.type})`).join(', ')}
 - Target Users: ${ideaData.targetUsers?.join(', ') || 'General users'}
+- Unique Value: ${ideaData.uniqueValue || 'Specialized solution'}
 
-Design Specifications:
-- Style: ${designInspiration.mood || 'modern'} ${designSystem?.theme || 'premium'} design
-- Color Palette: ${colors.slice(0, 3).join(', ')}
-- Typography: ${designSystem?.typography?.heading || 'Inter, sans-serif'}
-- Layout: ${designSystem?.layout || 'responsive grid'}
+🛠️ SPECIFIC FEATURES TO IMPLEMENT:
+${ideaData.keyFeatures?.map((feature: string, index: number) => `${index + 1}. ${feature}`).join('\n') || '1. Core functionality'}
 
-Technical Requirements:
-- Use React 18+ with TypeScript
-- Implement shadcn/ui components (Card, Button, Input, Badge, Table, Form)
-- Full CRUD operations (Create, Read, Update, Delete)
-- Form validation with proper error handling
-- Loading states and empty states with proper UI feedback  
-- Responsive design optimized for mobile and desktop
-- Modern CSS with Tailwind classes and custom styling
-- Proper accessibility (a11y) attributes
-- Search and filter functionality if applicable
+📊 Database Schema:
+- Table: ${tableName}
+- Fields: ${fields.map((f: any) => `\n  - ${f.name} (${f.type}): ${f.label || f.name}`).join('')}
 
-UI/UX Guidelines:
-- Clean, modern interface with professional appearance
-- Smooth animations and transitions
-- Intuitive user flow and navigation
-- Proper spacing and typography hierarchy
-- Error states with helpful messages
-- Success feedback for user actions
+🎨 Design Specifications:
+- Style: ${designInspiration.mood || 'modern'} ${designInspiration.designStyle || 'professional'}
+- Primary Colors: ${colors.slice(0, 4).join(', ')}
+- Typography: Heading: ${designSystem?.typography?.heading || 'Inter'}, Body: ${designSystem?.typography?.body || 'Inter'}
+${figmaDesignSpecs}
 
-Generate a complete, production-ready React component that implements all CRUD operations for the ${tableName} table.`;
+${categoryUIGuidelines}
+
+⚡ Technical Requirements:
+1. Use React 18+ with TypeScript and proper type safety
+2. Implement shadcn/ui components matching the category context
+3. Full CRUD operations specific to ${tableName} entity
+4. Advanced form validation based on field types
+5. Real-time search/filter for ${ideaData.category} use cases
+6. Responsive design with category-specific breakpoints
+7. Smooth animations using framer-motion
+8. Accessibility (WCAG 2.1 AA compliant)
+9. Error boundaries and loading states
+10. Performance optimization with React.memo and useMemo
+
+🎯 IMPORTANT: 
+- DO NOT create a generic task management system
+- Focus on the SPECIFIC features listed above
+- Use UI patterns appropriate for ${ideaData.category} category
+- Implement actual business logic for ${ideaData.originalIdea || ideaData.original}
+- Make the component production-ready with proper error handling
+
+Generate a complete, unique, and specialized React component.`;
 
     // プロンプトサイズの確認
     const promptLength = prompt.length;
     console.log('📏 [OPENAI] Prompt length:', promptLength, 'characters');
     console.log('📏 [OPENAI] Estimated tokens:', Math.ceil(promptLength / 4)); // 大まかな推定
 
-    const systemMessage = `You are an expert React/TypeScript developer. Create a high-quality production-ready component with modern best practices.`;
+    const systemMessage = `You are an expert React/TypeScript developer specializing in ${ideaData.category} applications. 
+Create a highly specialized, production-ready component that:
+1. Implements the exact features requested, not generic CRUD
+2. Uses UI patterns specific to ${ideaData.category} domain
+3. Integrates Figma design tokens properly
+4. Avoids generic task management patterns
+5. Creates unique business logic for the specific use case`;
 
     const functionSchema = {
-      description: 'Generate enterprise-level React component with Figma + Gemini integration',
+      description: 'Generate specialized React component with domain-specific UI and business logic',
       parameters: {
         type: 'object',
         properties: {
           componentName: { type: 'string', description: 'Component name in PascalCase' },
-          componentCode: { type: 'string', description: 'Complete React component code' },
-          typeDefinitions: { type: 'string', description: 'TypeScript type definitions' },
-          customHooks: { type: 'string', description: 'Custom React hooks code' },
-          apiIntegration: { type: 'string', description: 'API integration code' },
-          storybook: { type: 'string', description: 'Storybook story for component testing' }
+          componentCode: { type: 'string', description: 'Complete React component with domain-specific UI' },
+          typeDefinitions: { type: 'string', description: 'TypeScript interfaces for domain entities' },
+          customHooks: { type: 'string', description: 'Custom hooks for business logic' },
+          utilityFunctions: { type: 'string', description: 'Helper functions for domain operations' },
+          stateManagement: { type: 'string', description: 'State management logic' }
         },
         required: ['componentName', 'componentCode', 'typeDefinitions']
       }
@@ -987,17 +1014,17 @@ Generate TypeScript React component with CRUD, shadcn/ui, Tailwind CSS.`,
   }
 
   /**
-   * フォールバックコンポーネント生成（カテゴリ対応）
+   * フォールバックコンポーネント生成（多様性向上版）
    */
   private generateFallbackComponent(ideaData: any, designInspiration: any, schemaData: any): string {
-    console.log('🔄 [FALLBACK] Generating fallback component for category:', ideaData.category);
-    console.log('🔄 [FALLBACK] Original idea:', ideaData.original);
+    console.log('🔄 [FALLBACK] Generating diverse fallback for:', ideaData.category);
+    console.log('🔄 [FALLBACK] Features:', ideaData.keyFeatures);
     
     const componentName = this.generateComponentName(ideaData.original);
-    const primaryColor = designInspiration.colorPalette?.[0] || '#3b82f6';
+    const colors = designInspiration.colorPalette || this.getCategoryColors(ideaData.category);
     const category = ideaData.category?.toLowerCase() || 'general';
     
-    // カテゴリ別のコンテンツを生成
+    // カテゴリと機能に基づいた特化型コンテンツ生成
     const categoryContent = this.generateCategorySpecificContent(category, ideaData.original);
     
     return `'use client';
@@ -1177,6 +1204,113 @@ export default function ${componentName}({ className }: ${componentName}Props) {
     </div>
   );
 }`;
+  }
+
+  /**
+   * カテゴリ別の具体的なUI指示を生成
+   */
+  private getCategorySpecificUIGuidelines(category: string, keyFeatures?: string[]): string {
+    const featureList = keyFeatures?.join(', ') || 'core features';
+    
+    const categoryGuidelines = {
+      finance: `
+💰 Finance-Specific UI Requirements:
+- Use data visualization (charts, graphs) for financial metrics
+- Implement calculator components for financial calculations
+- Add transaction tables with sorting and filtering
+- Include summary cards with key financial indicators
+- Use green/red color coding for profit/loss
+- Add date range pickers for financial periods
+- Implement export functionality for reports
+- Features to emphasize: ${featureList}`,
+      
+      social: `
+💬 Social/Content-Specific UI Requirements:
+- Rich text editor for content creation
+- Media upload and preview components
+- Comment/discussion threads UI
+- User profiles and avatars
+- Social sharing buttons
+- Content cards with engagement metrics
+- Tag/category system with filters
+- Features to emphasize: ${featureList}`,
+      
+      ecommerce: `
+🛍️ E-commerce-Specific UI Requirements:
+- Product grid/list views with toggle
+- Shopping cart sidebar/modal
+- Product image galleries with zoom
+- Price displays with currency formatting
+- Inventory status indicators
+- Quick add-to-cart buttons
+- Product filters (price, category, etc.)
+- Features to emphasize: ${featureList}`,
+      
+      health: `
+🏥 Health-Specific UI Requirements:
+- Health metrics dashboards
+- Progress charts and graphs
+- Input forms for health data
+- Calendar views for appointments/medication
+- Reminder/notification components
+- Data privacy indicators
+- Export health reports functionality
+- Features to emphasize: ${featureList}`,
+      
+      education: `
+📚 Education-Specific UI Requirements:
+- Course/lesson card layouts
+- Progress tracking bars
+- Quiz/assessment interfaces
+- Video player integration
+- Note-taking components
+- Achievement/badge displays
+- Study schedule calendars
+- Features to emphasize: ${featureList}`,
+      
+      creative: `
+🎨 Creative-Specific UI Requirements:
+- Gallery/portfolio layouts
+- Drag-and-drop interfaces
+- Color picker components
+- Preview panels
+- Creative tool palettes
+- Project organization systems
+- Collaboration indicators
+- Features to emphasize: ${featureList}`,
+      
+      entertainment: `
+🎮 Entertainment-Specific UI Requirements:
+- Media player interfaces
+- Playlist/collection management
+- Rating/review components
+- Recommendation cards
+- Genre/category filters
+- Social features (likes, shares)
+- Immersive full-screen modes
+- Features to emphasize: ${featureList}`,
+      
+      productivity: `
+📊 Productivity-Specific UI Requirements:
+- Kanban boards or list views
+- Time tracking components
+- Priority indicators
+- Deadline/calendar integration
+- Team collaboration features
+- Analytics dashboards
+- Workflow automation UI
+- Features to emphasize: ${featureList}`
+    };
+    
+    return categoryGuidelines[category as keyof typeof categoryGuidelines] || `
+🔧 General Application UI Requirements:
+- Clean, intuitive interface
+- Responsive data tables
+- Search and filter components
+- Action buttons with clear CTAs
+- Status indicators
+- Form validation feedback
+- Features to emphasize: ${featureList}`;
   }
 
   /**
