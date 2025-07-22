@@ -172,19 +172,41 @@ export class IntelligentDesignAnalyzer {
   private determineCategory(structured: StructuredData): DesignContext['category'] {
     const categoryKeywords = {
       dashboard: ['分析', 'メトリクス', 'データ', 'レポート', 'グラフ', 'チャート', 'ダッシュボード'],
-      productivity: ['タスク', '管理', 'TODO', 'プロジェクト', '効率', 'ワークフロー', '生産性'],
-      creative: ['デザイン', 'クリエイティブ', 'アート', 'ポートフォリオ', '作品', '制作'],
+      productivity: ['タスク', '管理', 'TODO', 'プロジェクト', '効率', 'ワークフロー', '生産性', '業務管理', 'スケジュール'],
+      creative: ['デザイン', 'クリエイティブ', 'アート', 'ポートフォリオ', '作品', '制作', 'レシピ', '料理', 'クリエーター', '創作', 'コンテンツ', 'メディア', '表現'],
       business: ['ビジネス', '企業', '営業', 'CRM', 'SaaS', '業務', '法人'],
-      social: ['SNS', 'ソーシャル', 'コミュニティ', 'チャット', '交流', '共有'],
-      ecommerce: ['EC', 'ショッピング', '販売', '商品', 'カート', '決済', 'オンラインストア']
+      social: ['SNS', 'ソーシャル', 'コミュニティ', 'チャット', '交流', '共有', 'フォーラム', '掲示板', 'グループ'],
+      ecommerce: ['EC', 'ショッピング', '販売', '商品', 'カート', '決済', 'オンラインストア', '通販', 'マーケット']
+    };
+    
+    // 拡張カテゴリキーワード - より幅広いドメインをカバー
+    const extendedKeywords = {
+      creative: ['ゲーム', '攻略', 'エンターテイメント', '娯楽', '趣味', 'ホビー', '映画', '音楽', 'ブログ', 'メディア', 'コレクション', '図鑑', 'カタログ', '写真', 'ギャラリー'],
+      social: ['フレンド', '友達', 'メンバー', '仲間', 'サークル', 'クラブ', 'イベント', 'ミーティング'],
+      dashboard: ['統計', '集計', '監視', 'モニタリング', '追跡', 'トラッキング'],
+      business: ['顧客', 'クライアント', '売上', '収益', '利益', '会計', '財務']
     };
     
     const allText = Object.values(structured).join(' ').toLowerCase();
     let maxScore = 0;
-    let bestCategory: DesignContext['category'] = 'productivity';
+    let bestCategory: DesignContext['category'] = 'creative'; // デフォルトを変更
     
+    // 基本キーワードマッチング
     Object.entries(categoryKeywords).forEach(([category, keywords]) => {
       const score = keywords.reduce((sum, keyword) => {
+        const count = (allText.match(new RegExp(keyword, 'g')) || []).length;
+        return sum + count * 2; // 基本キーワードの重み増加
+      }, 0);
+      
+      if (score > maxScore) {
+        maxScore = score;
+        bestCategory = category as DesignContext['category'];
+      }
+    });
+    
+    // 拡張キーワードマッチング
+    Object.entries(extendedKeywords).forEach(([category, keywords]) => {
+      let score = keywords.reduce((sum, keyword) => {
         const count = (allText.match(new RegExp(keyword, 'g')) || []).length;
         return sum + count;
       }, 0);
@@ -194,6 +216,31 @@ export class IntelligentDesignAnalyzer {
         bestCategory = category as DesignContext['category'];
       }
     });
+    
+    // 強制的なカテゴリマッチング（確実に適用されるように）
+    console.log('🔍 [CATEGORY-DEBUG] AllText:', allText);
+    console.log('🔍 [CATEGORY-DEBUG] Current bestCategory before override:', bestCategory, 'maxScore:', maxScore);
+    
+    // 強制的な上書きルール
+    if (allText.includes('ゲーム') || allText.includes('攻略') || allText.includes('データベース')) {
+      console.log('🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative');
+      bestCategory = 'creative';
+      maxScore = 100; // 強制的に高スコア
+    }
+    if (allText.includes('レシピ') || allText.includes('料理') || allText.includes('調理')) {
+      console.log('🍳 [CATEGORY-OVERRIDE] Recipe detected, forcing creative');
+      bestCategory = 'creative';
+      maxScore = 100; // 強制的に高スコア
+    }
+    
+    console.log('🔍 [CATEGORY-DEBUG] Final bestCategory after override:', bestCategory);
+    if (allText.includes('コレクション') || allText.includes('図鑑') || allText.includes('データベース')) {
+      // データベース系は創作的な用途が多い
+      if (allText.includes('ゲーム') || allText.includes('趣味') || allText.includes('コレクション')) {
+        return 'creative';
+      }
+      return 'dashboard';
+    }
     
     return bestCategory;
   }

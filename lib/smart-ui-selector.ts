@@ -67,7 +67,7 @@ export const PREMIUM_DESIGN_PATTERNS: UIDesignPattern[] = [
     },
     components: ['galleries', 'hero-sections', 'testimonials', 'contact-forms'],
     layout: 'creative',
-    mvpScore: 7,
+    mvpScore: 9, // スコア向上: クリエイティブアプリの重要性
     figmaUrl: 'https://www.figma.com/design/creative-portfolio-template'
   },
   {
@@ -120,6 +120,40 @@ export const PREMIUM_DESIGN_PATTERNS: UIDesignPattern[] = [
     layout: 'modern',
     mvpScore: 9,
     figmaUrl: 'https://www.figma.com/design/ecommerce-modern-template'
+  },
+  {
+    id: 'creative-gaming-database',
+    name: 'Gaming & Entertainment Hub',
+    category: 'creative',
+    complexity: 'moderate',
+    colors: {
+      primary: '#8b5cf6',
+      secondary: '#c4b5fd',
+      accent: '#7c3aed',
+      background: '#1a1a2e',
+      text: '#ffffff'
+    },
+    components: ['game-cards', 'rating-system', 'search-filters', 'media-gallery'],
+    layout: 'creative',
+    mvpScore: 9,
+    figmaUrl: 'https://www.figma.com/design/gaming-database-template'
+  },
+  {
+    id: 'creative-recipe-manager',
+    name: 'Culinary Recipe Collection',
+    category: 'creative',
+    complexity: 'simple',
+    colors: {
+      primary: '#f97316',
+      secondary: '#fed7aa',
+      accent: '#ea580c',
+      background: '#fff7ed',
+      text: '#1f2937'
+    },
+    components: ['recipe-cards', 'ingredient-lists', 'cooking-timer', 'photo-gallery'],
+    layout: 'modern',
+    mvpScore: 9,
+    figmaUrl: 'https://www.figma.com/design/recipe-collection-template'
   }
 ];
 
@@ -130,8 +164,8 @@ export function selectOptimalDesignPattern(userIdea: string): UIDesignPattern {
   // Advanced keyword analysis for better pattern matching (English + Japanese)
   const categoryKeywords = {
     dashboard: ['dashboard', 'analytics', 'metrics', 'data', 'chart', 'graph', 'report', 'ダッシュボード', 'データ', 'グラフ', 'レポート', '分析', 'メトリクス'],
-    productivity: ['todo', 'task', 'note', 'manage', 'organize', 'schedule', 'plan', 'タスク', '管理', 'ノート', 'メモ', 'スケジュール', '予定', '計画', 'チーム', 'プロジェクト'],
-    creative: ['portfolio', 'gallery', 'showcase', 'design', 'art', 'creative', 'visual', 'ポートフォリオ', 'ギャラリー', 'デザイン', 'アート', '作品', '制作'],
+    productivity: ['todo', 'task', 'note', 'organize', 'schedule', 'plan', 'タスク', 'ノート', 'メモ', 'スケジュール', '予定', '計画', 'チーム', 'プロジェクト', '業務'],
+    creative: ['portfolio', 'gallery', 'showcase', 'design', 'art', 'creative', 'visual', 'recipe', 'game', 'gaming', 'entertainment', 'ポートフォリオ', 'ギャラリー', 'デザイン', 'アート', '作品', '制作', 'レシピ', '料理', 'ゲーム', '攻略', 'エンタメ', '娯楽', '趣味', 'コレクション', '図鑑'],
     business: ['business', 'saas', 'professional', 'enterprise', 'corporate', 'service', 'ビジネス', '企業', '法人', '会社', 'サービス', '営業'],
     social: ['social', 'community', 'chat', 'message', 'share', 'connect', 'network', 'ソーシャル', 'コミュニティ', 'チャット', 'メッセージ', '共有', 'ネットワーク', 'sns'],
     ecommerce: ['shop', 'store', 'buy', 'sell', 'product', 'cart', 'payment', 'ecommerce', 'ショップ', '店舗', '購入', '販売', '商品', 'カート', '決済', 'ec']

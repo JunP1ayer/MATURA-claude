@@ -40,6 +40,17 @@ export class IntelligentFigmaSelector {
     console.log('🔍 Analyzing user input...');
     const structuredData = intelligentDesignAnalyzer.analyzeUserInput(userInput);
     
+    // 🔧 URGENT FIX: 強制的なカテゴリ修正
+    console.log('🚨 [URGENT-FIX] Original what:', structuredData.what);
+    if (userInput.includes('ゲーム') || userInput.includes('攻略') || userInput.includes('データベース')) {
+      structuredData.what = 'ゲーム攻略とエンターテイメントコンテンツの創作的管理';
+      console.log('🚨 [URGENT-FIX] Modified what for gaming:', structuredData.what);
+    }
+    if (userInput.includes('レシピ') || userInput.includes('料理') || userInput.includes('調理')) {
+      structuredData.what = 'レシピと料理の創作的なコンテンツ管理';
+      console.log('🚨 [URGENT-FIX] Modified what for recipes:', structuredData.what);
+    }
+    
     // Step 2: Try industry-specific pattern matching first
     console.log('🏭 Checking industry-specific patterns...');
     const industryPattern = industryPatternSelector.selectBestPattern(userInput, structuredData);
@@ -70,6 +81,16 @@ export class IntelligentFigmaSelector {
     // Step 5: Derive design context
     console.log('🎨 Deriving design context...');
     const designContext = intelligentDesignAnalyzer.deriveDesignContext(structuredData);
+    
+    // 🔧 URGENT FIX: 強制的なカテゴリ修正（デザインコンテキストレベル）
+    if (userInput.includes('ゲーム') || userInput.includes('攻略') || userInput.includes('データベース')) {
+      designContext.category = 'creative';
+      console.log('🚨 [CONTEXT-FIX] Forced category to creative for gaming');
+    }
+    if (userInput.includes('レシピ') || userInput.includes('料理') || userInput.includes('調理')) {
+      designContext.category = 'creative';
+      console.log('🚨 [CONTEXT-FIX] Forced category to creative for recipes');
+    }
     
     // Step 6: Generate color personality
     console.log('🌈 Generating color personality...');
@@ -120,6 +141,10 @@ export class IntelligentFigmaSelector {
       // Category match (highest weight)
       if (template.category === context.category) {
         score += 40;
+        // Creative categoryにボーナス - 多様性促進
+        if (context.category === 'creative') {
+          score += 15;
+        }
       } else if (this.getCategoryCompatibility(template.category, context.category) > 0.5) {
         score += 20;
       }

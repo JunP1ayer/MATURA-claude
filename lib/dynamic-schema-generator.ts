@@ -67,12 +67,12 @@ Format:
 {"category":"finance","dataType":"income_records","primaryActions":["record","track","alert"],"targetUser":"students and part-time workers","keyFeatures":["income tracking","threshold alerts","automatic calculation"],"requiredFields":[{"name":"amount","type":"number","description":"income amount","required":true},{"name":"source","type":"text","description":"income source","required":true},{"name":"date","type":"date","description":"income date","required":true}]}`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are a JSON formatter. Return only valid JSON objects, no other text." },
+        { role: "system", content: "You are a creative JSON formatter. Generate diverse and creative schema designs. Return only valid JSON objects, no other text." },
         { role: "user", content: prompt }
       ],
-      temperature: 0.1,
+      temperature: 0.3, // ランダム性を追加（0.1 → 0.3）
       max_tokens: 1000,
     });
 

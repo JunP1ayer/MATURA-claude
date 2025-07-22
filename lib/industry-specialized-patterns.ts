@@ -357,13 +357,13 @@ export class IndustryPatternSelector {
     // スコアでソート
     scores.sort((a, b) => b.score - a.score);
     
-    // 最高スコアのパターンを返す（閾値チェック）
+    // 最高スコアのパターンを返す（厳格な閾値チェック）
     const bestMatch = scores[0];
     console.log(`🔍 [PATTERN] Best match: ${bestMatch.pattern.id} (score=${bestMatch.score.toFixed(3)})`);
-    console.log(`🔍 [PATTERN] Threshold check: ${bestMatch.score >= 0.4 ? 'PASS' : 'FAIL'}`);
+    console.log(`🔍 [PATTERN] Threshold check: ${bestMatch.score >= 0.7 ? 'PASS' : 'FAIL'}`);
     
-    // Lower threshold to 0.4 since industry matching alone gives 0.4
-    return bestMatch.score >= 0.4 ? bestMatch.pattern : null;
+    // 厳格な閾値（0.7）を設定して、確実にマッチする場合のみ業界パターンを使用
+    return bestMatch.score >= 0.7 ? bestMatch.pattern : null;
   }
 
   /**

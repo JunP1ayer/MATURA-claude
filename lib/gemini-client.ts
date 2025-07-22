@@ -1,5 +1,6 @@
 /**
- * Gemini API Client for enhanced code generation
+ * Enhanced Gemini API Client for Creative AI Generation
+ * Optimized for ideation, creativity, and diverse content generation
  */
 
 interface GeminiRequest {
@@ -7,6 +8,28 @@ interface GeminiRequest {
   temperature?: number;
   maxTokens?: number;
   context?: string;
+  creativityMode?: 'conservative' | 'balanced' | 'experimental' | 'wild';
+  topP?: number;
+  topK?: number;
+}
+
+interface GeminiCreativeResponse {
+  success: boolean;
+  data?: string;
+  error?: string;
+  creativityScore?: number;
+  variations?: string[];
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  metadata?: {
+    model: string;
+    temperature: number;
+    processingTime: number;
+    safety: any;
+  };
 }
 
 interface GeminiResponse {
@@ -103,6 +126,309 @@ export class GeminiClient {
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
+  }
+
+  /**
+   * 創造的アイデア生成 - Geminiの強みを活用
+   */
+  async generateCreativeIdeas(
+    userInput: string,
+    options: Partial<GeminiRequest> = {}
+  ): Promise<GeminiCreativeResponse> {
+    const startTime = Date.now();
+    
+    const creativityConfig = this.getCreativityConfig(options.creativityMode || 'balanced');
+    
+    const prompt = `🌟 創造的AI思考モード 🌟
+
+ユーザーの入力: "${userInput}"
+
+あなたは世界最高レベルの創造的思考AIです。このアイデアを革新的で魅力的な方向に発展させてください。
+
+創造的思考プロセス:
+1. 🔍 本質の理解: ユーザーの真の欲求と背景を読み取る
+2. 🚀 可能性の拡張: 従来の枠を超えた斬新なアプローチを考案
+3. 🎨 体験の革新: ユーザー体験を根本から変える要素を追加
+4. 💡 価値の創造: 新しい価値や意味を生み出す視点を提示
+5. 🌈 多様性の提供: 複数の異なる方向性を提案
+
+以下のJSON形式で、創造的で実現可能なアイデア群を生成してください：
+
+{
+  "enhancedConcept": {
+    "title": "進化したアイデアのタイトル",
+    "description": "魅力的で具体的な説明",
+    "uniqueValue": "独自の価値提案",
+    "innovation": "革新的な要素"
+  },
+  "creativeVariations": [
+    {
+      "name": "バリエーション名",
+      "approach": "アプローチ",
+      "features": ["特徴1", "特徴2", "特徴3"],
+      "targetExperience": "目指すユーザー体験"
+    }
+  ],
+  "businessOpportunities": [
+    "ビジネス機会1",
+    "ビジネス機会2"
+  ],
+  "technicalInnovations": [
+    "技術革新案1",
+    "技術革新案2"
+  ],
+  "userExperienceBreakthroughs": [
+    "UX革新1",
+    "UX革新2"
+  ],
+  "marketDifferentiation": "市場での差別化戦略",
+  "futureVision": "将来的な発展の可能性"
+}
+
+${this.getCreativityPrompt(options.creativityMode || 'balanced')}`;
+
+    const result = await this.generateText({
+      prompt,
+      temperature: creativityConfig.temperature,
+      maxTokens: options.maxTokens || 2000,
+      ...creativityConfig
+    });
+
+    const processingTime = Date.now() - startTime;
+
+    if (result.success && result.data) {
+      try {
+        // JSON抽出を試行
+        const jsonMatch = result.data.match(/\{[\s\S]*\}/);
+        let parsedData = null;
+        
+        if (jsonMatch) {
+          parsedData = JSON.parse(jsonMatch[0]);
+        }
+
+        return {
+          success: true,
+          data: result.data,
+          creativityScore: this.calculateCreativityScore(result.data),
+          variations: parsedData?.creativeVariations?.map((v: any) => v.name) || [],
+          usage: result.usage,
+          metadata: {
+            model: 'gemini-1.5-flash',
+            temperature: creativityConfig.temperature,
+            processingTime,
+            safety: null
+          }
+        };
+      } catch (parseError) {
+        // JSON解析失敗でも基本情報は返す
+        return {
+          success: true,
+          data: result.data,
+          creativityScore: this.calculateCreativityScore(result.data),
+          variations: [],
+          usage: result.usage,
+          metadata: {
+            model: 'gemini-1.5-flash',
+            temperature: creativityConfig.temperature,
+            processingTime,
+            safety: null
+          }
+        };
+      }
+    }
+
+    return {
+      success: false,
+      error: result.error || 'Creative generation failed',
+      creativityScore: 0,
+      variations: []
+    };
+  }
+
+  /**
+   * 創造的デザインコンセプト生成
+   */
+  async generateDesignConcepts(
+    appIdea: string,
+    creativityLevel: 'conservative' | 'balanced' | 'experimental' | 'wild' = 'balanced'
+  ): Promise<GeminiCreativeResponse> {
+    const creativityConfig = this.getCreativityConfig(creativityLevel);
+    
+    const prompt = `🎨 デザイン創造モード 🎨
+
+アプリアイデア: "${appIdea}"
+
+あなたは世界的に有名なデザイナーです。このアプリに革新的で美しいデザインコンセプトを提案してください。
+
+デザイン思考プロセス:
+1. 🎯 ユーザーの感情的ニーズを理解
+2. 🌈 視覚的インパクトの創造
+3. ✨ インタラクションの革新
+4. 🔮 未来的体験の設計
+5. 💫 ブランド価値の構築
+
+以下のJSON形式でデザインコンセプトを生成してください：
+
+{
+  "primaryConcept": {
+    "name": "メインコンセプト名",
+    "philosophy": "デザイン哲学",
+    "moodKeywords": ["ムード1", "ムード2", "ムード3"],
+    "colorStory": "カラーストーリー"
+  },
+  "visualIdentity": {
+    "colorPalettes": [
+      {
+        "name": "パレット名",
+        "colors": ["#color1", "#color2", "#color3", "#color4"],
+        "emotion": "感情的効果",
+        "usage": "使用場面"
+      }
+    ],
+    "typography": {
+      "heading": "見出しフォント提案",
+      "body": "本文フォント提案",
+      "accent": "アクセントフォント提案",
+      "personality": "フォントの個性"
+    },
+    "imagery": {
+      "style": "画像スタイル",
+      "iconApproach": "アイコンアプローチ",
+      "photographyMood": "写真の雰囲気"
+    }
+  },
+  "interactionDesign": {
+    "philosophy": "インタラクション哲学",
+    "keyAnimations": ["アニメーション1", "アニメーション2"],
+    "microInteractions": ["マイクロインタラクション1", "マイクロインタラクション2"],
+    "navigationStyle": "ナビゲーションスタイル"
+  },
+  "innovativeFeatures": [
+    {
+      "name": "革新機能名",
+      "description": "機能説明",
+      "userBenefit": "ユーザーメリット"
+    }
+  ],
+  "emotionalJourney": {
+    "onboarding": "オンボーディング体験",
+    "dailyUse": "日常使用体験",
+    "achievement": "達成体験"
+  }
+}
+
+${this.getCreativityPrompt(creativityLevel)}
+
+特に視覚的インパクトと感情的つながりを重視してください。`;
+
+    const result = await this.generateText({
+      prompt,
+      temperature: creativityConfig.temperature,
+      maxTokens: 2500,
+      ...creativityConfig
+    });
+
+    if (result.success) {
+      return {
+        success: true,
+        data: result.data,
+        creativityScore: this.calculateCreativityScore(result.data || ''),
+        usage: result.usage,
+        metadata: {
+          model: 'gemini-1.5-flash',
+          temperature: creativityConfig.temperature,
+          processingTime: 0,
+          safety: null
+        }
+      };
+    }
+
+    return {
+      success: false,
+      error: result.error,
+      creativityScore: 0
+    };
+  }
+
+  /**
+   * 創造性設定の取得
+   */
+  private getCreativityConfig(mode: string) {
+    const configs = {
+      conservative: {
+        temperature: 0.6,
+        topP: 0.8,
+        topK: 40
+      },
+      balanced: {
+        temperature: 0.8,
+        topP: 0.9,
+        topK: 60
+      },
+      experimental: {
+        temperature: 1.0,
+        topP: 0.95,
+        topK: 80
+      },
+      wild: {
+        temperature: 1.2,
+        topP: 1.0,
+        topK: 100
+      }
+    };
+
+    return configs[mode as keyof typeof configs] || configs.balanced;
+  }
+
+  /**
+   * 創造性プロンプトの取得
+   */
+  private getCreativityPrompt(mode: string): string {
+    const prompts = {
+      conservative: '実用性を重視しつつ、適度な創造性を発揮してください。',
+      balanced: '創造性と実用性のバランスを保ち、革新的だが実現可能なアイデアを提案してください。',
+      experimental: '大胆で革新的なアイデアを恐れずに提案してください。従来の常識を覆すような発想を歓迎します。',
+      wild: '制約を忘れ、最大限の創造性を発揮してください。SF的、未来的、非常識なアイデアも大歓迎です！'
+    };
+
+    return prompts[mode as keyof typeof prompts] || prompts.balanced;
+  }
+
+  /**
+   * 創造性スコア計算
+   */
+  private calculateCreativityScore(content: string): number {
+    let score = 0.5; // ベーススコア
+
+    // 長さによる評価
+    if (content.length > 500) score += 0.1;
+    if (content.length > 1000) score += 0.1;
+
+    // キーワードによる創造性判定
+    const creativeKeywords = [
+      '革新', '独創', '斬新', '画期的', '未来的', '創造的', 
+      '変革', '進化', 'イノベーション', 'ブレイクスルー',
+      '体験', '感情', '驚き', '魅力', 'ユニーク'
+    ];
+
+    creativeKeywords.forEach(keyword => {
+      if (content.includes(keyword)) score += 0.02;
+    });
+
+    // JSON構造の複雑さ
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        const keys = Object.keys(parsed);
+        if (keys.length >= 5) score += 0.1;
+        if (keys.length >= 8) score += 0.1;
+      }
+    } catch (e) {
+      // JSON解析失敗は問題なし
+    }
+
+    return Math.min(score, 1.0);
   }
 
   /**

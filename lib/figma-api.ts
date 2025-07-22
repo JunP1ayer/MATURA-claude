@@ -1,5 +1,47 @@
-// Figma API integration for design template processing
+// Enhanced Figma API integration for hybrid AI system
 import { PREMIUM_DESIGN_PATTERNS, UIDesignPattern } from './smart-ui-selector';
+
+export interface FigmaDesignTokens {
+  colors: {
+    primary: string[];
+    secondary: string[];
+    neutral: string[];
+    semantic: {
+      success: string;
+      warning: string;
+      error: string;
+      info: string;
+    };
+  };
+  typography: {
+    fontFamilies: string[];
+    fontSizes: number[];
+    fontWeights: number[];
+    lineHeights: number[];
+  };
+  spacing: {
+    scale: number[];
+    breakpoints: {
+      mobile: number;
+      tablet: number;
+      desktop: number;
+    };
+  };
+  shadows: Array<{
+    name: string;
+    x: number;
+    y: number;
+    blur: number;
+    spread: number;
+    color: string;
+  }>;
+  borderRadius: number[];
+  components: Array<{
+    name: string;
+    category: string;
+    properties: any;
+  }>;
+}
 
 export interface FigmaComponent {
   id: string;
@@ -174,6 +216,255 @@ export class FigmaDesignExtractor {
       accent: sortedColors[2] || defaultColors.accent,
       background: sortedColors[3] || defaultColors.background,
       text: sortedColors[4] || defaultColors.text,
+    };
+  }
+
+  /**
+   * Extract comprehensive design tokens from Figma file
+   */
+  async extractDesignTokens(fileId: string): Promise<FigmaDesignTokens | null> {
+    if (!this.accessToken) {
+      console.warn('Figma access token not available, using default design tokens');
+      return this.getDefaultDesignTokens();
+    }
+
+    try {
+      console.log('🎨 [FIGMA] Extracting design tokens from file:', fileId);
+      
+      // Fetch file data
+      const response = await fetch(`https://api.figma.com/v1/files/${fileId}`, {
+        headers: {
+          'X-Figma-Token': this.accessToken,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn(`Figma API error: ${response.status}, using defaults`);
+        return this.getDefaultDesignTokens();
+      }
+
+      const data = await response.json();
+      const document = data.document;
+
+      // Extract design tokens
+      const tokens = this.parseDesignTokens(document);
+      
+      console.log('✅ [FIGMA] Design tokens extracted successfully');
+      return tokens;
+
+    } catch (error: any) {
+      console.warn('Figma token extraction failed:', error?.message || 'Unknown error');
+      return this.getDefaultDesignTokens();
+    }
+  }
+
+  /**
+   * Parse design tokens from Figma document
+   */
+  private parseDesignTokens(document: any): FigmaDesignTokens {
+    const colors = this.extractColorTokens(document);
+    const typography = this.extractTypography(document);
+    const spacing = this.extractSpacing(document);
+    const shadows = this.extractShadows(document);
+    const components = this.extractComponentTokens(document);
+
+    return {
+      colors,
+      typography,
+      spacing,
+      shadows,
+      borderRadius: [4, 8, 12, 16, 24, 32],
+      components
+    };
+  }
+
+  /**
+   * Extract color tokens
+   */
+  private extractColorTokens(document: any): FigmaDesignTokens['colors'] {
+    const colorMap = new Map<string, number>();
+    
+    this.traverseNode(document, (node: any) => {
+      if (node.fills) {
+        node.fills.forEach((fill: any) => {
+          if (fill.type === 'SOLID' && fill.color) {
+            const hex = this.figmaColorToHex(fill.color);
+            colorMap.set(hex, (colorMap.get(hex) || 0) + 1);
+          }
+        });
+      }
+    });
+
+    const sortedColors = Array.from(colorMap.entries())
+      .sort(([,a], [,b]) => b - a)
+      .map(([color]) => color);
+
+    return {
+      primary: sortedColors.slice(0, 3),
+      secondary: sortedColors.slice(3, 6),
+      neutral: sortedColors.slice(6, 10),
+      semantic: {
+        success: '#22c55e',
+        warning: '#f59e0b', 
+        error: '#ef4444',
+        info: '#3b82f6'
+      }
+    };
+  }
+
+  /**
+   * Extract typography tokens
+   */
+  private extractTypography(document: any): FigmaDesignTokens['typography'] {
+    const fontFamilies = new Set<string>();
+    const fontSizes = new Set<number>();
+    const fontWeights = new Set<number>();
+    const lineHeights = new Set<number>();
+
+    this.traverseNode(document, (node: any) => {
+      if (node.style) {
+        if (node.style.fontFamily) fontFamilies.add(node.style.fontFamily);
+        if (node.style.fontSize) fontSizes.add(node.style.fontSize);
+        if (node.style.fontWeight) fontWeights.add(node.style.fontWeight);
+        if (node.style.lineHeightPx) lineHeights.add(node.style.lineHeightPx);
+      }
+    });
+
+    return {
+      fontFamilies: Array.from(fontFamilies),
+      fontSizes: Array.from(fontSizes).sort((a, b) => a - b),
+      fontWeights: Array.from(fontWeights).sort((a, b) => a - b),
+      lineHeights: Array.from(lineHeights).sort((a, b) => a - b)
+    };
+  }
+
+  /**
+   * Extract spacing tokens
+   */
+  private extractSpacing(document: any): FigmaDesignTokens['spacing'] {
+    return {
+      scale: [4, 8, 12, 16, 20, 24, 32, 40, 48, 64],
+      breakpoints: {
+        mobile: 768,
+        tablet: 1024,
+        desktop: 1280
+      }
+    };
+  }
+
+  /**
+   * Extract shadow tokens
+   */
+  private extractShadows(document: any): FigmaDesignTokens['shadows'] {
+    const shadows: FigmaDesignTokens['shadows'] = [];
+
+    this.traverseNode(document, (node: any) => {
+      if (node.effects) {
+        node.effects.forEach((effect: any) => {
+          if (effect.type === 'DROP_SHADOW') {
+            shadows.push({
+              name: `shadow-${shadows.length + 1}`,
+              x: effect.offset?.x || 0,
+              y: effect.offset?.y || 0,
+              blur: effect.radius || 0,
+              spread: effect.spread || 0,
+              color: effect.color ? this.figmaColorToHex(effect.color) : '#000000'
+            });
+          }
+        });
+      }
+    });
+
+    return shadows;
+  }
+
+  /**
+   * Extract component tokens
+   */
+  private extractComponentTokens(document: any): FigmaDesignTokens['components'] {
+    const components: FigmaDesignTokens['components'] = [];
+
+    this.traverseNode(document, (node: any) => {
+      if (node.type === 'COMPONENT' || node.type === 'COMPONENT_SET') {
+        components.push({
+          name: node.name,
+          category: this.categorizeComponent(node.name),
+          properties: {
+            width: node.absoluteBoundingBox?.width,
+            height: node.absoluteBoundingBox?.height,
+            type: node.type
+          }
+        });
+      }
+    });
+
+    return components;
+  }
+
+  /**
+   * Traverse Figma document tree
+   */
+  private traverseNode(node: any, callback: (node: any) => void): void {
+    callback(node);
+    if (node.children) {
+      node.children.forEach((child: any) => this.traverseNode(child, callback));
+    }
+  }
+
+  /**
+   * Categorize component by name
+   */
+  private categorizeComponent(name: string): string {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes('button')) return 'button';
+    if (lowerName.includes('input') || lowerName.includes('field')) return 'input';
+    if (lowerName.includes('card')) return 'card';
+    if (lowerName.includes('nav') || lowerName.includes('menu')) return 'navigation';
+    if (lowerName.includes('modal') || lowerName.includes('dialog')) return 'modal';
+    return 'other';
+  }
+
+  /**
+   * Default design tokens fallback
+   */
+  private getDefaultDesignTokens(): FigmaDesignTokens {
+    return {
+      colors: {
+        primary: ['#3b82f6', '#1d4ed8', '#1e40af'],
+        secondary: ['#64748b', '#475569', '#334155'],
+        neutral: ['#f8fafc', '#e2e8f0', '#cbd5e1', '#94a3b8'],
+        semantic: {
+          success: '#22c55e',
+          warning: '#f59e0b',
+          error: '#ef4444',
+          info: '#3b82f6'
+        }
+      },
+      typography: {
+        fontFamilies: ['Inter', 'Roboto', 'system-ui'],
+        fontSizes: [12, 14, 16, 18, 20, 24, 32, 48],
+        fontWeights: [400, 500, 600, 700],
+        lineHeights: [1.2, 1.4, 1.5, 1.6]
+      },
+      spacing: {
+        scale: [4, 8, 12, 16, 20, 24, 32, 40, 48, 64],
+        breakpoints: {
+          mobile: 768,
+          tablet: 1024,
+          desktop: 1280
+        }
+      },
+      shadows: [
+        { name: 'sm', x: 0, y: 1, blur: 2, spread: 0, color: '#0000000d' },
+        { name: 'md', x: 0, y: 4, blur: 6, spread: -1, color: '#0000001a' },
+        { name: 'lg', x: 0, y: 10, blur: 15, spread: -3, color: '#0000001a' }
+      ],
+      borderRadius: [4, 8, 12, 16, 24, 32],
+      components: [
+        { name: 'Button', category: 'button', properties: {} },
+        { name: 'Input', category: 'input', properties: {} },
+        { name: 'Card', category: 'card', properties: {} }
+      ]
     };
   }
 

@@ -32,47 +32,72 @@ export async function POST(req: NextRequest) {
     
     console.log('✅ [UNIVERSAL-API] Generation completed with confidence:', generatedApp.confidence);
 
-    // データベースに保存
+    // データベースに保存（エラーハンドリング強化）
     let savedApp = null;
     try {
-      const appData = {
-        name: `${idea.slice(0, 50)}${idea.length > 50 ? '...' : ''}`,
-        description: `AI生成アプリ - ${generatedApp.intent.category}カテゴリ`,
-        user_idea: idea,
-        schema: {
-          tableName: generatedApp.schema.tableName,
-          fields: generatedApp.schema.fields.map(field => ({
-            name: field.name,
-            type: field.type,
-            nullable: !field.required,
-            primaryKey: field.name === 'id'
-          }))
-        },
-        generated_code: generatedApp.code,
-        app_type: 'universal',
-        metadata: {
-          intent: generatedApp.intent,
-          ui: generatedApp.ui,
-          confidence: generatedApp.confidence,
-          generationTime: Date.now() - startTime,
-          generatedAt: new Date().toISOString()
-        }
-      };
-
-      const { data, error } = await supabase
-        .from('generated_apps')
-        .insert([appData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('❌ [UNIVERSAL-API] Database save failed:', error);
+      // Supabase接続確認
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('demo') || supabaseKey.includes('demo')) {
+        console.log('⚠️ [UNIVERSAL-API] Supabase not configured, skipping database save');
+        savedApp = {
+          id: 'demo-' + Math.random().toString(36).substr(2, 9),
+          name: `${idea.slice(0, 50)}${idea.length > 50 ? '...' : ''}`,
+          created_at: new Date().toISOString()
+        };
       } else {
-        savedApp = data;
-        console.log('✅ [UNIVERSAL-API] App saved to database:', data.id);
+        const appData = {
+          name: `${idea.slice(0, 50)}${idea.length > 50 ? '...' : ''}`,
+          description: `AI生成アプリ - ${generatedApp.intent.category}カテゴリ`,
+          user_idea: idea,
+          schema: {
+            tableName: generatedApp.schema.tableName,
+            fields: generatedApp.schema.fields.map(field => ({
+              name: field.name,
+              type: field.type,
+              nullable: !field.required,
+              primaryKey: field.name === 'id'
+            }))
+          },
+          generated_code: generatedApp.code,
+          app_type: 'universal',
+          metadata: {
+            intent: generatedApp.intent,
+            ui: generatedApp.ui,
+            confidence: generatedApp.confidence,
+            generationTime: Date.now() - startTime,
+            generatedAt: new Date().toISOString()
+          }
+        };
+
+        const { data, error } = await supabase
+          .from('generated_apps')
+          .insert([appData])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('❌ [UNIVERSAL-API] Database save failed:', error);
+          // フォールバック
+          savedApp = {
+            id: 'fallback-' + Math.random().toString(36).substr(2, 9),
+            name: appData.name,
+            created_at: new Date().toISOString()
+          };
+        } else {
+          savedApp = data;
+          console.log('✅ [UNIVERSAL-API] App saved to database:', data.id);
+        }
       }
     } catch (dbError) {
       console.error('❌ [UNIVERSAL-API] Database error:', dbError);
+      // フォールバック
+      savedApp = {
+        id: 'error-' + Math.random().toString(36).substr(2, 9),
+        name: `${idea.slice(0, 50)}${idea.length > 50 ? '...' : ''}`,
+        created_at: new Date().toISOString()
+      };
     }
 
     const totalTime = Date.now() - startTime;

@@ -97,18 +97,24 @@ export class FigmaEnhancedUIGenerator {
 
       if (!figmaApiKey || !figmaFileId) {
         console.log('⚠️ [FIGMA-UI] Figma API not configured, using fallback');
+        console.log(`[FIGMA-UI] API Key exists: ${!!figmaApiKey}, File ID: ${figmaFileId || 'missing'}`);
         return this.createFallbackDesignSystem(intent);
       }
+      
+      console.log(`🔍 [FIGMA-UI] Attempting to fetch Figma file: ${figmaFileId}`);
+      console.log(`[FIGMA-UI] API Key prefix: ${figmaApiKey?.substring(0, 7)}...`);
 
       // Figmaファイルからデザイントークンを取得
       const figmaResponse = await fetch(`https://api.figma.com/v1/files/${figmaFileId}`, {
         headers: {
           'X-Figma-Token': figmaApiKey
-        }
+        },
+        timeout: 5000
       });
 
       if (!figmaResponse.ok) {
-        throw new Error('Figma API request failed');
+        console.log(`⚠️ [FIGMA-UI] API request failed: ${figmaResponse.status}, using fallback`);
+        return this.createFallbackDesignSystem(intent);
       }
 
       const figmaData = await figmaResponse.json();
@@ -267,12 +273,40 @@ ${designPattern.name} - ${designPattern.config.emphasis}
         throw new Error('Gemini UI customization failed');
       }
 
-      const jsonMatch = response.data.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in Gemini response');
+      // 複数のJSONパターンを試行
+      const patterns = [
+        /\{[\s\S]*\}/,  // 基本パターン
+        /```json\s*(\{[\s\S]*?\})\s*```/, // コードブロック内
+        /json\s*(\{[\s\S]*?\})/, // json prefix付き
+        /(\{[\s\S]*?\})/  // より厳密なパターン
+      ];
+
+      let customConfig = null;
+      for (const pattern of patterns) {
+        const match = response.data.match(pattern);
+        if (match) {
+          const jsonStr = match[1] || match[0];
+          try {
+            // 不正な文字を修正
+            const cleanedJson = jsonStr
+              .replace(/'/g, '"')  // シングルクォートをダブルクォートに
+              .replace(/,\s*}/g, '}')  // trailing commaを削除
+              .replace(/,\s*]/g, ']')  // trailing commaを削除
+              .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":'); // キーをクォート
+
+            customConfig = JSON.parse(cleanedJson);
+            break;
+          } catch (parseError) {
+            console.log(`[FIGMA-UI] Parse attempt failed:`, parseError);
+            continue;
+          }
+        }
       }
 
-      const customConfig = JSON.parse(jsonMatch[0]);
+      if (!customConfig) {
+        console.log('⚠️ [FIGMA-UI] No valid JSON found, using intelligent fallback');
+        return this.createFallbackUIConfig(intent, designPattern);
+      }
       
       return {
         theme: customConfig.theme,
@@ -400,16 +434,62 @@ ${designPattern.name} - ${designPattern.config.emphasis}
   }
 
   private createFallbackUIConfig(intent: AppIntent, designPattern: any): UIConfiguration {
-    return {
-      theme: {
-        primaryColor: designPattern.config.primaryColor,
-        secondaryColor: '#64748b',
-        backgroundColor: '#ffffff'
+    // カテゴリ別インテリジェントフォールバック
+    const categoryConfigs = {
+      creative: {
+        theme: { primaryColor: '#8b5cf6', secondaryColor: '#a855f7', backgroundColor: '#fefefe' },
+        layout: 'grid' as const,
+        components: ['Card', 'ImageUpload', 'Gallery', 'Rating']
       },
-      layout: designPattern.config.layout,
-      components: ['Card', 'Button', 'Input', 'Form'],
-      interactions: ['click', 'hover', 'focus'],
-      designTokens: {},
+      entertainment: {
+        theme: { primaryColor: '#ef4444', secondaryColor: '#f97316', backgroundColor: '#fefefe' },
+        layout: 'dashboard' as const,
+        components: ['Card', 'Progress', 'Avatar', 'Leaderboard']
+      },
+      education: {
+        theme: { primaryColor: '#3b82f6', secondaryColor: '#1d4ed8', backgroundColor: '#fefefe' },
+        layout: 'list' as const,
+        components: ['Card', 'Progress', 'Quiz', 'Certificate']
+      },
+      health: {
+        theme: { primaryColor: '#059669', secondaryColor: '#10b981', backgroundColor: '#f0fdf4' },
+        layout: 'form' as const,
+        components: ['Card', 'Chart', 'Calendar', 'Tracker']
+      },
+      finance: {
+        theme: { primaryColor: '#1e40af', secondaryColor: '#3b82f6', backgroundColor: '#f8fafc' },
+        layout: 'dashboard' as const,
+        components: ['Card', 'Chart', 'Table', 'Calculator']
+      },
+      ecommerce: {
+        theme: { primaryColor: '#dc2626', secondaryColor: '#ea580c', backgroundColor: '#fefefe' },
+        layout: 'grid' as const,
+        components: ['ProductCard', 'Cart', 'Payment', 'Review']
+      },
+      social: {
+        theme: { primaryColor: '#ec4899', secondaryColor: '#f472b6', backgroundColor: '#fefefe' },
+        layout: 'list' as const,
+        components: ['Card', 'Avatar', 'Chat', 'Feed']
+      },
+      productivity: {
+        theme: { primaryColor: '#6366f1', secondaryColor: '#8b5cf6', backgroundColor: '#f8fafc' },
+        layout: 'list' as const,
+        components: ['Card', 'Checkbox', 'Calendar', 'Table']
+      }
+    };
+
+    const config = categoryConfigs[intent.category as keyof typeof categoryConfigs] || categoryConfigs.creative;
+
+    return {
+      theme: config.theme,
+      layout: config.layout,
+      components: config.components,
+      interactions: ['click', 'hover', 'focus', 'drag'],
+      designTokens: {
+        borderRadius: '8px',
+        shadows: ['sm', 'md'],
+        animations: ['fadeIn', 'slideUp']
+      },
       componentLibrary: ['shadcn/ui']
     };
   }

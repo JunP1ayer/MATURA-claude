@@ -30,10 +30,10 @@ export class RobustLLMSystem {
   constructor(config?: Partial<LLMSystemConfig>) {
     this.gemini = new GeminiClient();
     this.config = {
-      maxRetries: 3,
-      timeoutMs: 30000,
+      maxRetries: 2, // OpenAI最適化で試行回数を削減
+      timeoutMs: 45000, // OpenAI用にタイムアウトを延長
       fallbackEnabled: true,
-      qualityThreshold: 0.8,
+      qualityThreshold: 0.9, // OpenAI使用時は高品質を要求
       ...config
     };
   }
@@ -50,39 +50,50 @@ export class RobustLLMSystem {
     const startTime = Date.now();
     let attempts = 0;
 
-    // Phase 1: OpenAI Function Calling (Primary)
-    for (let i = 0; i < this.config.maxRetries; i++) {
-      attempts++;
-      try {
-        console.log(`🔄 [ROBUST-LLM] OpenAI attempt ${attempts}/${this.config.maxRetries}`);
-        
-        const result = await this.callOpenAIFunction<T>(
-          functionName,
-          functionSchema,
-          prompt,
-          systemMessage
-        );
-
-        if (result.success && result.data) {
-          const confidence = this.calculateConfidence(result.data, 'openai');
+    // Phase 1: OpenAI Function Calling (Primary) - Skip if API key issues
+    const openaiAvailable = await this.checkOpenAIAvailability();
+    
+    if (openaiAvailable) {
+      for (let i = 0; i < this.config.maxRetries; i++) {
+        attempts++;
+        try {
+          console.log(`🔄 [ROBUST-LLM] OpenAI attempt ${attempts}/${this.config.maxRetries}`);
           
-          if (confidence >= this.config.qualityThreshold) {
-            console.log('✅ [ROBUST-LLM] OpenAI success with high confidence:', confidence);
-            return {
-              success: true,
-              data: result.data,
-              provider: 'openai',
-              attempts,
-              confidence,
-              processingTime: Date.now() - startTime
-            };
-          } else {
-            console.log('⚠️ [ROBUST-LLM] OpenAI low confidence, retrying:', confidence);
+          const result = await this.callOpenAIFunction<T>(
+            functionName,
+            functionSchema,
+            prompt,
+            systemMessage
+          );
+
+          if (result.success && result.data) {
+            const confidence = this.calculateConfidence(result.data, 'openai');
+            
+            if (confidence >= this.config.qualityThreshold) {
+              console.log('✅ [ROBUST-LLM] OpenAI success with high confidence:', confidence);
+              return {
+                success: true,
+                data: result.data,
+                provider: 'openai',
+                attempts,
+                confidence,
+                processingTime: Date.now() - startTime
+              };
+            } else {
+              console.log('⚠️ [ROBUST-LLM] OpenAI low confidence, retrying:', confidence);
+            }
+          }
+        } catch (error) {
+          console.log('❌ [ROBUST-LLM] OpenAI attempt failed:', error);
+          // If it's an API key error, skip remaining OpenAI attempts
+          if (error.toString().includes('401') || error.toString().includes('API key')) {
+            console.log('🚫 [ROBUST-LLM] OpenAI API key error, skipping to Gemini');
+            break;
           }
         }
-      } catch (error) {
-        console.log('❌ [ROBUST-LLM] OpenAI attempt failed:', error);
       }
+    } else {
+      console.log('🚫 [ROBUST-LLM] OpenAI not available, skipping to Gemini');
     }
 
     // Phase 2: Gemini Fallback (Secondary)
@@ -142,35 +153,45 @@ export class RobustLLMSystem {
       );
 
       const apiPromise = openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           ...(systemMessage ? [{ role: "system" as const, content: systemMessage }] : []),
           { role: "user" as const, content: prompt }
         ],
-        functions: [
+        tools: [
           {
-            name: functionName,
-            description: functionSchema.description,
-            parameters: functionSchema.parameters
+            type: "function",
+            function: {
+              name: functionName,
+              description: functionSchema.description,
+              parameters: functionSchema.parameters
+            }
           }
         ],
-        function_call: { name: functionName },
-        temperature: 0.2,
+        tool_choice: { type: "function", function: { name: functionName } },
+        temperature: 0.5,
         max_tokens: 3000
       });
 
       const response = await Promise.race([apiPromise, timeoutPromise]) as any;
       
-      const functionCall = response.choices[0]?.message?.function_call;
-      if (!functionCall?.arguments) {
-        throw new Error('No function call response');
+      const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+      if (!toolCall?.function?.arguments) {
+        throw new Error('No tool call response');
       }
 
-      const parsedData = JSON.parse(functionCall.arguments);
+      const parsedData = JSON.parse(toolCall.function.arguments);
       
       // Validation
       if (!this.validateFunctionResponse(parsedData, functionSchema)) {
         throw new Error('Function response validation failed');
+      }
+
+      // Data sanitization for known issues
+      if (functionName === 'analyze_app_intent') {
+        this.sanitizeIntentData(parsedData);
+      } else if (functionName === 'generate_database_schema') {
+        this.sanitizeSchemaData(parsedData);
       }
 
       return { success: true, data: parsedData };
@@ -335,6 +356,107 @@ ${JSON.stringify(functionSchema.parameters, null, 2)}
     }
 
     return Math.min(confidence, 1.0);
+  }
+
+  /**
+   * Data sanitization for intent analysis
+   */
+  private sanitizeIntentData(data: any): void {
+    // Ensure targetUsers is always an array
+    if (typeof data.targetUsers === 'string') {
+      data.targetUsers = [data.targetUsers];
+    } else if (!Array.isArray(data.targetUsers)) {
+      data.targetUsers = ['一般ユーザー'];
+    }
+    
+    // Ensure keyFeatures is always an array
+    if (typeof data.keyFeatures === 'string') {
+      data.keyFeatures = [data.keyFeatures];
+    } else if (!Array.isArray(data.keyFeatures)) {
+      data.keyFeatures = ['基本機能'];
+    }
+
+    // Ensure required string fields exist
+    if (!data.primaryPurpose || typeof data.primaryPurpose !== 'string') {
+      data.primaryPurpose = 'データ管理システム';
+    }
+    
+    if (!data.dataToManage || typeof data.dataToManage !== 'string') {
+      data.dataToManage = 'アプリケーションデータ';
+    }
+  }
+
+  /**
+   * Data sanitization for schema generation
+   */
+  private sanitizeSchemaData(data: any): void {
+    // Ensure tableName exists
+    if (!data.tableName || typeof data.tableName !== 'string') {
+      data.tableName = 'app_data';
+    }
+    
+    // Ensure description exists
+    if (!data.description || typeof data.description !== 'string') {
+      data.description = 'アプリケーションデータの管理';
+    }
+    
+    // Ensure fields is always an array
+    if (!Array.isArray(data.fields)) {
+      data.fields = [
+        { name: 'id', label: 'ID', type: 'text', required: true },
+        { name: 'title', label: 'タイトル', type: 'text', required: true },
+        { name: 'description', label: '説明', type: 'text', required: false },
+        { name: 'created_at', label: '作成日', type: 'date', required: true }
+      ];
+    }
+    
+    // Validate each field object
+    data.fields = data.fields.map((field: any) => ({
+      name: field.name || 'field',
+      label: field.label || 'フィールド',
+      type: field.type || 'text',
+      required: typeof field.required === 'boolean' ? field.required : false,
+      placeholder: field.placeholder || '',
+      validation: field.validation || ''
+    }));
+  }
+
+  /**
+   * Check OpenAI availability without throwing errors
+   */
+  private async checkOpenAIAvailability(): Promise<boolean> {
+    try {
+      // Check OpenAI API key availability
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey || apiKey.length < 20 || !apiKey.startsWith('sk-')) {
+        console.log('🚫 [ROBUST-LLM] OpenAI API key not available or invalid');
+        return false;
+      }
+      
+      // Quick validation with OpenAI API
+      try {
+        const testResponse = await fetch('https://api.openai.com/v1/models', {
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+        
+        if (testResponse.ok) {
+          console.log('✅ [ROBUST-LLM] OpenAI API key validated');
+          return true;
+        } else {
+          console.log('🚫 [ROBUST-LLM] OpenAI API key validation failed:', testResponse.status);
+          return false;
+        }
+      } catch (testError) {
+        console.log('🚫 [ROBUST-LLM] OpenAI API key test failed:', testError);
+        return false;
+      }
+    } catch (error) {
+      console.log('🚫 [ROBUST-LLM] OpenAI availability check failed:', error);
+      return false;
+    }
   }
 
   /**

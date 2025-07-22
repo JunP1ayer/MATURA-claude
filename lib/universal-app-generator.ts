@@ -68,12 +68,12 @@ export class UniversalAppGenerator {
     console.log('🏥 [UNIVERSAL] System health:', health.overall ? 'Healthy' : 'Degraded');
     
     try {
-      // Step 1: 意図理解（強化されたLLMシステム使用）
+      // Step 1: 意図理解（創造性強化版）
       const intentResponse = await robustLLMSystem.callFunctionWithFallback<AppIntent>(
         'analyze_app_intent',
         this.getIntentAnalysisSchema(),
-        `Analyze this app idea: "${userIdea}"`,
-        'You are an expert app analyst. Analyze user ideas and extract structured information about their intent.'
+        this.buildCreativeIntentPrompt(userIdea),
+        'You are a creative app analyst who thinks outside the box. Analyze diverse app ideas with imagination and avoid defaulting to productivity. Each app has unique characteristics that should be captured.'
       );
       
       if (!intentResponse.success || !intentResponse.data) {
@@ -81,14 +81,29 @@ export class UniversalAppGenerator {
       }
       
       const intent = intentResponse.data;
+      
+      // Ensure targetUsers is always an array
+      if (typeof intent.targetUsers === 'string') {
+        intent.targetUsers = [intent.targetUsers];
+      } else if (!Array.isArray(intent.targetUsers)) {
+        intent.targetUsers = ['一般ユーザー'];
+      }
+      
+      // Ensure keyFeatures is always an array
+      if (typeof intent.keyFeatures === 'string') {
+        intent.keyFeatures = [intent.keyFeatures];
+      } else if (!Array.isArray(intent.keyFeatures)) {
+        intent.keyFeatures = ['基本機能'];
+      }
+      
       console.log('✅ [UNIVERSAL] Intent analyzed:', intent.category, `(confidence: ${intentResponse.confidence})`);
       
-      // Step 2: スキーマ生成（強化されたLLMシステム使用）
+      // Step 2: スキーマ生成（創造性強化版）
       const schemaResponse = await robustLLMSystem.callFunctionWithFallback<GeneratedSchema>(
         'generate_database_schema',
         this.getSchemaGenerationSchema(),
-        this.buildSchemaPrompt(intent, userIdea),
-        'You are a database schema expert. Generate optimal database schemas for apps.'
+        this.buildCreativeSchemaPrompt(intent, userIdea),
+        'You are a creative database architect. Design unique and specialized schemas that perfectly match the app category and purpose. Avoid generic productivity patterns and embrace the specific needs of each domain.'
       );
       
       if (!schemaResponse.success || !schemaResponse.data) {
@@ -96,6 +111,17 @@ export class UniversalAppGenerator {
       }
       
       const schema = schemaResponse.data;
+      
+      // Ensure schema.fields is always an array
+      if (!Array.isArray(schema.fields)) {
+        schema.fields = [
+          { name: 'id', label: 'ID', type: 'text', required: true },
+          { name: 'title', label: 'タイトル', type: 'text', required: true },
+          { name: 'description', label: '説明', type: 'text', required: false },
+          { name: 'created_at', label: '作成日', type: 'date', required: true }
+        ];
+      }
+      
       console.log('✅ [UNIVERSAL] Schema generated:', schema.tableName, `(confidence: ${schemaResponse.confidence})`);
       
       // Step 3: UI設定生成（Figma連携強化版）
@@ -119,21 +145,7 @@ export class UniversalAppGenerator {
         schema,
         ui,
         code: functionalCode.mainComponent,
-        confidence,
-        metadata: {
-          enhancedFeatures: {
-            businessLogic: functionalCode.businessLogicFunctions.length,
-            testCases: functionalCode.testCases.length,
-            figmaIntegration: !!ui.figmaDesignSystem,
-            accessibilityFeatures: ui.accessibilityFeatures?.length || 0
-          },
-          systemHealth: health,
-          processingDetails: {
-            intentProvider: intentResponse.provider,
-            schemaProvider: schemaResponse.provider,
-            totalAttempts: intentResponse.attempts + schemaResponse.attempts
-          }
-        }
+        confidence
       };
       
     } catch (error) {
@@ -143,11 +155,11 @@ export class UniversalAppGenerator {
   }
 
   /**
-   * Step 1: 意図理解 - OpenAI Function Callingで構造化
+   * Step 1: 意図理解 - OpenAI Tools APIで構造化
    */
   private async analyzeIntent(userIdea: string): Promise<AppIntent> {
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -158,61 +170,64 @@ export class UniversalAppGenerator {
           content: `Analyze this app idea: "${userIdea}"`
         }
       ],
-      functions: [
+      tools: [
         {
-          name: "analyze_app_intent",
-          description: "Extract structured information about the user's app idea",
-          parameters: {
-            type: "object",
-            properties: {
-              category: {
-                type: "string",
-                enum: ["productivity", "finance", "health", "social", "ecommerce", "creative", "utility", "education", "entertainment"],
-                description: "Primary category of the app"
+          type: "function",
+          function: {
+            name: "analyze_app_intent",
+            description: "Extract structured information about the user's app idea",
+            parameters: {
+              type: "object",
+              properties: {
+                category: {
+                  type: "string",
+                  enum: ["productivity", "finance", "health", "social", "ecommerce", "creative", "utility", "education", "entertainment"],
+                  description: "Primary category of the app"
+                },
+                primaryPurpose: {
+                  type: "string",
+                  description: "Main purpose or goal of the app"
+                },
+                targetUsers: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Target user groups"
+                },
+                keyFeatures: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Key features the app should have"
+                },
+                dataToManage: {
+                  type: "string",
+                  description: "Type of data the app will manage"
+                },
+                urgency: {
+                  type: "string",
+                  enum: ["low", "medium", "high"],
+                  description: "Urgency level of the problem being solved"
+                },
+                complexity: {
+                  type: "string",
+                  enum: ["simple", "moderate", "complex"],
+                  description: "Expected complexity of the app"
+                }
               },
-              primaryPurpose: {
-                type: "string",
-                description: "Main purpose or goal of the app"
-              },
-              targetUsers: {
-                type: "array",
-                items: { type: "string" },
-                description: "Target user groups"
-              },
-              keyFeatures: {
-                type: "array",
-                items: { type: "string" },
-                description: "Key features the app should have"
-              },
-              dataToManage: {
-                type: "string",
-                description: "Type of data the app will manage"
-              },
-              urgency: {
-                type: "string",
-                enum: ["low", "medium", "high"],
-                description: "Urgency level of the problem being solved"
-              },
-              complexity: {
-                type: "string",
-                enum: ["simple", "moderate", "complex"],
-                description: "Expected complexity of the app"
-              }
-            },
-            required: ["category", "primaryPurpose", "targetUsers", "keyFeatures", "dataToManage", "urgency", "complexity"]
+              required: ["category", "primaryPurpose", "targetUsers", "keyFeatures", "dataToManage", "urgency", "complexity"]
+            }
           }
         }
       ],
-      function_call: { name: "analyze_app_intent" },
+      tool_choice: { type: "function", function: { name: "analyze_app_intent" } },
       temperature: 0.3
     });
 
-    const functionCall = response.choices[0]?.message?.function_call;
-    if (!functionCall?.arguments) {
-      throw new Error('No function call response received');
+    const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+    if (!toolCall?.function?.arguments) {
+      throw new Error('No tool call response received');
     }
 
-    return JSON.parse(functionCall.arguments);
+    return JSON.parse(toolCall.function.arguments);
   }
 
   /**
@@ -220,7 +235,7 @@ export class UniversalAppGenerator {
    */
   private async generateSchema(intent: AppIntent, userIdea: string): Promise<GeneratedSchema> {
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -239,54 +254,57 @@ Key Features: ${intent.keyFeatures.join(', ')}
 Create an optimal schema with 3-6 fields that capture the essential data.`
         }
       ],
-      functions: [
+      tools: [
         {
-          name: "generate_database_schema",
-          description: "Generate a database schema for the app",
-          parameters: {
-            type: "object",
-            properties: {
-              tableName: {
-                type: "string",
-                description: "Table name in snake_case"
-              },
-              description: {
-                type: "string",
-                description: "Brief description of what this table stores"
-              },
-              fields: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                    label: { type: "string" },
-                    type: { 
-                      type: "string",
-                      enum: ["text", "number", "date", "email", "tel", "url", "boolean"]
+          type: "function",
+          function: {
+            name: "generate_database_schema",
+            description: "Generate a database schema for the app",
+            parameters: {
+              type: "object",
+              properties: {
+                tableName: {
+                  type: "string",
+                  description: "Table name in snake_case"
+                },
+                description: {
+                  type: "string",
+                  description: "Brief description of what this table stores"
+                },
+                fields: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" },
+                      label: { type: "string" },
+                      type: { 
+                        type: "string",
+                        enum: ["text", "number", "date", "email", "tel", "url", "boolean"]
+                      },
+                      required: { type: "boolean" },
+                      placeholder: { type: "string" },
+                      validation: { type: "string" }
                     },
-                    required: { type: "boolean" },
-                    placeholder: { type: "string" },
-                    validation: { type: "string" }
-                  },
-                  required: ["name", "label", "type", "required"]
+                    required: ["name", "label", "type", "required"]
+                  }
                 }
-              }
-            },
-            required: ["tableName", "description", "fields"]
+              },
+              required: ["tableName", "description", "fields"]
+            }
           }
         }
       ],
-      function_call: { name: "generate_database_schema" },
+      tool_choice: { type: "function", function: { name: "generate_database_schema" } },
       temperature: 0.2
     });
 
-    const functionCall = response.choices[0]?.message?.function_call;
-    if (!functionCall?.arguments) {
+    const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+    if (!toolCall?.function?.arguments) {
       throw new Error('No schema generation response received');
     }
 
-    return JSON.parse(functionCall.arguments);
+    return JSON.parse(toolCall.function.arguments);
   }
 
   /**
@@ -294,7 +312,7 @@ Create an optimal schema with 3-6 fields that capture the essential data.`
    */
   private async generateUI(intent: AppIntent, schema: GeneratedSchema): Promise<UIConfiguration> {
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -312,52 +330,55 @@ Data Fields: ${schema.fields.map(f => f.name).join(', ')}
 Create a modern, user-friendly interface design.`
         }
       ],
-      functions: [
+      tools: [
         {
-          name: "generate_ui_configuration",
-          description: "Generate UI configuration for the app",
-          parameters: {
-            type: "object",
-            properties: {
-              theme: {
-                type: "object",
-                properties: {
-                  primaryColor: { type: "string" },
-                  secondaryColor: { type: "string" },
-                  backgroundColor: { type: "string" }
+          type: "function",
+          function: {
+            name: "generate_ui_configuration",
+            description: "Generate UI configuration for the app",
+            parameters: {
+              type: "object",
+              properties: {
+                theme: {
+                  type: "object",
+                  properties: {
+                    primaryColor: { type: "string" },
+                    secondaryColor: { type: "string" },
+                    backgroundColor: { type: "string" }
+                  },
+                  required: ["primaryColor", "secondaryColor", "backgroundColor"]
                 },
-                required: ["primaryColor", "secondaryColor", "backgroundColor"]
+                layout: {
+                  type: "string",
+                  enum: ["list", "grid", "dashboard", "form"],
+                  description: "Primary layout type"
+                },
+                components: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "UI components to include"
+                },
+                interactions: {
+                  type: "array", 
+                  items: { type: "string" },
+                  description: "User interaction patterns"
+                }
               },
-              layout: {
-                type: "string",
-                enum: ["list", "grid", "dashboard", "form"],
-                description: "Primary layout type"
-              },
-              components: {
-                type: "array",
-                items: { type: "string" },
-                description: "UI components to include"
-              },
-              interactions: {
-                type: "array", 
-                items: { type: "string" },
-                description: "User interaction patterns"
-              }
-            },
-            required: ["theme", "layout", "components", "interactions"]
+              required: ["theme", "layout", "components", "interactions"]
+            }
           }
         }
       ],
-      function_call: { name: "generate_ui_configuration" },
+      tool_choice: { type: "function", function: { name: "generate_ui_configuration" } },
       temperature: 0.4
     });
 
-    const functionCall = response.choices[0]?.message?.function_call;
-    if (!functionCall?.arguments) {
+    const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+    if (!toolCall?.function?.arguments) {
       throw new Error('No UI configuration response received');
     }
 
-    return JSON.parse(functionCall.arguments);
+    return JSON.parse(toolCall.function.arguments);
   }
 
   /**
@@ -371,33 +392,27 @@ SPECIFICATIONS:
 - Purpose: ${intent.primaryPurpose}
 - Table: ${schema.tableName}
 - Fields: ${schema.fields.map(f => `${f.name} (${f.type})`).join(', ')}
-- Theme: ${ui.theme.primaryColor}
-- Layout: ${ui.layout}
+- UI Theme: ${ui.theme.primaryColor} primary, ${ui.layout} layout
+- Components: ${ui.components.join(', ')}
 
 REQUIREMENTS:
-1. Use Next.js 14 with TypeScript
-2. Include shadcn/ui components
-3. Implement full CRUD operations
-4. Use the exact field structure provided
-5. Apply the specified color theme
-6. Include proper error handling
-7. Make it responsive and accessible
+1. Use React with TypeScript
+2. Include all CRUD operations
+3. Responsive design with Tailwind CSS
+4. Form validation and error handling
+5. Modern UI components and interactions
+6. Local state management with useState/useReducer
+7. Professional code structure and comments
 
-Generate ONLY the main page component code.`;
+Generate a single, complete React component that implements all functionality.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
-        {
-          role: "system",
-          content: "You are an expert React developer. Generate production-ready React applications with modern best practices."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
+        { role: "system", content: "You are an expert React developer. Generate high-quality, production-ready React applications." },
+        { role: "user", content: prompt }
       ],
-      temperature: 0.1,
+      temperature: 0.3,
       max_tokens: 4000
     });
 
@@ -410,52 +425,7 @@ Generate ONLY the main page component code.`;
   }
 
   /**
-   * 強化された信頼度計算
-   */
-  private calculateEnhancedConfidence(
-    intentResponse: any,
-    schemaResponse: any,
-    ui: any,
-    functionalCode: any
-  ): number {
-    let confidence = 70; // Base confidence
-    
-    // LLMレスポンスの信頼度
-    confidence += intentResponse.confidence * 15;
-    confidence += schemaResponse.confidence * 15;
-    
-    // 機能の充実度
-    if (functionalCode.businessLogicFunctions.length > 0) confidence += 5;
-    if (functionalCode.testCases.length > 0) confidence += 5;
-    
-    // UI/UXの品質
-    if (ui.figmaDesignSystem) confidence += 10;
-    if (ui.accessibilityFeatures?.length > 3) confidence += 5;
-    
-    // システム信頼性
-    if (intentResponse.provider === 'openai') confidence += 5;
-    if (schemaResponse.provider === 'openai') confidence += 5;
-    
-    return Math.min(confidence, 100);
-  }
-
-  /**
-   * スキーマプロンプト構築
-   */
-  private buildSchemaPrompt(intent: AppIntent, userIdea: string): string {
-    return `Generate a database schema for this app:
-          
-Original Idea: "${userIdea}"
-Category: ${intent.category}
-Purpose: ${intent.primaryPurpose}
-Data to Manage: ${intent.dataToManage}
-Key Features: ${intent.keyFeatures.join(', ')}
-
-Create an optimal schema with 3-6 fields that capture the essential data.`;
-  }
-
-  /**
-   * 意図分析スキーマ定義
+   * スキーマ定義メソッド
    */
   private getIntentAnalysisSchema() {
     return {
@@ -466,7 +436,7 @@ Create an optimal schema with 3-6 fields that capture the essential data.`;
           category: {
             type: "string",
             enum: ["productivity", "finance", "health", "social", "ecommerce", "creative", "utility", "education", "entertainment"],
-            description: "Primary category of the app"
+            description: "Primary category of the app - think creatively beyond productivity"
           },
           primaryPurpose: {
             type: "string",
@@ -502,9 +472,6 @@ Create an optimal schema with 3-6 fields that capture the essential data.`;
     };
   }
 
-  /**
-   * スキーマ生成スキーマ定義
-   */
   private getSchemaGenerationSchema() {
     return {
       description: "Generate a database schema for the app",
@@ -543,23 +510,62 @@ Create an optimal schema with 3-6 fields that capture the essential data.`;
     };
   }
 
-  /**
-   * 信頼度計算（旧版・互換性のため残存）
-   */
-  private calculateConfidence(intent: AppIntent, schema: GeneratedSchema, ui: UIConfiguration): number {
-    let confidence = 70; // Base confidence
+  private buildCreativeIntentPrompt(userIdea: string): string {
+    return `Analyze this unique app idea with creativity and precision:
+
+"${userIdea}"
+
+IMPORTANT GUIDELINES:
+- DO NOT default to "productivity" unless it's clearly a productivity tool
+- Look for specific domain characteristics (gaming -> entertainment, recipes -> creative, etc.)
+- Consider the unique aspects that make this app special
+- Think about who would ACTUALLY use this app and why
+- Identify the true category based on the primary use case
+
+Analyze deeply and categorize accurately.`;
+  }
+
+  private buildCreativeSchemaPrompt(intent: AppIntent, userIdea: string): string {
+    const categoryExamples = {
+      entertainment: '(e.g., high_score, player_name, game_level, achievements)',
+      creative: '(e.g., recipe_name, ingredients, cooking_time, difficulty)',
+      education: '(e.g., course_name, lesson_progress, quiz_score, completion_date)',
+      health: '(e.g., symptom, severity, date_recorded, medication)',
+      social: '(e.g., member_name, group_role, join_date, activity_level)',
+      finance: '(e.g., transaction_amount, category, account, budget_goal)',
+      ecommerce: '(e.g., product_name, price, inventory, customer_rating)',
+      utility: '(e.g., tool_name, usage_count, configuration, last_used)'
+    };
     
-    // 意図の明確性
-    if (intent.keyFeatures.length >= 3) confidence += 10;
-    if (intent.primaryPurpose.length > 20) confidence += 5;
+    const examples = categoryExamples[intent.category] || '(e.g., specialized fields for this domain)';
     
-    // スキーマの適切性
-    if (schema.fields.length >= 3 && schema.fields.length <= 6) confidence += 10;
+    return `Generate a specialized database schema for this ${intent.category} app:
+          
+Original Idea: "${userIdea}"
+Category: ${intent.category}
+Purpose: ${intent.primaryPurpose}
+Data to Manage: ${intent.dataToManage}
+Key Features: ${intent.keyFeatures.join(', ')}
+
+Create a DOMAIN-SPECIFIC schema with 4-6 fields that are tailored to ${intent.category} apps ${examples}.
+
+DO NOT use generic productivity fields. Make it specific to the ${intent.category} domain.`;
+  }
+
+  private calculateEnhancedConfidence(
+    intentResponse: any,
+    schemaResponse: any,
+    ui: any,
+    functionalCode: any
+  ): number {
+    let confidence = 0.7; // Base confidence
     
-    // UI設定の完整性
-    if (ui.components.length >= 3) confidence += 5;
+    if (intentResponse.confidence > 0.8) confidence += 0.1;
+    if (schemaResponse.confidence > 0.8) confidence += 0.1;
+    if (ui.figmaDesignSystem) confidence += 0.05;
+    if (functionalCode.businessLogicFunctions?.length > 0) confidence += 0.05;
     
-    return Math.min(confidence, 100);
+    return Math.min(confidence, 1.0);
   }
 }
 
