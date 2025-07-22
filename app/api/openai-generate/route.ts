@@ -282,7 +282,7 @@ ${codeResult.data}
       instructions: {
         deployment: 'Next.js App Routerプロジェクトにコンポーネントをコピーして使用',
         apis: {
-          main: `/api/crud/${schemaResult.data?.mainTable?.name || 'data'}`,
+          main: `/api/crud/${(schemaResult.data as any)?.mainTable?.name || 'data'}`,
           endpoints: ['GET (取得)', 'POST (作成)', 'PUT (更新)', 'DELETE (削除)']
         },
         setup: [
@@ -292,7 +292,7 @@ ${codeResult.data}
           '4. 環境変数の設定',
           '5. アプリケーションの起動: npm run dev'
         ],
-        features: intentResult.data?.keyFeatures || [],
+        features: (intentResult.data as any)?.keyFeatures || [],
         nextSteps: [
           'ユーザー認証機能の追加',
           'データ分析ダッシュボードの実装',

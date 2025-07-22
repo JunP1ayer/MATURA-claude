@@ -82,7 +82,9 @@ export class FigmaEnhancedUIGenerator {
     return {
       ...customizedUI,
       figmaDesignSystem,
-      accessibilityFeatures
+      accessibilityFeatures,
+      designTokens: customizedUI.designTokens || {},
+      componentLibrary: customizedUI.componentLibrary || ['shadcn/ui']
     };
   }
 
@@ -108,8 +110,7 @@ export class FigmaEnhancedUIGenerator {
       const figmaResponse = await fetch(`https://api.figma.com/v1/files/${figmaFileId}`, {
         headers: {
           'X-Figma-Token': figmaApiKey
-        },
-        timeout: 5000
+        }
       });
 
       if (!figmaResponse.ok) {

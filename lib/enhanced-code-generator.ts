@@ -336,7 +336,7 @@ ${plan.mainFeatures.map((feature, i) => `${i + 1}. ${feature}`).join('\n')}
   private extractFunctions(code: string, type: 'business' | 'utility'): string[] {
     // 関数を抽出するロジック（簡略化）
     const functions = code.match(/function\s+\w+.*?\{[\s\S]*?\}/g) || [];
-    return functions.filter(fn => 
+    return functions.filter((fn: string) => 
       type === 'business' ? fn.includes('business') || fn.includes('logic') : 
       fn.includes('util') || fn.includes('helper')
     );
