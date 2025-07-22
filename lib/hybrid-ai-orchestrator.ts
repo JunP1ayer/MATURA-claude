@@ -156,56 +156,42 @@ export class HybridAIOrchestrator {
           category: parsed.category || this.inferCategoryFromIdea(userIdea),
           insights: parsed.insights || [],
           businessPotential: parsed.businessPotential || 'medium',
-          // 新しい本質理解フィールドを追加
-          coreValue: parsed.coreValue,
-          realProblem: parsed.realProblem,
+          // 本質理解フィールド
           targetUsers: parsed.targetUsers,
           keyFeatures: parsed.keyFeatures,
-          businessLogic: parsed.businessLogic,
-          uniqueValue: parsed.uniqueValue,
-          industryContext: parsed.industryContext
+          uniqueValue: parsed.uniqueValue
         };
       } catch (error) {
         console.log('⚠️ [GEMINI] Parsing failed, using intelligent fallback');
-        const intelligentAnalysis = this.createIntelligentFallbackFromText(userIdea);
+        const simpleAnalysis = this.createSimpleFallbackFromText(userIdea);
         return {
           original: userIdea,
-          enhanced: intelligentAnalysis.enhanced,
-          variations: intelligentAnalysis.variations,
-          category: intelligentAnalysis.category,
-          insights: intelligentAnalysis.insights,
-          businessPotential: intelligentAnalysis.businessPotential,
-          // 本質理解情報も保持
-          coreValue: intelligentAnalysis.coreValue,
-          realProblem: intelligentAnalysis.realProblem,
-          targetUsers: intelligentAnalysis.targetUsers,
-          keyFeatures: intelligentAnalysis.keyFeatures,
-          businessLogic: intelligentAnalysis.businessLogic,
-          uniqueValue: intelligentAnalysis.uniqueValue,
-          industryContext: intelligentAnalysis.industryContext
+          enhanced: simpleAnalysis.enhanced,
+          variations: [],
+          category: simpleAnalysis.category,
+          insights: simpleAnalysis.insights,
+          businessPotential: simpleAnalysis.businessPotential,
+          targetUsers: simpleAnalysis.targetUsers,
+          keyFeatures: simpleAnalysis.keyFeatures,
+          uniqueValue: simpleAnalysis.uniqueValue
         };
       }
     }
 
     // 最終フォールバック: Gemini API失敗時
-    console.log('⚠️ [GEMINI] API failed, using comprehensive intelligent analysis');
-    const deepAnalysis = this.createIntelligentFallbackFromText(userIdea);
+    console.log('⚠️ [GEMINI] API failed, using final fallback analysis');
+    const finalAnalysis = this.createSimpleFallbackFromText(userIdea);
     
     return {
       original: userIdea,
-      enhanced: deepAnalysis.enhanced,
-      variations: deepAnalysis.variations,
-      category: deepAnalysis.category,
-      insights: deepAnalysis.insights,
-      businessPotential: deepAnalysis.businessPotential,
-      // 文脈理解を最大限維持
-      coreValue: deepAnalysis.coreValue,
-      realProblem: deepAnalysis.realProblem,
-      targetUsers: deepAnalysis.targetUsers,
-      keyFeatures: deepAnalysis.keyFeatures,
-      businessLogic: deepAnalysis.businessLogic,
-      uniqueValue: deepAnalysis.uniqueValue,
-      industryContext: deepAnalysis.industryContext
+      enhanced: finalAnalysis.enhanced,
+      variations: [],
+      category: finalAnalysis.category,
+      insights: finalAnalysis.insights,
+      businessPotential: finalAnalysis.businessPotential,
+      targetUsers: finalAnalysis.targetUsers,
+      keyFeatures: finalAnalysis.keyFeatures,
+      uniqueValue: finalAnalysis.uniqueValue
     };
   }
 
@@ -843,64 +829,27 @@ export default function ${componentName}({ className }: ${componentName}Props) {
    * ユーティリティメソッド
    */
   private buildGeminiCreativityPrompt(userIdea: string, config: HybridGenerationConfig): string {
-    const creativityInstructions = {
-      low: '実用性を重視し、確実に動作する機能を提案してください。',
-      medium: '実用性と創造性のバランスを取り、革新的だが実現可能な機能を提案してください。',
-      high: '創造性を最大限に発揮し、従来にない斬新で魅力的な機能を提案してください。'
-    };
+    return `Analyze this app idea and provide a JSON response:
 
-    return `# アイデア本質理解・分析システム
-
-## 入力アイデア
 "${userIdea}"
 
-## あなたの役割
-世界トップクラスのプロダクト戦略家として、このアイデアの**本質的価値と真の目的**を深く理解してください。
+Respond with ONLY valid JSON (no extra text):
 
-## 必須分析項目
-
-### 1. 本質理解 (最重要)
-- ユーザーが **本当に解決したい問題** は何か？
-- どんな **業界・分野・用途** でのソリューションか？
-- **誰が、なぜ、どのような状況で** 使うのか？
-- 既存の汎用的ソリューション（タスク管理等）では **なぜ不十分** なのか？
-
-### 2. 文脈分析
-- 業界特有のニーズと制約
-- ターゲットユーザーの専門的要求
-- ビジネスプロセス上の位置づけ
-- 技術的・規制的考慮事項
-
-### 3. 価値提案
-- このアイデア独自の競争優位性
-- 解決する痛点の深刻度
-- 市場での差別化要因
-
-## 出力形式 (必ず正確なJSON)
-\`\`\`json
 {
-  "enhanced": "本質を理解した上での強化されたアイデア詳細",
-  "coreValue": "このアイデアの核となる価値提案",
-  "realProblem": "実際に解決する具体的問題",
-  "category": "finance/health/creative/entertainment/social/education/ecommerce/productivity",
-  "targetUsers": ["具体的ユーザー層1", "具体的ユーザー層2"],
-  "keyFeatures": ["本質的機能1", "本質的機能2", "本質的機能3"],
-  "businessLogic": ["ビジネスロジック1", "ビジネスロジック2"],
-  "uniqueValue": "既存ソリューションとの明確な差別化",
-  "businessPotential": "high/medium/low",
-  "industryContext": "業界・分野の文脈説明",
-  "variations": ["バリエーション1", "バリエーション2"],
-  "insights": ["重要な洞察1", "重要な洞察2", "重要な洞察3"]
+  "enhanced": "improved idea description in Japanese",
+  "category": "finance|health|creative|entertainment|social|education|ecommerce|productivity",
+  "targetUsers": ["user type 1", "user type 2"],
+  "keyFeatures": ["feature 1", "feature 2", "feature 3"],
+  "uniqueValue": "unique value proposition",
+  "businessPotential": "high|medium|low",
+  "insights": ["insight 1", "insight 2"]
 }
-\`\`\`
 
-## 重要な制約
-- **絶対に** 汎用的なタスク管理・TODO・メモアプリに逃げない
-- **必ず** 具体的な業界・用途・ユーザーニーズに特化する
-- **表面的なキーワード** ではなく **文脈と目的** を重視する
-- ${creativityInstructions[config.creativityLevel]}
-
-**ユーザーの真の意図を理解し、価値あるプロダクトアイデアに発展させてください。**`;
+IMPORTANT:
+- Return ONLY the JSON object
+- Use Japanese for text content
+- Avoid generic task management solutions
+- Focus on specific industry needs`;
   }
 
   /**
@@ -959,133 +908,42 @@ export default function ${componentName}({ className }: ${componentName}Props) {
   }
 
   private extractJSONFromGeminiResponse(response: string): any {
-    console.log('🔍 [JSON] Attempting to extract JSON from Gemini response');
+    console.log('🔍 [JSON] Extracting from Gemini response');
     
     try {
-      // 段階的JSONパターン抽出（優先度順）
-      const patterns = [
-        /```json\s*(\{[\s\S]*?\})\s*```/i, // コードブロック内（最優先）
-        /json\s*(\{[\s\S]*?\})/i, // json prefix付き
-        /\{[\s\S]*?"enhanced"[\s\S]*?\}/i, // enhanced含むJSON
-        /\{[\s\S]*?"category"[\s\S]*?\}/i, // category含むJSON
-        /\{[\s\S]*?\}/  // 最後の手段
-      ];
-
-      let bestMatch = null;
-      let bestScore = 0;
-
-      for (const pattern of patterns) {
-        const matches = response.match(pattern);
-        if (matches) {
-          const jsonStr = matches[1] || matches[0];
-          
-          // JSON品質スコア計算
-          const score = this.calculateJSONQualityScore(jsonStr);
-          console.log(`[JSON] Pattern match score: ${score}`);
-          
-          if (score > bestScore) {
-            bestMatch = jsonStr;
-            bestScore = score;
-          }
-        }
+      // シンプルなJSONパターン抽出
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in response');
       }
 
-      if (!bestMatch) {
-        throw new Error('No JSON pattern found in response');
-      }
+      let jsonStr = jsonMatch[0];
+      
+      // 基本的なJSON修正
+      jsonStr = jsonStr
+        .replace(/'/g, '"')  // シングル→ダブルクォート
+        .replace(/,\s*([}\]])/g, '$1')  // trailing comma削除
+        .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":'); // キーをクォート
 
-      // JSON修正・パース
-      const cleanedJson = this.cleanAndValidateJSON(bestMatch);
-      const parsed = JSON.parse(cleanedJson);
+      const parsed = JSON.parse(jsonStr);
       
-      // 必須フィールド確認・補完
-      const validated = this.validateAndCompleteGeminiResponse(parsed, response);
-      console.log('✅ [JSON] Successfully extracted and validated JSON');
-      
-      return validated;
+      // 必須フィールドの補完
+      return {
+        enhanced: parsed.enhanced || '専門的ソリューション',
+        category: parsed.category || this.inferCategoryFromIdea(response),
+        targetUsers: parsed.targetUsers || ['専門ユーザー'],
+        keyFeatures: parsed.keyFeatures || ['主要機能1', '主要機能2'],
+        uniqueValue: parsed.uniqueValue || '特化型アプローチ',
+        businessPotential: parsed.businessPotential || 'medium',
+        insights: parsed.insights || ['本質的価値提供']
+      };
 
     } catch (error) {
-      console.warn('⚠️ [JSON] Extraction failed, using intelligent text analysis');
-      return this.createIntelligentFallbackFromText(response);
+      console.warn('⚠️ [JSON] Parse failed, using text analysis');
+      return this.createSimpleFallbackFromText(response);
     }
   }
 
-  private calculateJSONQualityScore(jsonStr: string): number {
-    let score = 0;
-    
-    // 基本構造チェック
-    if (jsonStr.includes('enhanced')) score += 20;
-    if (jsonStr.includes('category')) score += 20;
-    if (jsonStr.includes('targetUsers')) score += 15;
-    if (jsonStr.includes('keyFeatures')) score += 15;
-    if (jsonStr.includes('coreValue')) score += 10;
-    if (jsonStr.includes('businessPotential')) score += 10;
-    
-    // JSON構造整合性
-    const openBraces = (jsonStr.match(/\{/g) || []).length;
-    const closeBraces = (jsonStr.match(/\}/g) || []).length;
-    if (openBraces === closeBraces) score += 10;
-    
-    return score;
-  }
-
-  private cleanAndValidateJSON(jsonStr: string): string {
-    return jsonStr
-      // 基本的な修正
-      .replace(/'/g, '"')  // シングルクォート→ダブルクォート
-      .replace(/,\s*[}\]]/g, match => match.replace(',', ''))  // trailing comma削除
-      .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":') // キーをクォート
-      .replace(/:\s*([^",{\[\]}\s][^",{\[\]}\n]*?)(?=\s*[,}])/g, ': "$1"') // 値をクォート
-      // 改行・制御文字の処理
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t')
-      // 重複コンマ除去
-      .replace(/,,+/g, ',');
-  }
-
-  private validateAndCompleteGeminiResponse(parsed: any, originalResponse: string): any {
-    // 必須フィールドの補完
-    const completed = {
-      enhanced: parsed.enhanced || parsed.description || originalResponse.slice(0, 200),
-      coreValue: parsed.coreValue || parsed.uniqueValue || 'ユーザーニーズに特化したソリューション',
-      realProblem: parsed.realProblem || '具体的な課題の解決',
-      category: parsed.category || this.inferCategoryFromIdea(originalResponse),
-      targetUsers: parsed.targetUsers || ['専門ユーザー'],
-      keyFeatures: parsed.keyFeatures || ['核心機能1', '核心機能2'],
-      businessLogic: parsed.businessLogic || ['基本的なビジネスロジック'],
-      uniqueValue: parsed.uniqueValue || 'システム固有の価値提案',
-      businessPotential: parsed.businessPotential || 'medium',
-      industryContext: parsed.industryContext || '特定業界向け',
-      variations: parsed.variations || [],
-      insights: parsed.insights || ['本質的洞察']
-    };
-
-    return completed;
-  }
-
-  private createIntelligentFallbackFromText(response: string): any {
-    console.log('🧠 [FALLBACK] Creating intelligent analysis from text');
-    
-    // テキスト内容の分析
-    const category = this.inferCategoryFromIdea(response);
-    const keyTerms = this.extractKeyTerms(response);
-    
-    return {
-      enhanced: `${keyTerms.join('、')}を活用した専門的ソリューション`,
-      coreValue: 'ユーザーの具体的ニーズに対応',
-      realProblem: '現状の課題解決',
-      category: category,
-      targetUsers: ['専門ユーザー', '業界関係者'],
-      keyFeatures: keyTerms.slice(0, 3).map(term => `${term}機能`),
-      businessLogic: ['専門的処理', 'データ管理', 'ユーザー対応'],
-      uniqueValue: `${category}分野に特化したアプローチ`,
-      businessPotential: 'medium',
-      industryContext: `${category}業界での活用`,
-      variations: [],
-      insights: [`${category}分野の専門的ニーズに対応`, '実用性重視の設計']
-    };
-  }
 
   private extractKeyTerms(text: string): string[] {
     // 重要そうなキーワードを抽出
@@ -1102,6 +960,23 @@ export default function ${componentName}({ className }: ${componentName}Props) {
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
       .map(([word]) => word);
+  }
+
+  private createSimpleFallbackFromText(response: string): any {
+    console.log('🔧 [FALLBACK] Creating simple analysis');
+    
+    const category = this.inferCategoryFromIdea(response);
+    const keyTerms = this.extractKeyTerms(response);
+    
+    return {
+      enhanced: `${keyTerms.slice(0, 2).join('・')}に特化したソリューション`,
+      category: category,
+      targetUsers: ['専門ユーザー', '業界関係者'],
+      keyFeatures: keyTerms.slice(0, 3).map(term => `${term}管理`),
+      uniqueValue: `${category}分野の専門的アプローチ`,
+      businessPotential: 'medium',
+      insights: [`${category}業界に特化`, '実用性重視の設計']
+    };
   }
 }
 
