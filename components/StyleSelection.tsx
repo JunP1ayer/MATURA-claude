@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { Grid, Layers, Eye } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { createSafeStyle, createSafeStyles, type StyleData } from '@/lib/styleUtils'
 import StyleCards from './StyleCards'
 import TinderStyleSwiper from './TinderStyleSwiper'
-import { createSafeStyle, createSafeStyles, type StyleData } from '@/lib/styleUtils'
 
 
 interface StyleSelectionProps {

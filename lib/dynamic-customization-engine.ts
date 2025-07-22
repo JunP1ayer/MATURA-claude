@@ -1,7 +1,7 @@
 // Dynamic Customization Engine for personalized UI generation
-import { IntelligentSelection } from './intelligent-figma-selector';
-import { StructuredData, DesignContext, ColorPersonality } from './intelligent-design-analyzer';
 import { figmaUIGenerator } from './figma-ui-generator';
+import { StructuredData, DesignContext, ColorPersonality } from './intelligent-design-analyzer';
+import { IntelligentSelection } from './intelligent-figma-selector';
 
 export interface CustomizationResult {
   generatedCode: string;
@@ -114,7 +114,7 @@ export class DynamicCustomizationEngine {
     const { customizedPattern, structuredData } = selection;
     
     // Check if we have Figma design data
-    const figmaDesign = (customizedPattern as any).figmaDesign;
+    const {figmaDesign} = (customizedPattern as any);
     
     if (figmaDesign) {
       console.log('🔗 Using Figma-based generation');
@@ -127,7 +127,7 @@ export class DynamicCustomizationEngine {
 
   // Generate UI from pattern data when Figma is not available
   private generatePatternBasedUI(pattern: any, schema: any, structured: StructuredData): string {
-    const tableName = schema.tableName;
+    const {tableName} = schema;
     const columns = schema.columns.filter((col: any) => 
       !col.primaryKey && 
       !col.name.includes('created_at') && 
@@ -460,7 +460,7 @@ export default Intelligent${this.toPascalCase(tableName)}App;`;
 
   // Helper methods for intelligent text generation
   private generatePersonalizedTitle(structured: StructuredData): string {
-    const what = structured.what;
+    const {what} = structured;
     if (what.includes('管理')) return 'スマート管理システム';
     if (what.includes('分析')) return 'インテリジェント分析プラットフォーム';
     if (what.includes('作成')) return 'クリエイティブ作成ツール';
@@ -468,7 +468,7 @@ export default Intelligent${this.toPascalCase(tableName)}App;`;
   }
 
   private generatePersonalizedFormTitle(structured: StructuredData): string {
-    const what = structured.what;
+    const {what} = structured;
     if (what.includes('データ')) return '新しいデータを追加';
     if (what.includes('情報')) return '情報を登録';
     if (what.includes('項目')) return '新しい項目を作成';
@@ -480,7 +480,7 @@ export default Intelligent${this.toPascalCase(tableName)}App;`;
   }
 
   private generatePersonalizedButtonText(structured: StructuredData): string {
-    const what = structured.what;
+    const {what} = structured;
     if (what.includes('作成')) return '作成する';
     if (what.includes('登録')) return '登録する';
     if (what.includes('追加')) return '追加する';
@@ -488,7 +488,7 @@ export default Intelligent${this.toPascalCase(tableName)}App;`;
   }
 
   private generatePersonalizedListTitle(structured: StructuredData): string {
-    const what = structured.what;
+    const {what} = structured;
     if (what.includes('データ')) return 'データ一覧';
     if (what.includes('項目')) return '項目リスト';
     if (what.includes('情報')) return '情報一覧';
@@ -496,7 +496,7 @@ export default Intelligent${this.toPascalCase(tableName)}App;`;
   }
 
   private generatePersonalizedEmptyStateTitle(structured: StructuredData): string {
-    const what = structured.what;
+    const {what} = structured;
     if (what.includes('データ')) return 'データがありません';
     if (what.includes('項目')) return '項目がありません';
     return 'まだ何もありません';

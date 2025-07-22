@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Rocket, Globe, Link2, CheckCircle, Share2, Star, DollarSign, BarChart3 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import PreviewButton from '@/components/shared/PreviewButton'
+import { Rocket, Globe, Link2, CheckCircle, Share2, Star, DollarSign, BarChart3 } from 'lucide-react'
 import { useMatura } from '@/components/providers/MaturaProvider'
+import PreviewButton from '@/components/shared/PreviewButton'
 import { generateDummyURL } from '@/lib/utils'
 
 export default function ReleaseBoard() {

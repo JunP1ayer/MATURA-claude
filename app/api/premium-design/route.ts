@@ -197,7 +197,7 @@ function generatePreviewComponents(designSystem: any): any {
                   bg-white shadow-${designSystem.shadows.lg} 
                   hover:shadow-${designSystem.shadows.xl} 
                   transition-all duration-${designSystem.motion.duration.normal}">
-        <h3 class="text-${designSystem.typography.fontSize['xl']} font-${designSystem.typography.fontWeight.bold} 
+        <h3 class="text-${designSystem.typography.fontSize.xl} font-${designSystem.typography.fontWeight.bold} 
                    text-neutral-800 mb-3">
           Premium Card
         </h3>

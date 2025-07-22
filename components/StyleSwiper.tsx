@@ -2,10 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, useAnimation, useMotionValue, useTransform, PanInfo } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Eye, RotateCcw, Heart, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Eye, RotateCcw, Heart, X } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import stylesData from '@/styles.json'
 
 interface Theme {
@@ -187,7 +187,7 @@ export default function StyleSwiper({ onThemeSelect, onThemePreview }: StyleSwip
                       variant="secondary"
                       className="text-xs"
                       style={{
-                        backgroundColor: currentTheme.colorPalette.primary + '20',
+                        backgroundColor: `${currentTheme.colorPalette.primary  }20`,
                         color: currentTheme.colorPalette.primary,
                         border: `1px solid ${currentTheme.colorPalette.primary}40`
                       }}

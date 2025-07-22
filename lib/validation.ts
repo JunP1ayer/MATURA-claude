@@ -337,7 +337,7 @@ export function checkStructureQuality(structureData: any): QualityCheckResult {
       issues.push({
         field: 'what',
         type: 'warning',
-        message: 'Duplicate features detected: ' + duplicates.join(', '),
+        message: `Duplicate features detected: ${  duplicates.join(', ')}`,
         severity: 2
       })
       consistency -= 15

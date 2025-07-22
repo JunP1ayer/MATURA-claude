@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Scissors, Calendar, Users, BarChart3, CheckCircle, Star, Clock, Shield, Smartphone } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowRight, Scissors, Calendar, Users, BarChart3, CheckCircle, Star, Clock, Shield, Smartphone } from 'lucide-react'
 import { Logo } from '@/components/Logo'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function BeautyPage() {
   const [selectedDemo, setSelectedDemo] = useState('reservation')

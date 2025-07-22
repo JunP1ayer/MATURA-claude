@@ -195,7 +195,7 @@ export class UXGenerator {
       businessType: this.categorizeBusinessType(insight.target),
       complexity: this.assessComplexity(insight.features),
       userType: this.categorizeUserType(insight.target),
-      industry: this.detectIndustry(insight.vision + ' ' + insight.value)
+      industry: this.detectIndustry(`${insight.vision  } ${  insight.value}`)
     }
   }
 

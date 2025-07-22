@@ -1,12 +1,6 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Upload, 
   FileText, 
@@ -21,6 +15,12 @@ import {
   Braces
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ImportResult {
   success: boolean;
@@ -56,7 +56,7 @@ export function DataImporter({ tableName, onImportComplete }: DataImporterProps)
       
       // ファイル形式チェック
       const allowedTypes = ['.csv', '.json', '.txt'];
-      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+      const fileExtension = `.${  file.name.split('.').pop()?.toLowerCase()}`;
       if (!allowedTypes.includes(fileExtension)) {
         toast.error('対応していないファイル形式です');
         return;
@@ -80,7 +80,7 @@ export function DataImporter({ tableName, onImportComplete }: DataImporterProps)
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragActive(false);
-    const files = e.dataTransfer.files;
+    const {files} = e.dataTransfer;
     handleFileSelect(files);
   };
 

@@ -1,7 +1,7 @@
-import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getGeneratedApp } from '@/lib/supabase-apps';
+import { Metadata } from 'next';
 import { PreviewPageClient } from '@/components/PreviewPageClient';
+import { getGeneratedApp } from '@/lib/supabase-apps';
 
 interface PageProps {
   params: {

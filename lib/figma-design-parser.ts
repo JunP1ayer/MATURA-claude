@@ -192,7 +192,7 @@ export class FigmaDesignParser {
   private static rgbaToHex(color: { r: number; g: number; b: number; a?: number }): string {
     const toHex = (n: number) => {
       const hex = Math.round(n * 255).toString(16)
-      return hex.length === 1 ? '0' + hex : hex
+      return hex.length === 1 ? `0${  hex}` : hex
     }
 
     return `#${toHex(color.r)}${toHex(color.g)}${toHex(color.b)}`

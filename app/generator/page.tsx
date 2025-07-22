@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
+import { Loader2, Sparkles, Rocket, CheckCircle2, Settings, Brain, Wand2 } from 'lucide-react'
+import StructureViewer from '@/components/StructureViewer'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Sparkles, Rocket, CheckCircle2, Settings, Brain, Wand2 } from 'lucide-react'
-import StructureViewer from '@/components/StructureViewer'
+import { Textarea } from '@/components/ui/textarea'
 import type { StructureData } from '@/lib/types'
 
 interface GenerationStep {
@@ -109,7 +109,7 @@ export default function GeneratorPage() {
       alert(`✅ 新機能テスト成功！品質スコア: ${qualityCheck.qualityScore}%`)
     } catch (error) {
       console.error('新機能テストエラー:', error)
-      alert('❌ 新機能テストに失敗しました: ' + error)
+      alert(`❌ 新機能テストに失敗しました: ${  error}`)
     }
   }
 

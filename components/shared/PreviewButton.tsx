@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Eye, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Eye, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface PreviewButtonProps {

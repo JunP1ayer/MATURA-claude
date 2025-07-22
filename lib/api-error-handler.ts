@@ -15,7 +15,7 @@ export class ApiError extends Error {
   public statusCode: number;
   public code: string;
 
-  constructor(message: string, statusCode: number = 500, code: string = 'INTERNAL_ERROR') {
+  constructor(message: string, statusCode = 500, code = 'INTERNAL_ERROR') {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
@@ -133,7 +133,7 @@ export function validateRequest(data: unknown, schema: any): void {
 /**
  * レート制限チェック
  */
-export function checkRateLimit(request: NextRequest, maxRequests: number = 100, windowMs: number = 60000): void {
+export function checkRateLimit(request: NextRequest, maxRequests = 100, windowMs = 60000): void {
   // 実際のレート制限実装はRedisやメモリベースのストレージを使用
   // ここでは簡単な例を示す
   const ip = request.ip || 'unknown';

@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Settings, User, Heart, Star, Bell } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Settings, User, Heart, Star, Bell } from 'lucide-react'
 
 interface ThemeData {
   name: string
@@ -256,9 +256,9 @@ function SingleThemeDisplay({ theme, className = "" }: SingleThemeDisplayProps) 
               <span 
                 className="px-2 py-1 text-xs rounded border"
                 style={{
-                  backgroundColor: theme.colors.primary + '20',
+                  backgroundColor: `${theme.colors.primary  }20`,
                   color: theme.colors.primary,
-                  borderColor: theme.colors.primary + '40'
+                  borderColor: `${theme.colors.primary  }40`
                 }}
               >
                 新機能
@@ -266,9 +266,9 @@ function SingleThemeDisplay({ theme, className = "" }: SingleThemeDisplayProps) 
               <span 
                 className="px-2 py-1 text-xs rounded border"
                 style={{
-                  backgroundColor: theme.colors.accent + '20',
+                  backgroundColor: `${theme.colors.accent  }20`,
                   color: theme.colors.accent,
-                  borderColor: theme.colors.accent + '40'
+                  borderColor: `${theme.colors.accent  }40`
                 }}
               >
                 人気

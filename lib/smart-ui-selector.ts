@@ -206,7 +206,7 @@ export function generateOptimizedUI(pattern: UIDesignPattern, userIdea: string, 
   }
   
   // Otherwise use the standard generator
-  const tableName = schema.tableName;
+  const {tableName} = schema;
   const columns = schema.columns.filter((col: any) => 
     !col.primaryKey && 
     !col.name.includes('created_at') && 

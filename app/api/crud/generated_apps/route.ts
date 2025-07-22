@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllGeneratedApps, getGeneratedApp, createGeneratedApp } from '@/lib/supabase-apps';
 import { AuthHelpers } from '@/lib/auth';
+import { getAllGeneratedApps, getGeneratedApp, createGeneratedApp } from '@/lib/supabase-apps';
 
 export async function GET(req: NextRequest) {
   try {

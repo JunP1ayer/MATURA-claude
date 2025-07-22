@@ -1,19 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Loader2, Sparkles, Palette, Code, Eye, Wand2, Figma, Lightbulb } from 'lucide-react';
-import { DynamicForm } from '@/components/DynamicForm';
-import { DataTable } from '@/components/DataTable';
 import { toast } from 'sonner';
+import { DataTable } from '@/components/DataTable';
+import { DynamicForm } from '@/components/DynamicForm';
 import { FigmaStyleSelector } from '@/components/FigmaStyleSelector';
 import { IntelligentDesignGenerator } from '@/components/IntelligentDesignGenerator';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { selectOptimalDesignPattern } from '@/lib/smart-ui-selector';
 
 interface Column {
@@ -164,8 +164,8 @@ export default function AppCreatorPage() {
       const schemaResult = await schemaResponse.json();
       setSchema(schemaResult.schema);
 
-      // Then generate with Figma
-      const figmaResponse = await fetch('/api/figma-generate', {
+      // Then generate with hybrid AI system
+      const figmaResponse = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -145,7 +145,7 @@ export class FigmaApiMonitor {
     };
   }
 
-  getRecentErrors(limit: number = 10): ApiUsageLog[] {
+  getRecentErrors(limit = 10): ApiUsageLog[] {
     return this.usageLog
       .filter(log => log.status >= 400)
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())

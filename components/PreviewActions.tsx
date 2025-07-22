@@ -1,7 +1,7 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Calendar } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface PreviewActionsProps {
   app: {

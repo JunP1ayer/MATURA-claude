@@ -12,7 +12,7 @@ export interface ComponentMapping {
 export class FigmaUIGenerator {
   // Generate React components from Figma design
   generateComponentsFromFigma(figmaDesign: FigmaDesignData, schema: any): string {
-    const tableName = schema.tableName;
+    const {tableName} = schema;
     const columns = schema.columns.filter((col: any) => 
       !col.primaryKey && 
       !col.name.includes('created_at') && 
@@ -104,7 +104,7 @@ export class FigmaUIGenerator {
 
   // Generate Tailwind styles based on Figma design
   private generateTailwindStyles(figmaDesign: FigmaDesignData): string {
-    const colors = figmaDesign.colors;
+    const {colors} = figmaDesign;
     
     return `
       /* Custom Figma-based styles */

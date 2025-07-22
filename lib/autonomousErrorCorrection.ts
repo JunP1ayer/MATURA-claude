@@ -21,7 +21,7 @@ export class AutonomousErrorCorrection {
   private maxIterations: number
   private correctionHistory: string[]
 
-  constructor(maxIterations: number = 3) {
+  constructor(maxIterations = 3) {
     this.maxIterations = maxIterations
     this.correctionHistory = []
     this.errorPatterns = this.initializeErrorPatterns()

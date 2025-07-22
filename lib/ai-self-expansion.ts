@@ -296,7 +296,7 @@ shadcn/ui コンポーネントを活用し、Tailwind CSSで実装してくだ�
         improvements.push({
           file: `ui-improvement-${index + 1}.tsx`,
           type: 'modify',
-          description: section.substring(0, 100) + '...',
+          description: `${section.substring(0, 100)  }...`,
           code: codeMatch[1],
           priority: 'medium'
         })

@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Lightbulb, Target, Star, Heart, ArrowRight, RefreshCw, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import PreviewButton from '@/components/shared/PreviewButton'
-import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
+import { Lightbulb, Target, Star, Heart, ArrowRight, RefreshCw, X } from 'lucide-react'
 import { useMatura } from '@/components/providers/MaturaProvider'
+import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
+import PreviewButton from '@/components/shared/PreviewButton'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
 import { Insight } from '@/lib/types'
 
@@ -16,6 +16,7 @@ export default function InsightRefine() {
 
   useEffect(() => {
     generateInsights()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Cleanup on unmount - cancel any ongoing requests
@@ -45,7 +46,6 @@ export default function InsightRefine() {
     } catch (error) {
       console.error('洞察生成エラー:', error)
     }
-    return;
   }
 
   const handleNext = () => {
@@ -57,7 +57,6 @@ export default function InsightRefine() {
 
   const handleRegenerate = (): void => {
     generateInsights()
-    return;
   }
 
   return (
@@ -266,7 +265,7 @@ export default function InsightRefine() {
                 </button>
               </motion.div>
             </motion.div>
-          ) : !insights && !chatOptimized.isLoading ? (
+          ) : (
             <div className="text-center py-16">
               <p className="text-red-600 mb-4">洞察の生成に失敗しました</p>
               <button
@@ -277,7 +276,7 @@ export default function InsightRefine() {
                 再試行
               </button>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </motion.div>

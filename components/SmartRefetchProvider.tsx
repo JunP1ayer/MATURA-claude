@@ -1,8 +1,8 @@
 'use client';
 
-import { useSmartRefetch } from '@/hooks/useVisibilityRefetch';
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSmartRefetch } from '@/hooks/useVisibilityRefetch';
 
 /**
  * アプリケーション全体のスマートrefetch制御

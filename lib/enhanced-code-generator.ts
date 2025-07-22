@@ -5,7 +5,29 @@
 
 import { GeminiClient } from '@/lib/gemini-client';
 import { openai } from '@/lib/openai';
-import type { AppIntent, GeneratedSchema, UIConfiguration } from './universal-app-generator';
+// Types previously from universal-app-generator
+export interface AppIntent {
+  purpose: string;
+  target_users: string;
+  key_features: string[];
+  business_model?: string;
+}
+
+export interface GeneratedSchema {
+  tableName: string;
+  columns: Array<{
+    name: string;
+    type: string;
+    nullable?: boolean;
+    defaultValue?: any;
+  }>;
+}
+
+export interface UIConfiguration {
+  layout: string;
+  theme: string;
+  components: string[];
+}
 
 export interface CodeGenerationPlan {
   mainFeatures: string[];

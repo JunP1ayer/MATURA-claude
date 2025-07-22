@@ -1,7 +1,7 @@
-import { Insight, UIStyle, UnifiedUXDesign, GeneratedCode } from './types'
-import { join } from 'path'
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs'
 import { execSync } from 'child_process'
+import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs'
+import { join } from 'path'
+import { Insight, UIStyle, UnifiedUXDesign, GeneratedCode } from './types'
 
 interface AutonomousGenerationOptions {
   includeTests: boolean
@@ -533,7 +533,7 @@ Generate only the complete, functional code without explanations or markdown for
     })
 
     if (missingImports.length > 0) {
-      const importSection = missingImports.join('\n') + '\n\n'
+      const importSection = `${missingImports.join('\n')  }\n\n`
       return importSection + code
     }
 
@@ -2826,7 +2826,7 @@ describe('Hooks', () => {
     console.log('🔍 Performing quality checks and corrections...')
 
     let iteration = 0
-    const maxIterations = this.options.maxIterations
+    const {maxIterations} = this.options
 
     while (iteration < maxIterations) {
       console.log(`Quality check iteration ${iteration + 1}/${maxIterations}`)

@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Wrench, Layout, Type, Navigation, Palette, ArrowRight, RefreshCw } from 'lucide-react'
 import { motion } from 'framer-motion'
-import PreviewButton from '@/components/shared/PreviewButton'
-import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
+import { Wrench, Layout, Type, Navigation, Palette, ArrowRight, RefreshCw } from 'lucide-react'
 import { useMatura } from '@/components/providers/MaturaProvider'
+import { ProcessingSpinner } from '@/components/shared/LoadingSpinner'
+import PreviewButton from '@/components/shared/PreviewButton'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
 import { UXDesign } from '@/lib/types'
 

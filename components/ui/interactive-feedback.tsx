@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, AlertCircle, Info, X, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { 
   toastSlideIn, 
   successBounce, 
@@ -11,6 +10,7 @@ import {
   scaleIn, 
   loadingSpinner 
 } from '@/lib/animations'
+import { cn } from '@/lib/utils'
 
 // トーストタイプ
 type ToastType = 'success' | 'error' | 'info' | 'warning' | 'loading'

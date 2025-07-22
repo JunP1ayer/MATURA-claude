@@ -92,13 +92,13 @@ export async function POST(request: NextRequest) {
     console.log('[DEBUG] Environment check:')
     console.log('[DEBUG] - OPENAI_API_KEY exists:', !!debugApiKey)
     console.log('[DEBUG] - OPENAI_API_KEY length:', debugApiKey?.length || 0)
-    console.log('[DEBUG] - OPENAI_API_KEY prefix:', debugApiKey ? debugApiKey.substring(0, 3) + '...' : 'none')
+    console.log('[DEBUG] - OPENAI_API_KEY prefix:', debugApiKey ? `${debugApiKey.substring(0, 3)  }...` : 'none')
     console.log('[DEBUG] - NODE_ENV:', process.env.NODE_ENV)
     console.log('='.repeat(50))
     // ***** DETAILED DEBUG LOGGING END *****
 
     // Get abort signal from request
-    const signal = request.signal
+    const {signal} = request
     
     // Log request start
     console.log('[/api/chat] Request started at:', new Date().toISOString())
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     
     // プレースホルダーキーのチェック
     if (apiKey.includes('YOUR_KEY_HERE') || apiKey.length < 20) {
-      console.error('[chat-api] OPENAI_API_KEY appears to be a placeholder:', apiKey.substring(0, 10) + '...')
+      console.error('[chat-api] OPENAI_API_KEY appears to be a placeholder:', `${apiKey.substring(0, 10)  }...`)
       return NextResponse.json(
         { error: 'OpenAI APIキーが正しく設定されていません。.env.localファイルに有効なAPIキーを設定してください。' },
         { status: 500 }

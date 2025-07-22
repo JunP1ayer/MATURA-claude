@@ -4,8 +4,8 @@
  */
 
 import { promptTuner, type PromptOptimizationResult } from './prompt-tuner'
-import { checkStructureQuality } from './validation'
 import type { StructureData } from './types'
+import { checkStructureQuality } from './validation'
 
 export interface AdvancedPromptConfig {
   contextEnrichment: boolean      // コンテキスト強化
@@ -295,29 +295,29 @@ export class AdvancedPromptEngine {
   private async enhanceTechnicalSpecs(structure: StructureData): Promise<StructureData> {
     return {
       ...structure,
-      how: structure.how + "\n\n技術詳細: Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Framer Motion, Vercel"
+      how: `${structure.how  }\n\n技術詳細: Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Framer Motion, Vercel`
     }
   }
 
   // プライベートヘルパーメソッド
   private enrichWhy(why: string): string {
-    return why + "（市場調査と業界分析に基づく検証済みニーズ）"
+    return `${why  }（市場調査と業界分析に基づく検証済みニーズ）`
   }
 
   private enrichWho(who: string): string {
-    return who + "（デモグラフィック分析とペルソナ設計完了）"
+    return `${who  }（デモグラフィック分析とペルソナ設計完了）`
   }
 
   private enrichWhat(what: string): string {
-    return what + " - 実装優先度と技術要件明確化済み"
+    return `${what  } - 実装優先度と技術要件明確化済み`
   }
 
   private enrichHow(how: string): string {
-    return how + "\n包括的アーキテクチャ設計とスケーラビリティ考慮済み"
+    return `${how  }\n包括的アーキテクチャ設計とスケーラビリティ考慮済み`
   }
 
   private enrichImpact(impact: string): string {
-    return impact + "（KPI設定とROI予測完了）"
+    return `${impact  }（KPI設定とROI予測完了）`
   }
 
   /**

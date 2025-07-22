@@ -295,7 +295,7 @@ export class SecureFigmaClient {
   }
 
   // エラー履歴取得
-  getRecentErrors(limit: number = 10) {
+  getRecentErrors(limit = 10) {
     return this.monitor.getRecentErrors(limit);
   }
 

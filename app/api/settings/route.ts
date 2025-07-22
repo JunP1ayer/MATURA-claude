@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // モック設定データ
 let mockSettings = {
   user: {
-    id: 'user_' + Date.now(),
+    id: `user_${  Date.now()}`,
     name: 'Demo User',
     email: 'demo@matura.ai',
     avatar: null,
@@ -90,7 +90,7 @@ let mockSettings = {
   metadata: {
     lastUpdated: new Date().toISOString(),
     version: '1.0.0',
-    configId: 'config_' + Date.now()
+    configId: `config_${  Date.now()}`
   }
 }
 
@@ -308,7 +308,7 @@ export async function POST(request: NextRequest) {
         break
 
       case 'backup':
-        const backupId = 'backup_' + Date.now()
+        const backupId = `backup_${  Date.now()}`
         console.log(`💾 [API] Creating settings backup: ${backupId}`)
         
         // バックアップのシミュレーション
@@ -378,7 +378,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         settings: mockSettings,
-        action: action,
+        action,
         timestamp: new Date().toISOString()
       }
     })

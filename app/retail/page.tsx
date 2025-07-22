@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, ShoppingCart, Package, Users, TrendingUp, CheckCircle, Star, Clock, Shield, Smartphone } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowRight, ShoppingCart, Package, Users, TrendingUp, CheckCircle, Star, Clock, Shield, Smartphone } from 'lucide-react'
 import { Logo } from '@/components/Logo'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function RetailPage() {
   const [selectedDemo, setSelectedDemo] = useState('pos')

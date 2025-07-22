@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, X, ArrowRight, Palette, Shuffle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import PreviewButton from '@/components/shared/PreviewButton'
+import { Heart, X, ArrowRight, Palette, Shuffle } from 'lucide-react'
 import { useMatura } from '@/components/providers/MaturaProvider'
+import PreviewButton from '@/components/shared/PreviewButton'
 import { UIDesign } from '@/lib/types'
 
 // ダミーUIデザインオプション（実際にはAIが生成）

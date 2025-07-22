@@ -67,28 +67,59 @@ export class OpenAIOptimizedSystem {
         config
       );
 
-      // OpenAI APIの実行
-      const response = await openai.chat.completions.create({
-        model: config.model,
-        messages: [
-          { role: "system", content: enhancedSystemMessage },
-          { role: "user", content: prompt }
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: functionName,
-              description: functionSchema.description,
-              parameters: functionSchema.parameters
+      // OpenAI APIの実行（GPT-3.5フォールバック付き）
+      let response;
+      try {
+        response = await openai.chat.completions.create({
+          model: config.model,
+          messages: [
+            { role: "system", content: enhancedSystemMessage },
+            { role: "user", content: prompt }
+          ],
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: functionName,
+                description: functionSchema.description,
+                parameters: functionSchema.parameters
+              }
             }
-          }
-        ],
-        tool_choice: { type: "function", function: { name: functionName } },
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-        response_format: { type: "text" }
-      });
+          ],
+          tool_choice: { type: "function", function: { name: functionName } },
+          temperature: config.temperature,
+          max_tokens: config.maxTokens,
+          response_format: { type: "text" }
+        });
+      } catch (error: any) {
+        // トークン制限エラーの場合、GPT-3.5-turboにフォールバック
+        if (error.message?.includes('tokens') && config.model === 'gpt-4') {
+          console.log('⚠️ [OPENAI-OPTIMIZED] Token limit exceeded, falling back to GPT-3.5-turbo');
+          response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              { role: "system", content: enhancedSystemMessage },
+              { role: "user", content: prompt }
+            ],
+            tools: [
+              {
+                type: "function",
+                function: {
+                  name: functionName,
+                  description: functionSchema.description,
+                  parameters: functionSchema.parameters
+                }
+              }
+            ],
+            tool_choice: { type: "function", function: { name: functionName } },
+            temperature: config.temperature,
+            max_tokens: Math.min(config.maxTokens, 4000),
+            response_format: { type: "text" }
+          });
+        } else {
+          throw error;
+        }
+      }
 
       // レスポンスの解析
       const toolCall = response.choices[0]?.message?.tool_calls?.[0];
@@ -96,6 +127,8 @@ export class OpenAIOptimizedSystem {
         throw new Error('No valid function call response');
       }
 
+      // JSON引数をパース
+      console.log('📥 [OPENAI-OPTIMIZED] Parsing function arguments');
       const parsedData = JSON.parse(toolCall.function.arguments);
       
       // 品質評価
@@ -152,17 +185,38 @@ export class OpenAIOptimizedSystem {
     try {
       console.log(`🎨 [OPENAI-OPTIMIZED] Generating ${type} text with ${config.model}`);
 
-      const response = await openai.chat.completions.create({
-        model: config.model,
-        messages: [
-          { role: "system", content: typeOptimization.systemPrompt },
-          { role: "user", content: prompt }
-        ],
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-        presence_penalty: typeOptimization.presencePenalty,
-        frequency_penalty: typeOptimization.frequencyPenalty
-      });
+      let response;
+      try {
+        response = await openai.chat.completions.create({
+          model: config.model,
+          messages: [
+            { role: "system", content: typeOptimization.systemPrompt },
+            { role: "user", content: prompt }
+          ],
+          temperature: config.temperature,
+          max_tokens: config.maxTokens,
+          presence_penalty: typeOptimization.presencePenalty,
+          frequency_penalty: typeOptimization.frequencyPenalty
+        });
+      } catch (error: any) {
+        // トークン制限エラーの場合、GPT-3.5-turboにフォールバック
+        if (error.message?.includes('tokens') && config.model === 'gpt-4') {
+          console.log('⚠️ [OPENAI-OPTIMIZED] Token limit exceeded, falling back to GPT-3.5-turbo');
+          response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              { role: "system", content: typeOptimization.systemPrompt },
+              { role: "user", content: prompt }
+            ],
+            temperature: config.temperature,
+            max_tokens: Math.min(config.maxTokens, 4000),
+            presence_penalty: typeOptimization.presencePenalty,
+            frequency_penalty: typeOptimization.frequencyPenalty
+          });
+        } else {
+          throw error;
+        }
+      }
 
       const content = response.choices[0]?.message?.content || '';
       
@@ -243,7 +297,7 @@ Quality Mode: MAXIMUM`;
    */
   private evaluateResponseQuality(data: any, schema: any): { confidence: number; reasoning: string } {
     let confidence = 0.8; // Base confidence for GPT-4
-    let issues: string[] = [];
+    const issues: string[] = [];
 
     // 必須フィールドの確認
     const required = schema.parameters?.required || [];
@@ -282,7 +336,7 @@ Quality Mode: MAXIMUM`;
    */
   private evaluateTextQuality(content: string, type: string): { confidence: number; reasoning: string } {
     let confidence = 0.8;
-    let factors: string[] = [];
+    const factors: string[] = [];
 
     // 長さの評価
     if (content.length > 200) {

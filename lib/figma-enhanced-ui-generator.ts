@@ -3,9 +3,9 @@
  * Figma連携による高品質デザインシステム生成
  */
 
-import { openai } from '@/lib/openai';
 import { GeminiClient } from '@/lib/gemini-client';
-import type { AppIntent, GeneratedSchema, UIConfiguration } from './universal-app-generator';
+import { openai } from '@/lib/openai';
+import type { AppIntent, GeneratedSchema, UIConfiguration } from './enhanced-code-generator';
 
 export interface FigmaDesignSystem {
   colorPalette: {

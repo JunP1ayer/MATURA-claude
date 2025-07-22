@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { intelligentFigmaSelector } from '@/lib/intelligent-figma-selector';
 import { dynamicCustomizationEngine } from '@/lib/dynamic-customization-engine';
-import { ultraPremiumUISystem } from '@/lib/ultra-premium-ui-system';
 import { geminiClient } from '@/lib/gemini-client';
+import { intelligentFigmaSelector } from '@/lib/intelligent-figma-selector';
+import { ultraPremiumUISystem } from '@/lib/ultra-premium-ui-system';
 
 export async function POST(request: Request) {
   try {

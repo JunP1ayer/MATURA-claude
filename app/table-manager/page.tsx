@@ -1,11 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Database, 
   Plus, 
@@ -23,15 +20,18 @@ import {
   X,
   ExternalLink
 } from 'lucide-react';
-import { TableCreator } from '@/components/TableCreator';
+import { DataExporter } from '@/components/DataExporter';
+import { DataImporter } from '@/components/DataImporter';
 import { DataTable } from '@/components/DataTable';
 import { DynamicForm } from '@/components/DynamicForm';
-import { DataImporter } from '@/components/DataImporter';
-import { DataExporter } from '@/components/DataExporter';
 import { RecentAppsSection } from '@/components/RecentAppsSection';
+import { TableCreator } from '@/components/TableCreator';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGeneratedAppsQuery } from '@/hooks/useSmartQuery';
-import Link from 'next/link';
 
 interface Column {
   id: string;

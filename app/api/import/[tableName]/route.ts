@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { AuthHelpers } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 interface ImportRequest {
   data: any[];
@@ -15,7 +15,7 @@ export async function POST(
   try {
     // 認証チェック（オプショナル）
     const user = await AuthHelpers.validateSession(req);
-    const tableName = params.tableName;
+    const {tableName} = params;
     
     if (!tableName) {
       return NextResponse.json(
@@ -173,7 +173,7 @@ export async function GET(
   { params }: { params: { tableName: string } }
 ) {
   try {
-    const tableName = params.tableName;
+    const {tableName} = params;
     
     // テーブルの存在確認とスキーマ取得
     const { data: schemaData, error } = await supabase

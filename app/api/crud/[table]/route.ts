@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import { setTableSchema, getTableSchema } from '@/lib/tableSchema';
 import { 
   getTableData, 
   setTableData, 
@@ -8,7 +9,6 @@ import {
   updateTableItem, 
   removeTableItem 
 } from '@/lib/virtualDataStore';
-import { setTableSchema, getTableSchema } from '@/lib/tableSchema';
 
 export async function GET(
   req: NextRequest,

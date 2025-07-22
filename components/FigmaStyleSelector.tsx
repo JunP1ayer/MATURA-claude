@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Figma, ExternalLink, Sparkles, Palette } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { PREMIUM_DESIGN_PATTERNS } from '@/lib/smart-ui-selector';
 import { FigmaStatusIndicator } from './FigmaStatusIndicator';
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { persist, createJSONStorage , subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { subscribeWithSelector } from 'zustand/middleware'
+
 
 // Base types for different app types
 export interface Task {

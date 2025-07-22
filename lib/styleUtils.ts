@@ -98,7 +98,7 @@ export function createSafeStyle(style: Partial<StyleData> | null | undefined): S
         : safePreviewColor[1],
       border: (typeof style.themeConfig.border === 'string' && style.themeConfig.border.trim() !== '') 
         ? style.themeConfig.border 
-        : safePreviewColor[1] + '40',
+        : `${safePreviewColor[1]  }40`,
       accent: (typeof style.themeConfig.accent === 'string' && style.themeConfig.accent.trim() !== '') 
         ? style.themeConfig.accent 
         : safePreviewColor[1]

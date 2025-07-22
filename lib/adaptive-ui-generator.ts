@@ -103,7 +103,7 @@ export function generateAdaptiveUI(requirements: AppRequirement, figmaData?: any
   const ideaType = detectIdeaType(requirements)
   
   // 2. 利用可能なデザインパターンを取得
-  const availablePatterns = DESIGN_PATTERNS[ideaType] || DESIGN_PATTERNS['productivity']
+  const availablePatterns = DESIGN_PATTERNS[ideaType] || DESIGN_PATTERNS.productivity
   
   // 3. ランダムまたはFigmaデータに基づいてパターン選択
   const selectedPattern = selectDesignPattern(availablePatterns, figmaData, requirements)
@@ -160,7 +160,7 @@ function generateDefaultColors(scheme: string): string[] {
     'creative': ['#FF69B4', '#00CED1', '#FF1493', '#32CD32', '#FF4500', '#8A2BE2']
   }
   
-  return colorSchemes[scheme] || colorSchemes['corporate']
+  return colorSchemes[scheme] || colorSchemes.corporate
 }
 
 function generateDynamicUI(
@@ -239,7 +239,7 @@ function generateComponents(pattern: DesignPattern, requirements: AppRequirement
     dashboard: pattern.layout === 'dashboard',
     grid: pattern.layout === 'card-grid',
     animations: pattern.animation,
-    colors: colors
+    colors
   }
 }
 

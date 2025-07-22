@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import type { Metadata } from 'next'
 import './globals.css'
-import { QueryProvider } from '@/components/providers/query-provider'
-import { ToastProvider } from '@/components/ui/interactive-feedback'
 import { Toaster } from 'sonner'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { QueryProvider } from '@/components/providers/query-provider'
+import { ToastProvider } from '@/components/ui/interactive-feedback'
 import ClientLayout from './client-layout'
 
 const inter = Inter({ subsets: ['latin'] })

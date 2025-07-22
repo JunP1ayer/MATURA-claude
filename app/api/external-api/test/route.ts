@@ -94,7 +94,7 @@ async function testApiEndpoint(endpoint: ApiEndpoint) {
     }
 
     // URLパラメータを追加
-    let url = endpoint.url;
+    let {url} = endpoint;
     if (endpoint.params) {
       const params = new URLSearchParams();
       Object.entries(endpoint.params).forEach(([key, value]) => {

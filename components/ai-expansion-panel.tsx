@@ -14,11 +14,11 @@ import {
   Palette,
   Zap
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { InteractiveButton, useToast } from '@/components/ui/interactive-feedback'
+import { Textarea } from '@/components/ui/textarea'
 import { fadeInUp, staggerContainer, scaleIn } from '@/lib/animations'
 
 interface AIExpansionPanelProps {

@@ -3,8 +3,8 @@
  * エラー処理、フォールバック、品質保証を徹底
  */
 
-import { openai } from '@/lib/openai';
 import { GeminiClient } from '@/lib/gemini-client';
+import { openai } from '@/lib/openai';
 
 export interface LLMResponse<T> {
   success: boolean;

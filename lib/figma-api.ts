@@ -244,7 +244,7 @@ export class FigmaDesignExtractor {
       }
 
       const data = await response.json();
-      const document = data.document;
+      const {document} = data;
 
       // Extract design tokens
       const tokens = this.parseDesignTokens(document);
@@ -492,7 +492,7 @@ export class FigmaDesignExtractor {
       }
 
       const data = await response.json();
-      const document = data.document;
+      const {document} = data;
       
       // Extract components from the first page
       const firstPage = document.children[0];

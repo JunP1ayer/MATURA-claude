@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { Badge } from '@/components/ui/badge'
 import { Palette, Check } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { useThemeStore } from '@/lib/stores/themeStore'
 
 export default function ThemeStatus() {
@@ -23,9 +23,9 @@ export default function ThemeStatus() {
         variant="outline"
         className="text-xs"
         style={{
-          backgroundColor: selectedTheme.themeConfig.primary + '20',
+          backgroundColor: `${selectedTheme.themeConfig.primary  }20`,
           color: selectedTheme.themeConfig.primary,
-          borderColor: selectedTheme.themeConfig.primary + '40'
+          borderColor: `${selectedTheme.themeConfig.primary  }40`
         }}
       >
         <div 

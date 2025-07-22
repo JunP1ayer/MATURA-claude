@@ -1,8 +1,8 @@
 // Intelligent Figma Template Selector and Customizer
-import { intelligentDesignAnalyzer, StructuredData, DesignContext, ColorPersonality } from './intelligent-design-analyzer';
-import { PREMIUM_DESIGN_PATTERNS, UIDesignPattern } from './smart-ui-selector';
 import { figmaExtractor, FigmaDesignData } from './figma-api';
 import { industryPatternSelector, IndustryPattern } from './industry-specialized-patterns';
+import { intelligentDesignAnalyzer, StructuredData, DesignContext, ColorPersonality } from './intelligent-design-analyzer';
+import { PREMIUM_DESIGN_PATTERNS, UIDesignPattern } from './smart-ui-selector';
 
 export interface IntelligentSelection {
   selectedPattern: UIDesignPattern;
@@ -309,7 +309,7 @@ export class IntelligentFigmaSelector {
       reasons.push(`汎用性を重視した安全な選択（確信度${context.confidenceScore}/10）`);
     }
     
-    return reasons.join('。') + '。';
+    return `${reasons.join('。')  }。`;
   }
 
   // Helper methods for compatibility scoring

@@ -88,7 +88,7 @@ export async function getGeneratedApp(id: string): Promise<GeneratedApp | null> 
 /**
  * 全アプリの一覧を取得（最新順）
  */
-export async function getAllGeneratedApps(limit: number = 50, userId?: string): Promise<GeneratedApp[]> {
+export async function getAllGeneratedApps(limit = 50, userId?: string): Promise<GeneratedApp[]> {
   let query = supabaseAdmin
     .from('generated_apps')
     .select('*')

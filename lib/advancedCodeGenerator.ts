@@ -1,8 +1,8 @@
 import { execSync } from 'child_process'
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
-import { Insight, UIStyle, UnifiedUXDesign } from './types'
 import AdvancedGeminiPromptGenerator, { AdvancedGenerationConfig } from './advancedGeminiPrompts'
+import { Insight, UIStyle, UnifiedUXDesign } from './types'
 
 export interface GenerationPhase {
   name: string
@@ -771,7 +771,7 @@ export class AdvancedCodeGenerator {
    */
   private generateMockUIComponent(prompt: string, outputFile: string): string {
     const componentName = this.extractComponentName(outputFile)
-    const features = this.insight.features
+    const {features} = this.insight
 
     return `'use client'
 

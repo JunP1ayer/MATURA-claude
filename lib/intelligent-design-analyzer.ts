@@ -166,7 +166,7 @@ export class IntelligentDesignAnalyzer {
     const typeKeywords = keywords[type as keyof typeof keywords] || [];
     const foundKeywords = typeKeywords.filter(keyword => input.includes(keyword));
     
-    return foundKeywords.length > 0 ? foundKeywords.join('、') + 'に関連' : null;
+    return foundKeywords.length > 0 ? `${foundKeywords.join('、')  }に関連` : null;
   }
 
   private determineCategory(structured: StructuredData): DesignContext['category'] {
@@ -206,7 +206,7 @@ export class IntelligentDesignAnalyzer {
     
     // 拡張キーワードマッチング
     Object.entries(extendedKeywords).forEach(([category, keywords]) => {
-      let score = keywords.reduce((sum, keyword) => {
+      const score = keywords.reduce((sum, keyword) => {
         const count = (allText.match(new RegExp(keyword, 'g')) || []).length;
         return sum + count;
       }, 0);

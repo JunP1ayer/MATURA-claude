@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createGeneratedApp, generateAppName } from '@/lib/supabase-apps';
 import { AuthHelpers } from '@/lib/auth';
+import { createGeneratedApp, generateAppName } from '@/lib/supabase-apps';
 
 interface Column {
   name: string;

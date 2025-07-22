@@ -1,7 +1,7 @@
 import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { hotelBookingService, taskService, recipeService, createCRUDService } from './supabase'
 import { useHotelBookingStore, useTaskStore, useRecipeStore, useAppMetadataStore } from './store'
+import { hotelBookingService, taskService, recipeService, createCRUDService } from './supabase'
 import type { HotelBooking, TaskItem, RecipeItem, BaseItem } from './supabase'
 
 // React Query keys

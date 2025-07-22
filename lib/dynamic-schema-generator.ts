@@ -158,7 +158,7 @@ Format:
       // 1. 直接パース
       return JSON.parse(content);
     } catch (error) {
-      console.log('❌ Direct JSON parse failed:', error.message);
+      console.log('❌ Direct JSON parse failed:', error instanceof Error ? error.message : 'Unknown error');
       console.log('🔍 Content preview:', content.substring(0, 200));
       
       try {

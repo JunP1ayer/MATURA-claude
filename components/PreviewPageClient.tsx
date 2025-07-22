@@ -1,10 +1,10 @@
 'use client';
 
-import { DynamicComponentRenderer } from '@/components/DynamicComponentRenderer';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Code2, Database, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { ArrowLeft, Code2, Database, Calendar } from 'lucide-react';
+import { DynamicComponentRenderer } from '@/components/DynamicComponentRenderer';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 
 interface PreviewPageClientProps {
   app: {

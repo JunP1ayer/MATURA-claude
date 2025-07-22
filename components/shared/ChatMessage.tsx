@@ -1,7 +1,7 @@
 'use client'
 
-import { User, Bot, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { User, Bot, Sparkles } from 'lucide-react'
 import { Message } from '@/lib/types'
 import { formatDate, cn } from '@/lib/utils'
 

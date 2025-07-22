@@ -138,7 +138,7 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
     console.log('🤖 [OPENAI-DEBUG] Override key provided:', !!apiKeyOverride)
     console.log('🤖 [OPENAI-DEBUG] Final API key exists:', !!API_KEY)
     console.log('🤖 [OPENAI-DEBUG] Final API key length:', API_KEY?.length || 0)
-    console.log('🤖 [OPENAI-DEBUG] Final API key preview:', API_KEY?.substring(0, 10) + '...')
+    console.log('🤖 [OPENAI-DEBUG] Final API key preview:', `${API_KEY?.substring(0, 10)  }...`)
     console.log('🤖 [OPENAI-DEBUG] API key format valid:', API_KEY?.startsWith('sk-'))
     
     if (!API_KEY) {
@@ -174,7 +174,7 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
     const model = 'gpt-3.5-turbo' // gpt-4ではなくgpt-3.5-turboを使用
     
     const requestBody = {
-      model: model,
+      model,
       messages: [
         { role: 'system', content: systemPrompt },
         ...validatedMessages,
@@ -194,7 +194,7 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
     // 2️⃣ 明示的にAPIキーを設定してfetchで使用
     console.log('🔑 [FETCH-PREP] === fetch準備でAPIキー確認 ===')
     console.log('🔑 [FETCH-PREP] API_KEY exists:', !!API_KEY)
-    console.log('🔑 [FETCH-PREP] API_KEY preview:', API_KEY.substring(0, 10) + '...')
+    console.log('🔑 [FETCH-PREP] API_KEY preview:', `${API_KEY.substring(0, 10)  }...`)
     
     // Use direct fetch instead of OpenAI SDK to avoid potential issues
     console.log('🌐 [OPENAI-DEBUG] Making direct API call to OpenAI...')
@@ -211,7 +211,7 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
     console.log('🔍 [AUTH-DEBUG] ===== Authorization ヘッダー確認 =====')
     console.log('🔍 [AUTH-DEBUG] API_KEY値:', API_KEY)
     console.log('🔍 [AUTH-DEBUG] authHeader全体:', authHeader)
-    console.log('🔍 [AUTH-DEBUG] authHeaderプレビュー:', authHeader.substring(0, 25) + '...')
+    console.log('🔍 [AUTH-DEBUG] authHeaderプレビュー:', `${authHeader.substring(0, 25)  }...`)
     console.log('🔍 [AUTH-DEBUG] Bearer形式正確:', authHeader.startsWith('Bearer sk-'))
     console.log('🔍 [AUTH-DEBUG] ==========================================')
     
@@ -230,7 +230,7 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
     console.log('🔍 [FETCH-DEBUG] ===== fetchOptions確認 =====')
     console.log('🔍 [FETCH-DEBUG] method:', fetchOptions.method)
     console.log('🔍 [FETCH-DEBUG] Content-Type:', fetchOptions.headers['Content-Type'])
-    console.log('🔍 [FETCH-DEBUG] Authorization:', fetchOptions.headers['Authorization'])
+    console.log('🔍 [FETCH-DEBUG] Authorization:', fetchOptions.headers.Authorization)
     console.log('🔍 [FETCH-DEBUG] User-Agent:', fetchOptions.headers['User-Agent'])
     console.log('🔍 [FETCH-DEBUG] bodyサイズ:', fetchOptions.body.length)
     console.log('🔍 [FETCH-DEBUG] ==========================================')
@@ -239,7 +239,7 @@ export async function chatWithOpenAI(messages: any[], phase: string, signal?: Ab
       method: fetchOptions.method,
       headers: {
         'Content-Type': fetchOptions.headers['Content-Type'],
-        'Authorization': fetchOptions.headers['Authorization'].substring(0, 20) + '...',
+        'Authorization': `${fetchOptions.headers.Authorization.substring(0, 20)  }...`,
         'User-Agent': fetchOptions.headers['User-Agent']
       },
       bodyLength: fetchOptions.body.length

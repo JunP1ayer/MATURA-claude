@@ -85,7 +85,7 @@ export class AppError extends Error {
   constructor(
     message: string,
     public code: string,
-    public statusCode: number = 400
+    public statusCode = 400
   ) {
     super(message)
     this.name = 'AppError'
@@ -146,7 +146,7 @@ export function sanitizeArray(input: string[]): string[] {
 // Async operation wrapper with error handling
 export async function withErrorHandling<T>(
   operation: () => Promise<T>,
-  errorMessage: string = '操作に失敗しました'
+  errorMessage = '操作に失敗しました'
 ): Promise<{ success: boolean; data?: T; error?: string }> {
   try {
     const data = await operation()
@@ -167,8 +167,8 @@ export class RateLimiter {
 
   isAllowed(
     identifier: string, 
-    maxAttempts: number = 5, 
-    windowMs: number = 60000
+    maxAttempts = 5, 
+    windowMs = 60000
   ): boolean {
     const now = Date.now()
     const attempts = this.attempts.get(identifier) || []

@@ -2,10 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, useAnimation, useMotionValue, useTransform, PanInfo } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
+import { Heart, X, RotateCcw, Grid, Layers } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Heart, X, RotateCcw, Grid, Layers } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { useThemeStore } from '@/lib/stores/themeStore'
 import { createSafeStyle, createSafeStyles, type StyleData } from '@/lib/styleUtils'
 
@@ -321,7 +321,7 @@ export default function TinderStyleSwiper({ styles, onStyleSelect, onStyleReject
                 <Badge 
                   key={index}
                   style={{
-                    backgroundColor: (safeStyle?.previewColor?.[1] || '#888888') + '20',
+                    backgroundColor: `${safeStyle?.previewColor?.[1] || '#888888'  }20`,
                     color: (safeStyle?.previewColor?.[1] || '#888888'),
                     border: `1px solid ${(safeStyle?.previewColor?.[1] || '#888888')}40`
                   }}
@@ -413,7 +413,7 @@ export default function TinderStyleSwiper({ styles, onStyleSelect, onStyleReject
                       variant="secondary"
                       className="text-xs"
                       style={{
-                        backgroundColor: (safeCurrentStyle?.previewColor?.[0] || '#000000') + '20',
+                        backgroundColor: `${safeCurrentStyle?.previewColor?.[0] || '#000000'  }20`,
                         color: (safeCurrentStyle?.previewColor?.[0] || '#000000')
                       }}
                     >

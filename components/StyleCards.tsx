@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import * as Icons from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import * as Icons from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface StyleData {
   id?: string
@@ -52,7 +52,7 @@ const createUltraSafeStyle = (rawStyle: any): StyleData => {
       surface: rawStyle?.themeConfig?.surface || defaultColors[2],
       text: rawStyle?.themeConfig?.text || defaultColors[0],
       textSecondary: rawStyle?.themeConfig?.textSecondary || defaultColors[1],
-      border: rawStyle?.themeConfig?.border || (defaultColors[1] + '40'),
+      border: rawStyle?.themeConfig?.border || (`${defaultColors[1]  }40`),
       accent: rawStyle?.themeConfig?.accent || defaultColors[1]
     }
   }
@@ -244,7 +244,7 @@ export default function StyleCards({ onStyleSelect }: StyleCardsProps) {
                 style={{ 
                   borderColor: isSelected 
                     ? '#3b82f6' 
-                    : getPreviewColor(safeStyle.previewColor, 1, '#cccccc') + '40'
+                    : `${getPreviewColor(safeStyle.previewColor, 1, '#cccccc')  }40`
                 }}
               >
                 <CardHeader className="pb-4">
@@ -303,7 +303,7 @@ export default function StyleCards({ onStyleSelect }: StyleCardsProps) {
                               variant="secondary"
                               className="text-xs px-2 py-1 rounded-full"
                               style={{
-                                backgroundColor: getPreviewColor(safeStyle.previewColor, 1, '#cccccc') + '15',
+                                backgroundColor: `${getPreviewColor(safeStyle.previewColor, 1, '#cccccc')  }15`,
                                 color: getPreviewColor(safeStyle.previewColor, 0, '#000000'),
                                 border: `1px solid ${getPreviewColor(safeStyle.previewColor, 1, '#cccccc')}30`
                               }}
@@ -316,7 +316,7 @@ export default function StyleCards({ onStyleSelect }: StyleCardsProps) {
                               variant="secondary"
                               className="text-xs px-2 py-1 rounded-full"
                               style={{
-                                backgroundColor: getPreviewColor(safeStyle.previewColor, 1, '#cccccc') + '15',
+                                backgroundColor: `${getPreviewColor(safeStyle.previewColor, 1, '#cccccc')  }15`,
                                 color: getPreviewColor(safeStyle.previewColor, 0, '#000000'),
                                 border: `1px solid ${getPreviewColor(safeStyle.previewColor, 1, '#cccccc')}30`
                               }}

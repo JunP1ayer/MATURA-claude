@@ -23,7 +23,7 @@ function initializeOpenAI() {
     console.log(`🔧 [GPT4-INIT] API Key starts with sk-: ${apiKey.startsWith('sk-')}`);
     
     openai = new OpenAI({
-      apiKey: apiKey,
+      apiKey,
     });
     
     console.log('✅ [GPT4-INIT] OpenAI client initialized successfully');

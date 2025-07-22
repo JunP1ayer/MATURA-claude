@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeRequirementsWithGPT4, designSystemArchitecture } from '@/lib/gpt4-analyzer';
-import { generateUIDesignSystem, implementApplication } from '@/lib/enhanced-gemini-generator';
 import { DynamicSchemaGenerator } from '@/lib/dynamic-schema-generator';
+import { generateUIDesignSystem, implementApplication } from '@/lib/enhanced-gemini-generator';
+import { analyzeRequirementsWithGPT4, designSystemArchitecture } from '@/lib/gpt4-analyzer';
 
 interface ThirtyMinuteRequest {
   idea: string;
@@ -913,7 +913,7 @@ async function generateAppConfig(idea: string) {
   }
   
   // 扶養・収入管理（優先度高）
-  console.log('📋 Checking for income management keywords in:', lowerIdea.substring(0, 50) + '...');
+  console.log('📋 Checking for income management keywords in:', `${lowerIdea.substring(0, 50)  }...`);
   if (lowerIdea.includes('扶養') || lowerIdea.includes('収入') || lowerIdea.includes('年収') || lowerIdea.includes('103万') || lowerIdea.includes('130万')) {
     console.log('✅ Income management app selected!');
     return {

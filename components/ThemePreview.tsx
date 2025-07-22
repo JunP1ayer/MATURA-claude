@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Heart, Star, Settings, User, Mail, Bell } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Heart, Star, Settings, User, Mail, Bell } from 'lucide-react'
 
 interface ThemeConfig {
   name: string
@@ -308,7 +308,7 @@ function ThemePreviewComponent({ theme }: ThemePreviewProps) {
               <div className="flex flex-wrap gap-2 mb-4">
                 <Badge 
                   style={{
-                    backgroundColor: theme.colors.primary + '20',
+                    backgroundColor: `${theme.colors.primary  }20`,
                     color: theme.colors.primary,
                     border: `1px solid ${theme.colors.primary}40`
                   }}
@@ -317,7 +317,7 @@ function ThemePreviewComponent({ theme }: ThemePreviewProps) {
                 </Badge>
                 <Badge 
                   style={{
-                    backgroundColor: theme.colors.accent + '20',
+                    backgroundColor: `${theme.colors.accent  }20`,
                     color: theme.colors.accent,
                     border: `1px solid ${theme.colors.accent}40`
                   }}

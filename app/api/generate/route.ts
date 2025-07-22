@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     console.log('Request body:', body);
-    const { idea, userInput, mode = 'balanced' } = body as GenerateRequest;
+    const { idea, userInput, mode = 'balanced', autonomous = false, figmaFileId } = body as GenerateRequest;
     const inputIdea = idea || userInput; // Legacy support
 
     if (!inputIdea || !inputIdea.trim()) {

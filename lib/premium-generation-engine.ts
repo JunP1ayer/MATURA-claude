@@ -4,9 +4,9 @@
  */
 
 import { geminiClient } from './gemini-client';
-import { thirtyMinuteProcess } from './thirty-minute-process';
-import { qualityEvaluationSystem } from './quality-evaluation-system';
 import { premiumDesignGenerator } from './premium-design-system';
+import { qualityEvaluationSystem } from './quality-evaluation-system';
+import { thirtyMinuteProcess } from './thirty-minute-process';
 import { ultraPremiumUISystem } from './ultra-premium-ui-system';
 
 export interface PremiumGenerationRequest {
@@ -108,9 +108,9 @@ export class PremiumGenerationEngine {
     return {
       detailedRequirements: requirements,
       systemArchitecture: architecture,
-      designSystem: designSystem,
-      generatedCode: generatedCode,
-      qualityReport: qualityReport,
+      designSystem,
+      generatedCode,
+      qualityReport,
       generationMetadata: {
         totalTime: processResult.totalTime,
         qualityScore: processResult.finalQualityScore,

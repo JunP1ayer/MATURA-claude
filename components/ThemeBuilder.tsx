@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import * as Icons from 'lucide-react'
 import { ArrowLeft, Palette, Layout, Smartphone } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createSafeStyle, type StyleData } from '@/lib/styleUtils'
 
 
@@ -34,7 +34,7 @@ export default function ThemeBuilder({ selectedStyle, onBack, onApplyTheme }: Th
       </div>
 
       {/* 選択されたスタイル情報 */}
-      <Card className="mb-8" style={{ borderColor: (safeStyle?.previewColor?.[1] || '#888888') + '40' }}>
+      <Card className="mb-8" style={{ borderColor: `${safeStyle?.previewColor?.[1] || '#888888'  }40` }}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {IconComponent && (
@@ -53,7 +53,7 @@ export default function ThemeBuilder({ selectedStyle, onBack, onApplyTheme }: Th
               <Badge
                 key={index}
                 style={{
-                  backgroundColor: (safeStyle?.previewColor?.[1] || '#888888') + '15',
+                  backgroundColor: `${safeStyle?.previewColor?.[1] || '#888888'  }15`,
                   color: (safeStyle?.previewColor?.[0] || '#000000'),
                   border: `1px solid ${(safeStyle?.previewColor?.[1] || '#888888')}30`
                 }}
@@ -112,7 +112,7 @@ export default function ThemeBuilder({ selectedStyle, onBack, onApplyTheme }: Th
                   >
                     <div 
                       className="w-full h-2 rounded"
-                      style={{ backgroundColor: (safeStyle?.previewColor?.[1] || '#888888') + '30' }}
+                      style={{ backgroundColor: `${safeStyle?.previewColor?.[1] || '#888888'  }30` }}
                     />
                   </div>
                   <div 
@@ -124,7 +124,7 @@ export default function ThemeBuilder({ selectedStyle, onBack, onApplyTheme }: Th
                   >
                     <div 
                       className="w-3/4 h-2 rounded"
-                      style={{ backgroundColor: (safeStyle?.previewColor?.[1] || '#888888') + '30' }}
+                      style={{ backgroundColor: `${safeStyle?.previewColor?.[1] || '#888888'  }30` }}
                     />
                   </div>
                 </div>

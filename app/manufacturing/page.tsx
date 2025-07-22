@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Factory, Package, BarChart3, Settings, CheckCircle, Star, Users, Clock, Shield } from 'lucide-react'
 import Link from 'next/link'
+import { ArrowRight, Factory, Package, BarChart3, Settings, CheckCircle, Star, Users, Clock, Shield } from 'lucide-react'
 import { Logo } from '@/components/Logo'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ManufacturingPage() {
   const [selectedDemo, setSelectedDemo] = useState('inventory')

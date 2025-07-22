@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // モック結果データ
 const mockResults = {
   projectInfo: {
-    id: 'proj_' + Date.now(),
+    id: `proj_${  Date.now()}`,
     name: 'MATURA Generated App',
     description: 'AI-generated Next.js application with TypeScript, Tailwind CSS, and Zustand',
     createdAt: new Date().toISOString(),
@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
       ...responseData,
       generated: {
         timestamp: new Date().toISOString(),
-        requestId: 'req_' + Date.now(),
+        requestId: `req_${  Date.now()}`,
         processingTime: Math.floor(Math.random() * 500) + 100, // 100-600ms
         dataVersion: '1.0'
       }
@@ -280,8 +280,8 @@ export async function POST(request: NextRequest) {
         
         // エクスポート処理のシミュレーション
         const exportResult = {
-          exportId: 'export_' + Date.now(),
-          format: format,
+          exportId: `export_${  Date.now()}`,
+          format,
           downloadUrl: `/api/download/results.${format}`,
           expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1時間後
           fileSize: format === 'pdf' ? '2.4MB' : format === 'xlsx' ? '1.8MB' : '156KB'

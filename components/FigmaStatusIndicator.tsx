@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { CheckCircle, XCircle, AlertCircle, Figma, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, XCircle, AlertCircle, Figma, Loader2 } from 'lucide-react';
 
 interface FigmaStatus {
   hasApiKey: boolean;

@@ -508,7 +508,7 @@ export class PremiumDesignGenerator {
    * ユーティリティメソッド
    */
   private generateId(): string {
-    return 'premium-design-' + Math.random().toString(36).substr(2, 9);
+    return `premium-design-${  Math.random().toString(36).substr(2, 9)}`;
   }
   
   private generateSystemName(category: string, industry: string): string {

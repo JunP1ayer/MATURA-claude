@@ -90,7 +90,7 @@ export class UIPatternGenerator {
   /**
    * 指定された数のUIパターンを生成
    */
-  generateUIPatterns(count: number = 3): UIPattern[] {
+  generateUIPatterns(count = 3): UIPattern[] {
     // インサイトとUIスタイルに基づいてパターンを選択・カスタマイズ
     const selectedPatterns = this.selectOptimalPatterns(count)
     return selectedPatterns.map(pattern => this.customizePatternForProject(pattern))

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useRef, useEffect, useState } from 'react'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 interface CodePreviewProps {
   code: string
@@ -105,7 +105,7 @@ export default function CodePreview({ code, title = 'プレビュー', className
     // 🔧 DEBUG: iframeに送るHTMLコードを出力
     console.log('🖼️ [IFRAME-DEBUG] ===== IFRAME HTML INPUT =====')
     console.log('🖼️ [IFRAME-DEBUG] HTML Code length:', htmlCode?.length || 0)
-    console.log('🖼️ [IFRAME-DEBUG] HTML Code preview:', htmlCode?.substring(0, 200) + '...')
+    console.log('🖼️ [IFRAME-DEBUG] HTML Code preview:', `${htmlCode?.substring(0, 200)  }...`)
     console.log('🖼️ [IFRAME-DEBUG] Full HTML Code:', htmlCode)
     console.log('🖼️ [IFRAME-DEBUG] ===== END OF IFRAME HTML INPUT =====')
 

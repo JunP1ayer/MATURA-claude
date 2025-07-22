@@ -131,7 +131,10 @@ export class GeminiClient {
   /**
    * 創造的アイデア生成 - Geminiの強みを活用
    */
-  async generateCreativeIdeas(
+  /**
+   * 柔軟なアイデア分析 - カテゴリ制約なし
+   */
+  async analyzeIdeaFlexibly(
     userInput: string,
     options: Partial<GeminiRequest> = {}
   ): Promise<GeminiCreativeResponse> {
@@ -139,53 +142,42 @@ export class GeminiClient {
     
     const creativityConfig = this.getCreativityConfig(options.creativityMode || 'balanced');
     
-    const prompt = `🌟 創造的AI思考モード 🌟
+    const prompt = `🌟 自由創造的AI分析モード 🌟
 
 ユーザーの入力: "${userInput}"
 
-あなたは世界最高レベルの創造的思考AIです。このアイデアを革新的で魅力的な方向に発展させてください。
+あなたは制約のない創造的思考AIです。このアイデアをありのままに分析し、可能性を最大限に広げてください。
 
-創造的思考プロセス:
-1. 🔍 本質の理解: ユーザーの真の欲求と背景を読み取る
-2. 🚀 可能性の拡張: 従来の枠を超えた斬新なアプローチを考案
-3. 🎨 体験の革新: ユーザー体験を根本から変える要素を追加
-4. 💡 価値の創造: 新しい価値や意味を生み出す視点を提示
-5. 🌈 多様性の提供: 複数の異なる方向性を提案
+分析アプローチ:
+1. 🔍 本質理解: アイデアの核心と真の価値を抽出
+2. 🚀 自由発想: 既存の枠組みにとらわれない視点
+3. 🎨 多面分析: 複数の角度からの可能性探求
+4. 💡 革新提案: 新しい価値創造の方向性
+5. 🌈 融合思考: 異なる領域の組み合わせ
 
-以下のJSON形式で、創造的で実現可能なアイデア群を生成してください：
+以下のJSON形式で、自由で創造的な分析を提供してください：
 
 {
-  "enhancedConcept": {
-    "title": "進化したアイデアのタイトル",
-    "description": "魅力的で具体的な説明",
-    "uniqueValue": "独自の価値提案",
-    "innovation": "革新的な要素"
-  },
-  "creativeVariations": [
-    {
-      "name": "バリエーション名",
-      "approach": "アプローチ",
-      "features": ["特徴1", "特徴2", "特徴3"],
-      "targetExperience": "目指すユーザー体験"
-    }
-  ],
-  "businessOpportunities": [
-    "ビジネス機会1",
-    "ビジネス機会2"
-  ],
-  "technicalInnovations": [
-    "技術革新案1",
-    "技術革新案2"
-  ],
-  "userExperienceBreakthroughs": [
-    "UX革新1",
-    "UX革新2"
-  ],
-  "marketDifferentiation": "市場での差別化戦略",
-  "futureVision": "将来的な発展の可能性"
+  "enhancedDescription": "アイデアの魅力的で詳細な説明（50-100文字）",
+  "coreEssence": "アイデアの本質的価値",
+  "naturalTags": ["自然に浮かぶ特徴タグ1", "タグ2", "タグ3", "タグ4", "タグ5"],
+  "targetUsers": ["具体的ユーザー1", "ユーザー2", "ユーザー3"],
+  "keyFeatures": ["核心機能1", "機能2", "機能3", "機能4"],
+  "uniqueValue": "独自価値提案",
+  "innovationAreas": ["革新領域1", "領域2", "領域3"],
+  "crossDomainPotential": ["異分野融合の可能性1", "可能性2"],
+  "userExperienceVision": "目指すユーザー体験の描写",
+  "businessPotential": "high|medium|low",
+  "marketOpportunity": "市場機会の説明",
+  "technicalConsiderations": ["技術的考慮点1", "考慮点2"],
+  "futureEvolution": "将来的な進化の方向性",
+  "inspiration": "このアイデアから得られるインスピレーション"
 }
 
-${this.getCreativityPrompt(options.creativityMode || 'balanced')}`;
+
+${this.getCreativityPrompt(options.creativityMode || 'balanced')}
+
+重要: カテゴリに無理に当てはめず、アイデアの本来の可能性を自由に探求してください。`;
 
     const result = await this.generateText({
       prompt,
@@ -471,7 +463,7 @@ ${JSON.stringify(designPattern, null, 2)}
 ## 出力形式
 完全なReactコンポーネントのコードのみを出力してください。説明は不要です。
 
-コンポーネント名: ${schema.tableName ? this.toPascalCase(schema.tableName) + 'Manager' : 'AppManager'}
+コンポーネント名: ${schema.tableName ? `${this.toPascalCase(schema.tableName)  }Manager` : 'AppManager'}
 `;
 
     return this.generateText({
@@ -492,22 +484,24 @@ ${JSON.stringify(designPattern, null, 2)}
 ## ユーザー入力
 ${userInput}
 
-## 分析して以下のJSON形式で回答してください
+## 以下のJSON形式で柔軟に分析してください
 {
-  "category": "business|creative|social|productivity|ecommerce|education",
+  "designCharacter": "デザインの性格（自由記述）",
   "complexity": "simple|moderate|complex",
-  "targetAudience": "general|professional|creative|technical|children",
-  "primaryGoal": "efficiency|engagement|sales|learning|communication",
-  "emotionalTone": "modern|friendly|professional|playful|elegant",
+  "targetAudience": "ターゲット層（自由記述）",
+  "primaryGoals": ["主要目標1", "目標2", "目標3"],
+  "emotionalTone": "感情的トーン（自由記述）",
+  "designTags": ["デザインタグ1", "タグ2", "タグ3", "タグ4"],
   "recommendedColors": {
-    "primary": "#色コード",
-    "secondary": "#色コード", 
-    "accent": "#色コード",
+    "palette": ["#色コード1", "#色コード2", "#色コード3", "#色コード4"],
+    "mood": "色の雰囲気",
     "reasoning": "色選択の理由"
   },
-  "layoutStyle": "minimal|modern|classic|creative",
+  "layoutApproach": "レイアウトアプローチ（自由記述）",
   "keyFeatures": ["機能1", "機能2", "機能3"],
-  "designPriorities": ["優先事項1", "優先事項2"],
+  "designPriorities": ["優先事項1", "優先事項2", "優先事項3"],
+  "innovativeElements": ["革新要素1", "要素2"],
+  "userExperienceFocus": "UX重点領域",
   "confidenceScore": 0.8
 }
 

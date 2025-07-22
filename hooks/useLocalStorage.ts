@@ -35,7 +35,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   // 他のタブでの変更を監視
   useEffect(() => {
     if (typeof window === 'undefined') {
-      return () => {};
+      return undefined
     }
 
     const handleStorageChange = (e: StorageEvent) => {

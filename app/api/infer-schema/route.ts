@@ -181,7 +181,7 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 export async function POST(req: NextRequest) {
-  let userInput: string = '';
+  let userInput = '';
   
   try {
     const requestBody = await req.json();

@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, ArrowRight, Database, RefreshCw, Eye, ExternalLink, Sparkles, Factory, Scissors, ShoppingCart } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Loader2, ArrowRight, Database, RefreshCw, Eye, ExternalLink, Sparkles, Factory, Scissors, ShoppingCart } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { checkFetchResponse } from '@/lib/error-handler';
 import { useGeneratedAppsQuery } from '@/hooks/useSmartQuery';
+import { checkFetchResponse } from '@/lib/error-handler';
 import { findTemplateByKeywords, IndustryTemplate } from '@/lib/industry-templates';
 
 interface GeneratedResult {

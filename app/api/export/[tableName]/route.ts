@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { AuthHelpers } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 interface ExportOptions {
   format: 'csv' | 'json' | 'excel';
@@ -27,7 +27,7 @@ export async function POST(
   try {
     // 認証チェック（オプショナル）
     const user = await AuthHelpers.validateSession(req);
-    const tableName = params.tableName;
+    const {tableName} = params;
     
     if (!tableName) {
       return NextResponse.json(
@@ -123,7 +123,7 @@ async function generateExportData(data: any[], options: ExportOptions): Promise<
             value = date.toISOString();
             break;
           case 'locale':
-            value = date.toLocaleDateString('ja-JP') + ' ' + date.toLocaleTimeString('ja-JP');
+            value = `${date.toLocaleDateString('ja-JP')  } ${  date.toLocaleTimeString('ja-JP')}`;
             break;
           case 'timestamp':
             value = date.getTime().toString();
@@ -186,7 +186,7 @@ function generateJSON(data: any[], options: ExportOptions): string {
     exportedAt: new Date().toISOString(),
     totalRows: data.length,
     columns: options.selectedColumns,
-    data: data
+    data
   };
   
   return JSON.stringify(jsonData, null, 2);
@@ -242,7 +242,7 @@ export async function GET(
   { params }: { params: { tableName: string } }
 ) {
   try {
-    const tableName = params.tableName;
+    const {tableName} = params;
     
     const { count, error } = await supabase
       .from(tableName)

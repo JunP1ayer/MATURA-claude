@@ -77,7 +77,7 @@ export interface AppSettings {
 export class ApiClient {
   private baseUrl: string
 
-  constructor(baseUrl: string = '') {
+  constructor(baseUrl = '') {
     this.baseUrl = baseUrl
   }
 
@@ -186,8 +186,8 @@ export class ApiClient {
    */
   async getGenerationResults(
     format: 'full' | 'summary' | 'metrics' = 'full',
-    includeFiles: boolean = true,
-    includeMetrics: boolean = true
+    includeFiles = true,
+    includeMetrics = true
   ): Promise<ApiResponse<GenerationResults>> {
     const params = new URLSearchParams({
       format,

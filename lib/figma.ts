@@ -442,12 +442,12 @@ export class FigmaParser {
     return structure
   }
 
-  private static rgbaToHex(r: number, g: number, b: number, a: number = 1): string | null {
+  private static rgbaToHex(r: number, g: number, b: number, a = 1): string | null {
     if (a === 0) return null
     
     const toHex = (n: number) => {
       const hex = Math.round(n * 255).toString(16)
-      return hex.length === 1 ? '0' + hex : hex
+      return hex.length === 1 ? `0${  hex}` : hex
     }
 
     const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`

@@ -1,7 +1,7 @@
 'use client'
 
-import { motion, type Variants } from 'framer-motion'
 import React from 'react'
+import { motion, type Variants } from 'framer-motion'
 
 // Common animation variants
 export const fadeInUp: Variants = {

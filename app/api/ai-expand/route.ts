@@ -1,8 +1,8 @@
+import { promises as fs } from 'fs'
+import path from 'path'
 import { NextRequest, NextResponse } from 'next/server'
 import { handleSelfExpansionRequest } from '@/lib/ai-self-expansion'
 import { SecurityMiddleware, AuditLogger } from '@/lib/auth'
-import { promises as fs } from 'fs'
-import path from 'path'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()

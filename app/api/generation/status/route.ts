@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // モックデータ保存用（実際の実装ではRedisやデータベースを使用）
 let mockGenerationState = {
-  id: 'gen_' + Date.now(),
+  id: `gen_${  Date.now()}`,
   status: 'idle', // idle, generating, completed, error
   progress: 0,
   startedAt: null as string | null,
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
       case 'reset':
         mockGenerationState = {
-          id: 'gen_' + Date.now(),
+          id: `gen_${  Date.now()}`,
           status: 'idle',
           progress: 0,
           startedAt: null,

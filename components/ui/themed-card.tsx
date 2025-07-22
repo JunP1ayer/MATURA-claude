@@ -1,6 +1,6 @@
 import * as React from "react"
-import { cn } from "@/lib/cn"
 import { useThemedStyles } from "@/components/providers/ThemeProvider"
+import { cn } from "@/lib/cn"
 
 const ThemedCard = React.forwardRef<
   HTMLDivElement,

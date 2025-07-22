@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
 import { Loader2, Sparkles, Database, FormInput } from 'lucide-react';
-import { DynamicForm } from '@/components/DynamicForm';
-import { DataTable } from '@/components/DataTable';
 import { toast } from 'sonner';
+import { DataTable } from '@/components/DataTable';
+import { DynamicForm } from '@/components/DynamicForm';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Column {
   name: string;

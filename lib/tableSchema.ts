@@ -2,7 +2,7 @@
 // Separated from API route to follow Next.js best practices
 
 // インメモリストレージ（実際の実装では永続化データベースを使用）
-let virtualSchemas: { [tableName: string]: any } = {};
+const virtualSchemas: { [tableName: string]: any } = {};
 
 /**
  * Set schema for a specific table

@@ -3,8 +3,8 @@
  * Figma + Gemini + OpenAI の最適な組み合わせシステム
  */
 
-import { openAIOptimized } from '@/lib/openai-optimized-system';
 import { GeminiClient } from '@/lib/gemini-client';
+import { openAIOptimized } from '@/lib/openai-optimized-system';
 
 export interface HybridGenerationConfig {
   mode: 'creative' | 'professional' | 'experimental' | 'balanced';
@@ -133,65 +133,84 @@ export class HybridAIOrchestrator {
     userIdea: string, 
     config: HybridGenerationConfig
   ) {
-    console.log('🌟 [GEMINI] Creative idea enhancement started');
+    console.log('🌟 [GEMINI] Flexible idea analysis started');
 
-    const creativityPrompt = this.buildGeminiCreativityPrompt(userIdea, config);
-    
-    const result = await this.gemini.generateText({
-      prompt: creativityPrompt,
-      temperature: config.creativityLevel === 'high' ? 0.9 : 
-                   config.creativityLevel === 'medium' ? 0.7 : 0.5,
-      maxTokens: 1500
+    // 新しい柔軟な分析メソッドを使用
+    const result = await this.gemini.analyzeIdeaFlexibly(userIdea, {
+      creativityMode: config.creativityLevel === 'high' ? 'experimental' : 
+                      config.creativityLevel === 'medium' ? 'balanced' : 'conservative',
+      maxTokens: 2000
     });
 
     if (result.success && result.data) {
       try {
         // JSONパース試行
-        const parsed = this.extractJSONFromGeminiResponse(result.data);
-        console.log('✅ [GEMINI] Idea enhancement completed');
+        const parsed = this.extractFlexibleJSONFromGeminiResponse(result.data);
+        console.log('✅ [GEMINI] Flexible idea analysis completed');
         return {
           original: userIdea,
-          enhanced: parsed.enhanced || userIdea,
-          variations: parsed.variations || [userIdea],
-          category: parsed.category || this.inferCategoryFromIdea(userIdea),
-          insights: parsed.insights || [],
+          enhanced: parsed.enhancedDescription || userIdea,
+          variations: [],
+          category: this.extractCategoryFromTags(parsed.naturalTags || []),
+          insights: parsed.technicalConsiderations || [],
           businessPotential: parsed.businessPotential || 'medium',
-          // 本質理解フィールド
-          targetUsers: parsed.targetUsers,
-          keyFeatures: parsed.keyFeatures,
-          uniqueValue: parsed.uniqueValue
+          // 新しい柔軟なフィールド
+          coreEssence: parsed.coreEssence,
+          naturalTags: parsed.naturalTags || [],
+          targetUsers: parsed.targetUsers || [],
+          keyFeatures: parsed.keyFeatures || [],
+          uniqueValue: parsed.uniqueValue,
+          innovationAreas: parsed.innovationAreas || [],
+          crossDomainPotential: parsed.crossDomainPotential || [],
+          userExperienceVision: parsed.userExperienceVision,
+          futureEvolution: parsed.futureEvolution,
+          inspiration: parsed.inspiration
         };
       } catch (error) {
-        console.log('⚠️ [GEMINI] Parsing failed, using intelligent fallback');
-        const simpleAnalysis = this.createSimpleFallbackFromText(userIdea);
+        console.log('⚠️ [GEMINI] Parsing failed, using flexible fallback');
+        const flexibleAnalysis = this.createFlexibleFallbackFromText(userIdea);
         return {
           original: userIdea,
-          enhanced: simpleAnalysis.enhanced,
+          enhanced: flexibleAnalysis.enhancedDescription,
           variations: [],
-          category: simpleAnalysis.category,
-          insights: simpleAnalysis.insights,
-          businessPotential: simpleAnalysis.businessPotential,
-          targetUsers: simpleAnalysis.targetUsers,
-          keyFeatures: simpleAnalysis.keyFeatures,
-          uniqueValue: simpleAnalysis.uniqueValue
+          category: flexibleAnalysis.primaryTag,
+          insights: flexibleAnalysis.considerations,
+          businessPotential: flexibleAnalysis.businessPotential,
+          coreEssence: flexibleAnalysis.coreEssence,
+          naturalTags: flexibleAnalysis.naturalTags,
+          targetUsers: flexibleAnalysis.targetUsers,
+          keyFeatures: flexibleAnalysis.keyFeatures,
+          uniqueValue: flexibleAnalysis.uniqueValue,
+          innovationAreas: [],
+          crossDomainPotential: [],
+          userExperienceVision: flexibleAnalysis.vision,
+          futureEvolution: flexibleAnalysis.futureEvolution,
+          inspiration: flexibleAnalysis.inspiration
         };
       }
     }
 
     // 最終フォールバック: Gemini API失敗時
-    console.log('⚠️ [GEMINI] API failed, using final fallback analysis');
-    const finalAnalysis = this.createSimpleFallbackFromText(userIdea);
+    console.log('⚠️ [GEMINI] API failed, using flexible final fallback');
+    const finalAnalysis = this.createFlexibleFallbackFromText(userIdea);
     
     return {
       original: userIdea,
-      enhanced: finalAnalysis.enhanced,
+      enhanced: finalAnalysis.enhancedDescription,
       variations: [],
-      category: finalAnalysis.category,
-      insights: finalAnalysis.insights,
+      category: finalAnalysis.primaryTag,
+      insights: finalAnalysis.considerations,
       businessPotential: finalAnalysis.businessPotential,
+      coreEssence: finalAnalysis.coreEssence,
+      naturalTags: finalAnalysis.naturalTags,
       targetUsers: finalAnalysis.targetUsers,
       keyFeatures: finalAnalysis.keyFeatures,
-      uniqueValue: finalAnalysis.uniqueValue
+      uniqueValue: finalAnalysis.uniqueValue,
+      innovationAreas: [],
+      crossDomainPotential: [],
+      userExperienceVision: finalAnalysis.vision,
+      futureEvolution: finalAnalysis.futureEvolution,
+      inspiration: finalAnalysis.inspiration
     };
   }
 
@@ -204,25 +223,31 @@ export class HybridAIOrchestrator {
   ) {
     console.log('🎨 [GEMINI] Design inspiration generation started');
 
-    const designPrompt = `アプリアイデア: "${userIdea}"
+    const designPrompt = `Design concept for: "${userIdea}"
 
-このアプリに最適なデザインコンセプトを創造的に提案してください：
+Create a JSON object with design recommendations:
 
+\`\`\`json
 {
-  "colorPalette": ["#主色", "#副色", "#アクセント色", "#背景色"],
-  "designStyle": "modern/minimalist/playful/professional",
+  "colorPalette": ["#primary", "#secondary", "#accent", "#background"],
+  "designStyle": "modern|minimalist|playful|professional",
   "typography": {
-    "heading": "フォントファミリー",
-    "body": "本文フォント",
-    "accent": "アクセントフォント"
+    "heading": "Font family name",
+    "body": "Body font name",
+    "accent": "Accent font name"
   },
-  "components": ["推奨UIコンポーネント"],
-  "layout": "grid/list/dashboard/card",
-  "mood": "温かい/クール/活発/落ち着いた",
-  "inspiration": "デザインインスピレーション説明"
+  "components": ["recommended UI components"],
+  "layout": "grid|list|dashboard|card",
+  "mood": "warm|cool|energetic|calm",
+  "inspiration": "Design inspiration description"
 }
+\`\`\`
 
-創造性を重視し、ユニークで魅力的なデザイン提案をしてください。`;
+IMPORTANT:
+- Return ONLY valid JSON without comments
+- No // or /* */ comments
+- Use practical color hex codes
+- Be creative and unique`;
 
     const result = await this.gemini.generateText({
       prompt: designPrompt,
@@ -298,12 +323,18 @@ export class HybridAIOrchestrator {
         const data = await response.json();
         console.log('✅ [FIGMA] Successfully fetched design data');
         
+        // Figmaファイルからデザイントークンを抽出
+        const extractedDesign = this.extractFigmaDesignTokens(data);
+        
         return {
           figmaTokens: data,
-          colorPalette: ['#3b82f6', '#64748b', '#f59e0b', '#ffffff'],
-          typography: { heading: 'Inter', body: 'Inter' },
-          components: ['Button', 'Input', 'Card'],
-          designSystem: 'figma-integrated'
+          colorPalette: extractedDesign.colorPalette,
+          typography: extractedDesign.typography,
+          components: extractedDesign.components,
+          designSystem: 'figma-integrated',
+          spacing: extractedDesign.spacing,
+          borderRadius: extractedDesign.borderRadius,
+          shadows: extractedDesign.shadows
         };
       } catch (fetchError: any) {
         console.log('⚠️ [FIGMA] Fetch failed:', fetchError?.message || 'Unknown error');
@@ -316,17 +347,275 @@ export class HybridAIOrchestrator {
   }
 
   /**
-   * デフォルトデザインシステム
+   * Figmaデザインファイルからデザイントークンを抽出
+   */
+  private extractFigmaDesignTokens(figmaData: any) {
+    try {
+      const document = figmaData?.document;
+      if (!document) {
+        console.log('⚠️ [FIGMA] No document found, using fallback design');
+        return this.getFallbackDesign();
+      }
+
+      // カラーパレットの抽出
+      const colorPalette = this.extractColorsFromFigma(document);
+      
+      // タイポグラフィの抽出
+      const typography = this.extractTypographyFromFigma(document);
+      
+      // コンポーネントの抽出
+      const components = this.extractComponentsFromFigma(document);
+      
+      // スペーシングの抽出
+      const spacing = this.extractSpacingFromFigma(document);
+
+      console.log('✅ [FIGMA] Design tokens extracted successfully');
+      console.log('🎨 [FIGMA] Colors:', colorPalette.slice(0, 3));
+      console.log('📝 [FIGMA] Typography:', typography.heading);
+      console.log('🧩 [FIGMA] Components:', components.slice(0, 3));
+
+      return {
+        colorPalette,
+        typography,
+        components,
+        spacing,
+        borderRadius: ['4px', '8px', '12px', '16px'],
+        shadows: ['0 1px 3px rgba(0,0,0,0.1)', '0 4px 6px rgba(0,0,0,0.1)']
+      };
+    } catch (error) {
+      console.log('⚠️ [FIGMA] Token extraction failed:', (error as Error)?.message || 'Unknown error');
+      return this.getFallbackDesign();
+    }
+  }
+
+  private extractColorsFromFigma(document: any): string[] {
+    try {
+      const colors: string[] = [];
+      
+      // Figmaのfillsからカラーを抽出する再帰関数
+      const extractColors = (node: any) => {
+        if (node.fills && Array.isArray(node.fills)) {
+          node.fills.forEach((fill: any) => {
+            if (fill.type === 'SOLID' && fill.color) {
+              const { r, g, b } = fill.color;
+              const hex = `#${Math.round(r * 255).toString(16).padStart(2, '0')}${Math.round(g * 255).toString(16).padStart(2, '0')}${Math.round(b * 255).toString(16).padStart(2, '0')}`;
+              if (!colors.includes(hex)) {
+                colors.push(hex);
+              }
+            }
+          });
+        }
+        
+        if (node.children) {
+          node.children.forEach(extractColors);
+        }
+      };
+
+      extractColors(document);
+      
+      // 最大8色まで、デフォルトカラーで補完
+      const finalColors = colors.slice(0, 8);
+      const defaultColors = ['#3b82f6', '#64748b', '#f59e0b', '#ffffff', '#000000', '#ef4444', '#10b981', '#8b5cf6'];
+      
+      while (finalColors.length < 4) {
+        finalColors.push(defaultColors[finalColors.length]);
+      }
+      
+      return finalColors;
+    } catch (error) {
+      return ['#3b82f6', '#64748b', '#f59e0b', '#ffffff'];
+    }
+  }
+
+  private extractTypographyFromFigma(document: any) {
+    try {
+      const fonts = new Set<string>();
+      
+      const extractFonts = (node: any) => {
+        if (node.style && node.style.fontFamily) {
+          fonts.add(node.style.fontFamily);
+        }
+        if (node.children) {
+          node.children.forEach(extractFonts);
+        }
+      };
+
+      extractFonts(document);
+      const fontArray = Array.from(fonts);
+
+      return {
+        heading: fontArray[0] || 'Inter',
+        body: fontArray[1] || fontArray[0] || 'Inter',
+        accent: fontArray[2] || fontArray[0] || 'Playfair Display'
+      };
+    } catch (error) {
+      return { heading: 'Inter', body: 'Inter', accent: 'Playfair Display' };
+    }
+  }
+
+  private extractComponentsFromFigma(document: any): string[] {
+    try {
+      const components: string[] = [];
+      
+      const extractComponents = (node: any) => {
+        if (node.type === 'COMPONENT' && node.name) {
+          components.push(node.name);
+        }
+        if (node.children) {
+          node.children.forEach(extractComponents);
+        }
+      };
+
+      extractComponents(document);
+      
+      // デフォルトコンポーネントで補完
+      const defaultComponents = ['Button', 'Input', 'Card', 'Badge', 'Avatar', 'Dialog'];
+      const finalComponents = [...new Set([...components, ...defaultComponents])];
+      
+      return finalComponents.slice(0, 10);
+    } catch (error) {
+      return ['Button', 'Input', 'Card', 'Badge'];
+    }
+  }
+
+  private extractSpacingFromFigma(document: any): string[] {
+    // Figmaのconstraintsやlayoutから推測
+    return ['4px', '8px', '12px', '16px', '24px', '32px', '48px', '64px'];
+  }
+
+  private getFallbackDesign() {
+    return {
+      colorPalette: ['#3b82f6', '#64748b', '#f59e0b', '#ffffff'],
+      typography: { heading: 'Inter', body: 'Inter', accent: 'Playfair Display' },
+      components: ['Button', 'Input', 'Card', 'Badge'],
+      spacing: ['4px', '8px', '16px', '24px'],
+      borderRadius: ['4px', '8px', '12px'],
+      shadows: ['0 1px 3px rgba(0,0,0,0.1)']
+    };
+  }
+
+  /**
+   * 柔軟なJSONレスポンス解析
+   */
+  private extractFlexibleJSONFromGeminiResponse(response: string): any {
+    try {
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+    } catch (error) {
+      console.log('JSON parsing failed:', error);
+    }
+    return {};
+  }
+
+  /**
+   * 自然なタグからカテゴリを抽出
+   */
+  private extractCategoryFromTags(tags: string[]): string {
+    const categoryMapping = {
+      productivity: ['タスク', 'TODO', '仕事', '効率', '管理', 'スケジュール'],
+      social: ['SNS', 'コミュニティ', 'チャット', '投稿', 'シェア', 'フォロー'],
+      ecommerce: ['ショップ', '販売', '購入', '商品', 'EC', 'カート'],
+      finance: ['家計簿', '金融', '投資', '支出', '収入', 'お金'],
+      health: ['健康', 'フィットネス', '運動', '医療', 'ダイエット', '記録'],
+      education: ['学習', '教育', '勉強', '知識', 'スキル', '課題'],
+      creative: ['アート', '創作', 'デザイン', '音楽', '写真', '表現'],
+      entertainment: ['ゲーム', '娯楽', '映画', '音楽', '趣味', 'エンタメ']
+    };
+
+    // タグをチェックして最も適したカテゴリを見つける
+    for (const [category, keywords] of Object.entries(categoryMapping)) {
+      for (const tag of tags) {
+        if (keywords.some(keyword => tag.includes(keyword))) {
+          return category;
+        }
+      }
+    }
+
+    return 'general';
+  }
+
+  /**
+   * 柔軟なフォールバック分析生成
+   */
+  private createFlexibleFallbackFromText(userInput: string): any {
+    const inputLower = userInput.toLowerCase();
+    
+    // 自然言語からの特徴抽出
+    const naturalTags = [];
+    const features = [];
+    
+    // 基本的なタグ抽出
+    if (inputLower.includes('タスク') || inputLower.includes('todo') || inputLower.includes('管理')) {
+      naturalTags.push('タスク管理', '生産性', '効率化');
+      features.push('タスク作成・編集・削除', '進捗管理', '期限設定');
+    }
+    if (inputLower.includes('ブログ') || inputLower.includes('記事') || inputLower.includes('投稿')) {
+      naturalTags.push('コンテンツ作成', '文章', 'メディア');
+      features.push('記事作成・編集', '公開管理', 'カテゴリ分類');
+    }
+    if (inputLower.includes('ショップ') || inputLower.includes('販売') || inputLower.includes('ec')) {
+      naturalTags.push('eコマース', '販売', 'ビジネス');
+      features.push('商品管理', '注文処理', '在庫管理');
+    }
+    if (inputLower.includes('家計簿') || inputLower.includes('金融') || inputLower.includes('収支')) {
+      naturalTags.push('金融', '家計管理', '資産');
+      features.push('収支記録', '予算管理', '分析レポート');
+    }
+
+    // デフォルト値で補完
+    if (naturalTags.length === 0) {
+      naturalTags.push('アプリケーション', 'デジタルツール', 'ユーザー体験');
+    }
+    if (features.length === 0) {
+      features.push('データ管理', '検索・フィルタ', 'ユーザーインターフェース');
+    }
+
+    return {
+      enhancedDescription: `${userInput}を効果的に実現する革新的なアプリケーション`,
+      coreEssence: `${userInput}の本質的価値を提供`,
+      naturalTags,
+      primaryTag: this.extractCategoryFromTags(naturalTags),
+      targetUsers: ['一般ユーザー', '専門ユーザー', '初心者'],
+      keyFeatures: features,
+      uniqueValue: 'シンプルで直感的なインターフェースと高い実用性',
+      businessPotential: 'medium',
+      considerations: ['ユーザビリティの向上', '機能の充実', '継続的な改善'],
+      vision: 'ユーザーの日常をより便利にする体験',
+      futureEvolution: 'AIと連携した高度な機能の追加',
+      inspiration: 'テクノロジーで人々の生活を豊かにする'
+    };
+  }
+
+  /**
+   * デフォルトデザインシステム（高品質版）
    */
   private getDefaultDesignSystem() {
     return {
       figmaTokens: null,
-      colorPalette: ['#3b82f6', '#64748b', '#f59e0b', '#ffffff'],
-      typography: { heading: 'Inter', body: 'Inter' },
-      components: ['Card', 'Button', 'Input', 'Badge'],
-      designSystem: 'default-premium',
-      theme: 'modern',
-      layout: 'responsive'
+      colorPalette: ['#6366f1', '#8b5cf6', '#06b6d4', '#ffffff'],
+      typography: { 
+        heading: 'Inter, system-ui, sans-serif', 
+        body: 'Inter, system-ui, sans-serif',
+        accent: 'JetBrains Mono, monospace'
+      },
+      components: ['Card', 'Button', 'Input', 'Badge', 'Modal', 'Table', 'Form'],
+      designSystem: 'premium-modern',
+      theme: 'gradient-enhanced',
+      layout: 'responsive-grid',
+      spacing: ['8px', '16px', '24px', '32px', '48px', '64px'],
+      borderRadius: ['8px', '12px', '16px', '24px'],
+      shadows: [
+        '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+        '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
+        '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)'
+      ],
+      gradients: [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+      ]
     };
   }
 
@@ -379,23 +668,26 @@ export class HybridAIOrchestrator {
           required: ['tableName', 'fields', 'businessLogic']
         }
       },
-      `強化されたアイデア: ${JSON.stringify(ideaData, null, 2)}
-デザインシステム: ${JSON.stringify(designSystem, null, 2)}
+`Create a comprehensive database schema for: "${ideaData.enhanced || ideaData.original}"
 
-このアプリに最適な高度なデータベーススキーマを設計してください：
+Application Category: ${ideaData.category}
+Target Users: ${ideaData.targetUsers?.join(', ') || 'General users'}
+Key Features: ${ideaData.keyFeatures?.join(', ') || 'Basic functionality'}
 
-要件:
-1. 実用的で拡張性のあるフィールド構成
-2. ビジネスロジックを支える関係性
-3. パフォーマンスを考慮したインデックス
-4. データ整合性とセキュリティ
-5. 将来の機能拡張への対応
+Requirements:
+- Design schema specifically for ${ideaData.category} domain
+- Include 4-6 essential fields that represent the core data model
+- Add appropriate data types (string, number, date, boolean, text)
+- Ensure fields support the main use cases
+- Add proper labels in Japanese for UI display
+- Consider search, filtering, and sorting capabilities
+- Include performance indexes for key lookup fields
 
-特に以下を重視してください：
-- ユーザー体験を向上させるデータ設計
-- 検索・フィルタリング性能
-- レポート・分析機能への対応`,
-      'あなたは経験豊富なデータベースアーキテクトです。ビジネス要件を満たす最適なスキーマを設計してください。',
+Create a practical, real-world schema that directly supports the application's purpose.
+Table name should reflect the primary entity (e.g., 'tasks', 'blog_posts', 'products', 'transactions').
+
+Focus on utility and user experience over complexity.`,
+`You are a database architect. Create an optimal schema for the business requirements.`,
       { model: 'gpt-4', temperature: 0.3 }
     );
 
@@ -404,16 +696,134 @@ export class HybridAIOrchestrator {
       return schemaResult.data;
     }
 
-    console.log('⚠️ [OPENAI] Schema generation failed, using fallback');
+    console.log('⚠️ [OPENAI] Schema generation failed, using dynamic fallback');
+    
+    // カテゴリベースの動的フォールバック
+    const category = ideaData.category || 'general';
+    return this.generateDynamicFallbackSchema(ideaData.original || ideaData.enhanced, category);
+  }
+
+  /**
+   * 動的フォールバックスキーマ生成
+   */
+  private generateDynamicFallbackSchema(idea: string, category: string): any {
+    const ideaLower = idea.toLowerCase();
+    
+    // カテゴリベースのスキーマテンプレート
+    const schemaTemplates = {
+      finance: {
+        tableName: 'financial_records',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: '項目名' },
+          { name: 'amount', type: 'number', required: true, label: '金額' },
+          { name: 'category', type: 'string', required: false, label: 'カテゴリ' },
+          { name: 'date', type: 'date', required: true, label: '日付' },
+          { name: 'notes', type: 'text', required: false, label: 'メモ' }
+        ]
+      },
+      productivity: {
+        tableName: 'tasks',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: 'タスク名' },
+          { name: 'description', type: 'text', required: false, label: '詳細' },
+          { name: 'status', type: 'string', required: true, label: 'ステータス' },
+          { name: 'priority', type: 'string', required: false, label: '優先度' },
+          { name: 'due_date', type: 'date', required: false, label: '期限' }
+        ]
+      },
+      ecommerce: {
+        tableName: 'products',
+        fields: [
+          { name: 'name', type: 'string', required: true, label: '商品名' },
+          { name: 'price', type: 'number', required: true, label: '価格' },
+          { name: 'description', type: 'text', required: false, label: '商品説明' },
+          { name: 'category', type: 'string', required: false, label: 'カテゴリ' },
+          { name: 'stock', type: 'number', required: true, label: '在庫数' }
+        ]
+      },
+      social: {
+        tableName: 'posts',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: 'タイトル' },
+          { name: 'content', type: 'text', required: true, label: '内容' },
+          { name: 'author', type: 'string', required: true, label: '投稿者' },
+          { name: 'tags', type: 'string', required: false, label: 'タグ' },
+          { name: 'published_at', type: 'datetime', required: true, label: '投稿日時' }
+        ]
+      },
+      creative: {
+        tableName: 'creative_items',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: 'タイトル' },
+          { name: 'description', type: 'text', required: false, label: '説明' },
+          { name: 'type', type: 'string', required: false, label: '種類' },
+          { name: 'status', type: 'string', required: true, label: 'ステータス' },
+          { name: 'created_at', type: 'datetime', required: true, label: '作成日時' }
+        ]
+      },
+      health: {
+        tableName: 'health_records',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: '記録名' },
+          { name: 'value', type: 'number', required: false, label: '数値' },
+          { name: 'unit', type: 'string', required: false, label: '単位' },
+          { name: 'date', type: 'date', required: true, label: '記録日' },
+          { name: 'notes', type: 'text', required: false, label: 'メモ' }
+        ]
+      },
+      education: {
+        tableName: 'learning_items',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: '学習項目' },
+          { name: 'progress', type: 'number', required: false, label: '進捗率' },
+          { name: 'difficulty', type: 'string', required: false, label: '難易度' },
+          { name: 'category', type: 'string', required: false, label: 'カテゴリ' },
+          { name: 'completed_at', type: 'date', required: false, label: '完了日' }
+        ]
+      }
+    };
+    
+    // 特定キーワードによる追加調整
+    if (ideaLower.includes('ブログ') || ideaLower.includes('記事') || ideaLower.includes('投稿')) {
+      return {
+        tableName: 'blog_posts',
+        fields: [
+          { name: 'title', type: 'string', required: true, label: 'タイトル' },
+          { name: 'content', type: 'text', required: true, label: '本文' },
+          { name: 'author', type: 'string', required: false, label: '著者' },
+          { name: 'category', type: 'string', required: false, label: 'カテゴリ' },
+          { name: 'published_at', type: 'datetime', required: false, label: '公開日時' }
+        ],
+        relationships: [],
+        businessLogic: ['記事の作成・編集・削除', 'カテゴリ別表示', '公開/非公開管理'],
+        indexes: ['title', 'published_at']
+      };
+    }
+    
+    if (ideaLower.includes('在庫') || ideaLower.includes('商品管理') || ideaLower.includes('inventory')) {
+      return {
+        tableName: 'inventory_items',
+        fields: [
+          { name: 'product_name', type: 'string', required: true, label: '商品名' },
+          { name: 'sku', type: 'string', required: true, label: '商品コード' },
+          { name: 'quantity', type: 'number', required: true, label: '数量' },
+          { name: 'price', type: 'number', required: false, label: '価格' },
+          { name: 'location', type: 'string', required: false, label: '保管場所' }
+        ],
+        relationships: [],
+        businessLogic: ['在庫の追加・更新・削除', '在庫数の自動計算', '不足アラート'],
+        indexes: ['sku', 'product_name']
+      };
+    }
+    
+    // デフォルトはカテゴリベース
+    const template = schemaTemplates[category] || schemaTemplates.creative;
+    
     return {
-      tableName: 'app_data',
-      fields: [
-        { name: 'title', type: 'string', required: true, label: 'タイトル' },
-        { name: 'description', type: 'text', required: false, label: '説明' }
-      ],
+      ...template,
       relationships: [],
-      businessLogic: ['基本的なCRUD操作'],
-      indexes: ['title']
+      businessLogic: ['基本的なCRUD操作', 'データの検索・フィルタ', '一覧表示'],
+      indexes: [template.fields[0]?.name || 'id']
     };
   }
 
@@ -432,111 +842,78 @@ export class HybridAIOrchestrator {
     const schemaData = await this.generateSchemaWithOpenAI(ideaData, designSystem, config);
     
     // Function Callingを使って構造化されたコード生成
+    console.log('🔄 [OPENAI] Starting Function Calling for component generation');
+    console.log('🔄 [OPENAI] Category:', ideaData.category);
+    console.log('🔄 [OPENAI] Enhanced idea:', ideaData.enhanced);
+    
+    const tableName = (schemaData as any)?.tableName || 'app_data';
+    const fields = ((schemaData as any)?.fields || []).slice(0, 5);
+    const colors = designInspiration.colorPalette || designSystem?.colorPalette || ['#6366f1', '#8b5cf6'];
+    
+    const prompt = `Create a high-quality React TypeScript component for: "${ideaData.enhanced || ideaData.original}"
+
+Application Details:
+- Category: ${ideaData.category}
+- Component Name: ${this.generateComponentName(ideaData.original)}
+- Database Table: ${tableName}
+- Key Fields: ${fields.map((f: any) => `${f.name} (${f.type})`).join(', ')}
+- Target Users: ${ideaData.targetUsers?.join(', ') || 'General users'}
+
+Design Specifications:
+- Style: ${designInspiration.mood || 'modern'} ${designSystem?.theme || 'premium'} design
+- Color Palette: ${colors.slice(0, 3).join(', ')}
+- Typography: ${designSystem?.typography?.heading || 'Inter, sans-serif'}
+- Layout: ${designSystem?.layout || 'responsive grid'}
+
+Technical Requirements:
+- Use React 18+ with TypeScript
+- Implement shadcn/ui components (Card, Button, Input, Badge, Table, Form)
+- Full CRUD operations (Create, Read, Update, Delete)
+- Form validation with proper error handling
+- Loading states and empty states with proper UI feedback  
+- Responsive design optimized for mobile and desktop
+- Modern CSS with Tailwind classes and custom styling
+- Proper accessibility (a11y) attributes
+- Search and filter functionality if applicable
+
+UI/UX Guidelines:
+- Clean, modern interface with professional appearance
+- Smooth animations and transitions
+- Intuitive user flow and navigation
+- Proper spacing and typography hierarchy
+- Error states with helpful messages
+- Success feedback for user actions
+
+Generate a complete, production-ready React component that implements all CRUD operations for the ${tableName} table.`;
+
+    // プロンプトサイズの確認
+    const promptLength = prompt.length;
+    console.log('📏 [OPENAI] Prompt length:', promptLength, 'characters');
+    console.log('📏 [OPENAI] Estimated tokens:', Math.ceil(promptLength / 4)); // 大まかな推定
+
+    const systemMessage = `You are an expert React/TypeScript developer. Create a high-quality production-ready component with modern best practices.`;
+
+    const functionSchema = {
+      description: 'Generate enterprise-level React component with Figma + Gemini integration',
+      parameters: {
+        type: 'object',
+        properties: {
+          componentName: { type: 'string', description: 'Component name in PascalCase' },
+          componentCode: { type: 'string', description: 'Complete React component code' },
+          typeDefinitions: { type: 'string', description: 'TypeScript type definitions' },
+          customHooks: { type: 'string', description: 'Custom React hooks code' },
+          apiIntegration: { type: 'string', description: 'API integration code' },
+          storybook: { type: 'string', description: 'Storybook story for component testing' }
+        },
+        required: ['componentName', 'componentCode', 'typeDefinitions']
+      }
+    };
+
     const codeResult = await openAIOptimized.executeFunction(
       'generate_hybrid_react_component',
-      {
-        description: 'Generate enterprise-level React component with Figma + Gemini integration',
-        parameters: {
-          type: 'object',
-          properties: {
-            componentName: { type: 'string', description: 'Component name in PascalCase' },
-            componentCode: { type: 'string', description: 'Complete React component code' },
-            typeDefinitions: { type: 'string', description: 'TypeScript type definitions' },
-            customHooks: { type: 'string', description: 'Custom React hooks code' },
-            apiIntegration: { type: 'string', description: 'API integration code' },
-            storybook: { type: 'string', description: 'Storybook story for component testing' }
-          },
-          required: ['componentName', 'componentCode', 'typeDefinitions']
-        }
-      },
-      `🎭 HYBRID AI プレミアムコード生成
-
-## プロジェクト仕様
-**アイデア**: ${ideaData.enhanced || ideaData.original}
-**カテゴリ**: ${ideaData.category}
-**ビジネスポテンシャル**: ${ideaData.businessPotential}
-
-## Gemini創造的インスピレーション
-${JSON.stringify(designInspiration, null, 2)}
-
-## Figmaデザインシステム
-${designSystem ? JSON.stringify(designSystem, null, 2) : 'デフォルトデザインシステム使用'}
-
-## データベーススキーマ
-${JSON.stringify(schemaData, null, 2)}
-
-## ハイブリッドAI統合要求
-
-### 🌟 Geminiの創造性を反映
-- ${designInspiration.inspiration || 'クリエイティブなユーザー体験'}
-- ${designInspiration.mood || 'modern'} な雰囲気
-- カラーパレット: ${(designInspiration.colorPalette || ['#3b82f6']).join(', ')}
-
-### 🎨 Figmaデザイントークン活用
-- ${designSystem?.figmaTokens ? 'Figmaデザイントークン統合' : 'プレミアムデザインシステム'}
-- レスポンシブブレークポイント対応
-- 一貫したスペーシングとタイポグラフィ
-
-### ⚡ 企業レベル技術実装
-1. **完全TypeScript**: 厳密な型安全性
-2. **パフォーマンス最適化**: React.memo, useMemo, useCallback適用
-3. **アクセシビリティ**: ARIA attributes完全対応
-4. **エラーハンドリング**: Error Boundaries + 優雅な回復
-5. **リアルタイム更新**: SWR/React Query統合
-6. **アニメーション**: Framer Motion微細効果
-7. **フォーム**: React Hook Form + Zod検証
-8. **状態管理**: Zustand/Context API適切選択
-9. **国際化**: i18n基盤組み込み
-10. **テスト**: Testing Library準拠
-
-### 必須技術スタック
-\`\`\`typescript
-// 使用必須ライブラリ
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { toast } from 'sonner';
-import { Search, Plus, Heart, Share2, Download, Upload, Filter, Grid, List } from 'lucide-react';
-\`\`\`
-
-### コンポーネント設計要求
-1. **メインコンテナ**: 全体レイアウト管理
-2. **ヘッダー**: ナビゲーション + 検索 + ユーザープロフィール
-3. **コンテンツエリア**: ${ideaData.category}に特化した機能区域
-4. **サイドバー**: フィルタ・設定・追加機能
-5. **フッター**: 補助情報・リンク
-6. **モーダル**: 作成・編集・詳細表示
-7. **カスタムフック**: ビジネスロジック分離
-
-### 品質基準
-- **コード品質**: ESLint + Prettier準拠
-- **型カバレッジ**: 100%
-- **エラーハンドリング**: 全API呼び出し保護
-- **ローディング状態**: スケルトンUI実装
-- **空状態**: Empty State対応
-- **レスポンシブ**: sm, md, lg, xl全対応
-
-完全に動作する本格的なReactコンポーネントを生成してください。`,
-      `あなたは世界トップクラスのReact/TypeScript開発者です。
-
-Figma + Gemini + OpenAIの総合力を活用し、以下を統合した最高品質のコンポーネントを作成してください：
-
-1. **Geminiの創造性**: 革新的なUX/UI設計
-2. **Figmaの一貫性**: デザインシステム準拠
-3. **OpenAIの技術力**: 完璧なTypeScript実装
-
-企業レベルの品質で、実際のプロダクションで使用できるコードを生成してください。`,
+      functionSchema,
+      prompt,
+      systemMessage,
       { 
         model: 'gpt-4', 
         temperature: 0.2, 
@@ -557,31 +934,26 @@ Figma + Gemini + OpenAIの総合力を活用し、以下を統合した最高品
       };
     }
 
-    console.log('⚠️ [OPENAI] Advanced code generation failed, attempting simplified version');
+    console.log('⚠️ [OPENAI] Function calling failed, attempting text generation');
+    console.log('⚠️ [OPENAI] Failure reason:', codeResult.error || 'Unknown error');
+    console.log('⚠️ [OPENAI] Attempting fallback with direct prompt...');
     
-    // フォールバック: 簡略化されたコード生成
+    // フォールバック: 軽量コード生成
     const fallbackResult = await openAIOptimized.generateAdvancedText(
-      `Create a complete React component for: ${ideaData.enhanced || ideaData.original}
+      `Create React component: ${ideaData.enhanced || ideaData.original}
       
-Design: ${JSON.stringify(designInspiration)}
-Schema: ${JSON.stringify(schemaData)}
+Category: ${ideaData.category}
+Table: ${(schemaData as any)?.tableName || 'app_data'}
+Fields: ${((schemaData as any)?.fields || []).slice(0, 3).map((f: any) => f?.name || 'field').join(', ')}
+Component: ${this.generateComponentName(ideaData.original)}
 
-Generate enterprise-level TypeScript React component with:
-- Full functionality for ${ideaData.category} app
-- Tailwind CSS styling
-- shadcn/ui components
-- Framer Motion animations
-- Complete CRUD operations
-- Error handling
-- Loading states
-- Responsive design
-
-Component name: ${this.generateComponentName(ideaData.original)}`,
+Generate TypeScript React component with CRUD, shadcn/ui, Tailwind CSS.`,
       'technical',
       { model: 'gpt-4', temperature: 0.3, maxTokens: 4000 }
     );
 
     if (fallbackResult.success && fallbackResult.data) {
+      console.log('✅ [OPENAI] Text generation fallback successful');
       return {
         component: fallbackResult.data,
         types: '// TypeScript types embedded in component',
@@ -590,7 +962,12 @@ Component name: ${this.generateComponentName(ideaData.original)}`,
       };
     }
 
-    console.log('❌ [OPENAI] All code generation attempts failed');
+    console.log('⚠️ [OPENAI] Both function calling and text generation failed');
+    console.log('⚠️ [OPENAI] Function calling error:', codeResult.error || 'Unknown');
+    console.log('⚠️ [OPENAI] Text generation error:', fallbackResult.error || 'Unknown');
+    console.log('⚠️ [OPENAI] Using category-aware template as last resort');
+    
+    // 最後のリゾート：カテゴリ対応テンプレート生成
     return {
       component: this.generateFallbackComponent(ideaData, designInspiration, schemaData),
       types: '// Basic TypeScript types',
@@ -604,17 +981,24 @@ Component name: ${this.generateComponentName(ideaData.original)}`,
    */
   private generateComponentName(idea: string): string {
     const words = idea.split(/\s+/).slice(0, 2);
-    return words.map(word => 
+    return `${words.map(word => 
       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase().replace(/[^a-zA-Z]/g, '')
-    ).join('') + 'Manager';
+    ).join('')  }Manager`;
   }
 
   /**
-   * フォールバックコンポーネント生成
+   * フォールバックコンポーネント生成（カテゴリ対応）
    */
   private generateFallbackComponent(ideaData: any, designInspiration: any, schemaData: any): string {
+    console.log('🔄 [FALLBACK] Generating fallback component for category:', ideaData.category);
+    console.log('🔄 [FALLBACK] Original idea:', ideaData.original);
+    
     const componentName = this.generateComponentName(ideaData.original);
     const primaryColor = designInspiration.colorPalette?.[0] || '#3b82f6';
+    const category = ideaData.category?.toLowerCase() || 'general';
+    
+    // カテゴリ別のコンテンツを生成
+    const categoryContent = this.generateCategorySpecificContent(category, ideaData.original);
     
     return `'use client';
 
@@ -624,7 +1008,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Heart, Star } from 'lucide-react';
+import { Plus, Search, Heart, Star, DollarSign, Calendar, Calculator } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ${componentName}Props {
@@ -645,17 +1029,15 @@ export default function ${componentName}({ className }: ${componentName}Props) {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Simulate data loading
+    // カテゴリ特化のサンプルデータでロード
     setTimeout(() => {
       setItems([
         {
           id: '1',
-          ${schemaData.fields?.slice(0, 3).map((field: any, index: number) => 
-            `${field.name}: ${field.type === 'text' ? `'Sample ${field.label || field.name} ${index + 1}'` : 
-            field.type === 'number' ? Math.floor(Math.random() * 100) :
-            field.type === 'boolean' ? 'true' : 
-            `'Sample data'`}`
-          ).join(',\n          ') || "name: 'Sample Item 1',\n          description: 'Sample description'"}
+          name: '${categoryContent.sampleData.name}',
+          ${Object.entries(categoryContent.sampleData).filter(([key]) => key !== 'name').map(([key, value]) => 
+            `${key}: '${value}'`
+          ).join(',\n          ')},
           created_at: new Date().toISOString(),
         },
       ]);
@@ -692,16 +1074,17 @@ export default function ${componentName}({ className }: ${componentName}Props) {
         className="flex justify-between items-center mb-8"
       >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            ${ideaData.enhanced ? ideaData.enhanced.split(' ').slice(0, 3).join(' ') : componentName}
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            {category === 'finance' ? <DollarSign className="w-8 h-8" /> : <Calendar className="w-8 h-8" />}
+            ${categoryContent.title}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            ${designInspiration.inspiration || 'Manage your items efficiently'}
+            ${categoryContent.subtitle}
           </p>
         </div>
         <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
           <Plus className="w-4 h-4 mr-2" />
-          Add New
+          ${categoryContent.addButtonText}
         </Button>
       </motion.div>
 
@@ -715,7 +1098,7 @@ export default function ${componentName}({ className }: ${componentName}Props) {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
-            placeholder="Search items..."
+            placeholder="${categoryContent.searchPlaceholder}"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -797,6 +1180,169 @@ export default function ${componentName}({ className }: ${componentName}Props) {
   }
 
   /**
+   * カテゴリ別コンテンツ生成
+   */
+  private generateCategorySpecificContent(category: string, originalIdea: string) {
+    const categoryConfigs = {
+      finance: {
+        title: '家計管理システム',
+        subtitle: '収支を効率的に管理して資産を最適化',
+        icon: 'DollarSign',
+        addButtonText: '収入記録',
+        searchPlaceholder: '収支項目を検索...',
+        emptyTitle: '収支記録がありません',
+        emptyMessage: '新しい収支記録を追加して家計を管理しましょう',
+        badge: '記録済み',
+        sampleData: {
+          name: '給与収入',
+          amount: '250000',
+          status: '記録済み',
+          description: '月次給与'
+        }
+      },
+      productivity: {
+        title: 'タスク管理システム',
+        subtitle: 'プロジェクトとタスクを効率的に管理',
+        icon: 'CheckSquare',
+        addButtonText: 'タスク追加',
+        searchPlaceholder: 'タスクを検索...',
+        emptyTitle: 'タスクがありません',
+        emptyMessage: '新しいタスクを追加して生産性を向上させましょう',
+        badge: '進行中',
+        sampleData: {
+          name: 'プロジェクト計画',
+          priority: 'High',
+          status: '進行中',
+          description: '新機能の企画と設計'
+        }
+      },
+      social: {
+        title: 'ブログ管理システム',
+        subtitle: '記事とコンテンツを効率的に管理',
+        icon: 'FileText',
+        addButtonText: '記事作成',
+        searchPlaceholder: '記事を検索...',
+        emptyTitle: '記事がありません',
+        emptyMessage: '新しい記事を作成してコンテンツを充実させましょう',
+        badge: '公開済み',
+        sampleData: {
+          name: 'ブログ記事のタイトル',
+          category: 'Technology',
+          status: '下書き',
+          description: '記事の概要'
+        }
+      },
+      ecommerce: {
+        title: '商品管理システム',
+        subtitle: '在庫と商品を効率的に管理',
+        icon: 'Package',
+        addButtonText: '商品登録',
+        searchPlaceholder: '商品を検索...',
+        emptyTitle: '商品がありません',
+        emptyMessage: '新しい商品を登録して在庫を管理しましょう',
+        badge: '在庫あり',
+        sampleData: {
+          name: 'サンプル商品',
+          price: '1980',
+          status: '販売中',
+          description: '人気商品'
+        }
+      },
+      health: {
+        title: '健康記録システム',
+        subtitle: '健康データを効率的に管理',
+        icon: 'Heart',
+        addButtonText: '記録追加',
+        searchPlaceholder: '健康記録を検索...',
+        emptyTitle: '健康記録がありません',
+        emptyMessage: '新しい健康記録を追加して体調を管理しましょう',
+        badge: '正常値',
+        sampleData: {
+          name: '体重測定',
+          value: '68.5',
+          status: '正常',
+          description: '朝の測定'
+        }
+      },
+      education: {
+        title: '学習管理システム',
+        subtitle: '学習進捗を効率的に管理',
+        icon: 'BookOpen',
+        addButtonText: '学習記録',
+        searchPlaceholder: '学習項目を検索...',
+        emptyTitle: '学習記録がありません',
+        emptyMessage: '新しい学習記録を追加して進捗を管理しましょう',
+        badge: '進行中',
+        sampleData: {
+          name: 'プログラミング基礎',
+          progress: '75',
+          status: '進行中',
+          description: 'React学習コース'
+        }
+      },
+      creative: {
+        title: 'クリエイティブ管理システム',
+        subtitle: 'クリエイティブ作品を効率的に管理',
+        icon: 'Palette',
+        addButtonText: '作品追加',
+        searchPlaceholder: '作品を検索...',
+        emptyTitle: '作品がありません',
+        emptyMessage: '新しい作品を追加してポートフォリオを構築しましょう',
+        badge: '完成',
+        sampleData: {
+          name: 'デザインプロジェクト',
+          type: 'UI/UX',
+          status: '完成',
+          description: 'モバイルアプリデザイン'
+        }
+      },
+      entertainment: {
+        title: 'エンターテイメント管理システム',
+        subtitle: 'コンテンツとメディアを効率的に管理',
+        icon: 'Play',
+        addButtonText: 'コンテンツ追加',
+        searchPlaceholder: 'コンテンツを検索...',
+        emptyTitle: 'コンテンツがありません',
+        emptyMessage: '新しいコンテンツを追加してライブラリを充実させましょう',
+        badge: '視聴済み',
+        sampleData: {
+          name: 'おすすめ映画',
+          genre: 'ドラマ',
+          status: '視聴済み',
+          description: '評価の高い作品'
+        }
+      }
+    };
+
+    // カテゴリ別の特定テンプレート選択
+    const config = categoryConfigs[category];
+    if (config) {
+      return config;
+    }
+
+    // フォールバック：元のアイデアから推測
+    const ideaLower = originalIdea.toLowerCase();
+    if (ideaLower.includes('ブログ') || ideaLower.includes('記事') || ideaLower.includes('投稿')) {
+      return categoryConfigs.social;
+    }
+    if (ideaLower.includes('商品') || ideaLower.includes('在庫') || ideaLower.includes('EC') || ideaLower.includes('ショップ')) {
+      return categoryConfigs.ecommerce;
+    }
+    if (ideaLower.includes('健康') || ideaLower.includes('運動') || ideaLower.includes('体重')) {
+      return categoryConfigs.health;
+    }
+    if (ideaLower.includes('学習') || ideaLower.includes('教育') || ideaLower.includes('勉強')) {
+      return categoryConfigs.education;
+    }
+    if (ideaLower.includes('扶養') || ideaLower.includes('控除') || ideaLower.includes('税金') || ideaLower.includes('家計')) {
+      return categoryConfigs.finance;
+    }
+
+    // 最後のデフォルト
+    return categoryConfigs.productivity;
+  }
+
+  /**
    * 統合と品質向上
    */
   private async enhanceAndIntegrate(data: any): Promise<HybridResult> {
@@ -829,27 +1375,31 @@ export default function ${componentName}({ className }: ${componentName}Props) {
    * ユーティリティメソッド
    */
   private buildGeminiCreativityPrompt(userIdea: string, config: HybridGenerationConfig): string {
-    return `Analyze this app idea and provide a JSON response:
+    return `Analyze this application idea and provide detailed insights: "${userIdea}"
 
-"${userIdea}"
+Please analyze this idea thoroughly and respond with a JSON object in this EXACT format:
 
-Respond with ONLY valid JSON (no extra text):
-
+\`\`\`json
 {
-  "enhanced": "improved idea description in Japanese",
-  "category": "finance|health|creative|entertainment|social|education|ecommerce|productivity",
-  "targetUsers": ["user type 1", "user type 2"],
-  "keyFeatures": ["feature 1", "feature 2", "feature 3"],
-  "uniqueValue": "unique value proposition",
+  "enhanced": "Improved and detailed description in Japanese (50-100 characters)",
+  "category": "productivity|social|ecommerce|finance|health|education|creative|entertainment",
+  "targetUsers": ["specific user type 1", "specific user type 2", "specific user type 3"],
+  "keyFeatures": ["core feature 1", "core feature 2", "core feature 3", "core feature 4"],
+  "uniqueValue": "What makes this application unique and valuable (in Japanese)",
   "businessPotential": "high|medium|low",
-  "insights": ["insight 1", "insight 2"]
+  "insights": ["key insight about the market", "user pain point this solves", "implementation consideration"]
 }
+\`\`\`
 
-IMPORTANT:
-- Return ONLY the JSON object
-- Use Japanese for text content
-- Avoid generic task management solutions
-- Focus on specific industry needs`;
+Analysis Guidelines:
+1. ENHANCED: Make the description more specific and compelling
+2. CATEGORY: Choose the MOST appropriate category based on primary function
+3. TARGET_USERS: Be very specific (e.g., "忙しいビジネスパーソン", "子育て中の母親", "フリーランサー")
+4. KEY_FEATURES: List practical, implementable features
+5. UNIQUE_VALUE: Focus on the core value proposition
+6. INSIGHTS: Provide meaningful business and technical insights
+
+IMPORTANT: Return ONLY the JSON code block. No additional text or comments.`;
   }
 
   /**
@@ -858,30 +1408,48 @@ IMPORTANT:
   private inferCategoryFromIdea(userIdea: string): string {
     const idea = userIdea.toLowerCase();
     
-    // 金融・税制関連（最優先）
-    if (idea.includes('扶養') || idea.includes('控除') || idea.includes('税金') || idea.includes('年収')) {
-      return 'finance';
+    // 生産性・タスク管理（優先度を上げる）
+    if (idea.includes('タスク') || idea.includes('todo') || idea.includes('プロジェクト') || 
+        idea.includes('進捗') || idea.includes('スケジュール') || idea.includes('管理システム')) {
+      return 'productivity';
     }
-    if (idea.includes('家計') || idea.includes('収入') || idea.includes('給与') || idea.includes('投資')) {
+    
+    // ブログ・コンテンツ管理
+    if (idea.includes('ブログ') || idea.includes('記事') || idea.includes('投稿') || 
+        idea.includes('コンテンツ') || idea.includes('cms')) {
+      return 'social';
+    }
+    
+    // EC・商取引
+    if (idea.includes('ショッピング') || idea.includes('EC') || idea.includes('購入') || 
+        idea.includes('販売') || idea.includes('商品') || idea.includes('店舗') || 
+        idea.includes('在庫') || idea.includes('inventory')) {
+      return 'ecommerce';
+    }
+    
+    // 金融・税制関連
+    if (idea.includes('扶養') || idea.includes('控除') || idea.includes('税金') || idea.includes('年収') ||
+        idea.includes('家計') || idea.includes('収入') || idea.includes('給与') || idea.includes('投資') ||
+        idea.includes('金融') || idea.includes('会計')) {
       return 'finance';
     }
     
     // 医療・健康関連
-    if (idea.includes('病院') || idea.includes('患者') || idea.includes('診療') || idea.includes('医療')) {
-      return 'health';
-    }
-    if (idea.includes('健康') || idea.includes('運動') || idea.includes('フィットネス')) {
+    if (idea.includes('病院') || idea.includes('患者') || idea.includes('診療') || idea.includes('医療') ||
+        idea.includes('健康') || idea.includes('運動') || idea.includes('フィットネス')) {
       return 'health';
     }
     
     // 教育関連
-    if (idea.includes('学習') || idea.includes('教育') || idea.includes('勉強') || idea.includes('学校')) {
+    if (idea.includes('学習') || idea.includes('教育') || idea.includes('勉強') || idea.includes('学校') ||
+        idea.includes('コース') || idea.includes('資格')) {
       return 'education';
     }
     
-    // クリエイティブ関連
-    if (idea.includes('レシピ') || idea.includes('料理') || idea.includes('写真') || idea.includes('デザイン')) {
-      return 'creative';
+    // ソーシャル・コミュニケーション
+    if (idea.includes('SNS') || idea.includes('コミュニティ') || idea.includes('チャット') || 
+        idea.includes('友達') || idea.includes('メッセージ')) {
+      return 'social';
     }
     
     // エンターテイメント
@@ -889,23 +1457,14 @@ IMPORTANT:
       return 'entertainment';
     }
     
-    // EC・商取引
-    if (idea.includes('ショッピング') || idea.includes('EC') || idea.includes('購入') || idea.includes('販売')) {
-      return 'ecommerce';
+    // クリエイティブ関連
+    if (idea.includes('レシピ') || idea.includes('料理') || idea.includes('写真') || 
+        idea.includes('デザイン') || idea.includes('アート') || idea.includes('創作')) {
+      return 'creative';
     }
     
-    // ソーシャル
-    if (idea.includes('SNS') || idea.includes('コミュニティ') || idea.includes('チャット') || idea.includes('友達')) {
-      return 'social';
-    }
-    
-    // タスク管理（最後の手段として限定）
-    if (idea.includes('TODO') && idea.includes('タスク')) {
-      return 'productivity';
-    }
-    
-    // デフォルトは creative（タスク管理を避ける）
-    return 'creative';
+    // デフォルトは productivity（より実用的）
+    return 'productivity';
   }
 
   /**
@@ -929,37 +1488,83 @@ IMPORTANT:
 
   private extractJSONFromGeminiResponse(response: string): any {
     console.log('🔍 [JSON] Extracting from Gemini response');
+    console.log('🔍 [JSON] Raw response:', response);
+    console.log('🔍 [JSON] Response length:', response.length);
     
     try {
-      // シンプルなJSONパターン抽出
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
+      // 複数のJSONパターンを試行
+      const patterns = [
+        /\{[\s\S]*?\}/,  // 最初の{}ブロック
+        /```json\s*(\{[\s\S]*?\})\s*```/i,  // ```json block (case insensitive)
+        /```\s*(\{[\s\S]*?\})\s*```/,  // ``` block
+        /json\s*:\s*(\{[\s\S]*?\})/i,  // json: {object}
+        /response\s*:\s*(\{[\s\S]*?\})/i,  // response: {object}
+        /\{[\s\S]*"enhanced"[\s\S]*\}/,  // JSONっぽいものでenhancedキーを含む
+        /\{[^{}]*"category"[^{}]*\}/,  // 単純なJSONでcategoryキーを含む
+        /\{[\s\S]+\}/,  // 最後の{}ブロック（貪欲マッチ）
+      ];
+
+      let jsonStr = '';
+      let parsed = null;
+
+      for (let i = 0; i < patterns.length; i++) {
+        const pattern = patterns[i];
+        console.log(`🔍 [JSON] Trying pattern ${i + 1}:`, pattern.toString());
+        const matches = response.match(pattern);
+        console.log(`🔍 [JSON] Pattern ${i + 1} matches:`, matches ? matches.length : 0);
+        
+        if (matches) {
+          jsonStr = matches[1] || matches[0];
+          console.log(`🔍 [JSON] Extracted string:`, `${jsonStr.substring(0, 200)  }...`);
+          
+          try {
+            // 基本的なJSON修正を段階的に適用
+            const cleanJson = jsonStr
+              .replace(/^\s*```json?\s*/, '')  // コードブロック削除
+              .replace(/\s*```\s*$/, '')       // 終了コードブロック削除
+              .replace(/\/\/.*$/gm, '')        // インラインコメント削除（行の途中の//から行末まで）
+              .replace(/\/\*[\s\S]*?\*\//g, '') // ブロックコメント削除
+              .replace(/'/g, '"')              // シングル→ダブルクォート
+              .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":') // キーをクォート
+              .replace(/,\s*([}\]])/g, '$1')   // trailing comma削除
+              .replace(/,\s*,/g, ',')          // 重複カンマ削除
+              .replace(/\s+/g, ' ')            // 複数スペースを1つに
+              .trim();
+
+            console.log(`🔍 [JSON] Cleaned JSON:`, `${cleanJson.substring(0, 200)  }...`);
+            parsed = JSON.parse(cleanJson);
+            console.log('✅ [JSON] Successfully parsed with pattern', i + 1);
+            break;
+          } catch (parseError) {
+            console.log(`⚠️ [JSON] Pattern ${i + 1} failed:`, (parseError as Error).message);
+            continue;
+          }
+        } else {
+          console.log(`⚠️ [JSON] Pattern ${i + 1} found no matches`);
+        }
       }
 
-      let jsonStr = jsonMatch[0];
-      
-      // 基本的なJSON修正
-      jsonStr = jsonStr
-        .replace(/'/g, '"')  // シングル→ダブルクォート
-        .replace(/,\s*([}\]])/g, '$1')  // trailing comma削除
-        .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":'); // キーをクォート
-
-      const parsed = JSON.parse(jsonStr);
+      if (!parsed) {
+        throw new Error('No valid JSON found in any pattern');
+      }
       
       // 必須フィールドの補完
       return {
-        enhanced: parsed.enhanced || '専門的ソリューション',
+        enhanced: parsed.enhanced || parsed.description || '専門的ソリューション',
         category: parsed.category || this.inferCategoryFromIdea(response),
-        targetUsers: parsed.targetUsers || ['専門ユーザー'],
-        keyFeatures: parsed.keyFeatures || ['主要機能1', '主要機能2'],
-        uniqueValue: parsed.uniqueValue || '特化型アプローチ',
-        businessPotential: parsed.businessPotential || 'medium',
-        insights: parsed.insights || ['本質的価値提供']
+        targetUsers: parsed.targetUsers || parsed.users || ['専門ユーザー'],
+        keyFeatures: parsed.keyFeatures || parsed.features || ['主要機能1', '主要機能2'],
+        uniqueValue: parsed.uniqueValue || parsed.value || '特化型アプローチ',
+        businessPotential: parsed.businessPotential || parsed.potential || 'medium',
+        insights: parsed.insights || ['本質的価値提供'],
+        variations: parsed.variations || [],
+        colorPalette: parsed.colorPalette || ['#3b82f6', '#64748b'],
+        designStyle: parsed.designStyle || 'modern',
+        mood: parsed.mood || 'professional'
       };
 
     } catch (error) {
-      console.warn('⚠️ [JSON] Parse failed, using text analysis');
+      console.warn('⚠️ [JSON] All parsing attempts failed, using text analysis:', (error as Error).message);
       return this.createSimpleFallbackFromText(response);
     }
   }
@@ -990,7 +1595,7 @@ IMPORTANT:
     
     return {
       enhanced: `${keyTerms.slice(0, 2).join('・')}に特化したソリューション`,
-      category: category,
+      category,
       targetUsers: ['専門ユーザー', '業界関係者'],
       keyFeatures: keyTerms.slice(0, 3).map(term => `${term}機能`),
       uniqueValue: `${category}分野の専門的アプローチ`,

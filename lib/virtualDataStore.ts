@@ -2,7 +2,7 @@
 // Separated from API route to follow Next.js best practices
 
 // インメモリデータストレージ（実際の実装では永続化データベースを使用）
-let virtualData: { [tableName: string]: any[] } = {};
+const virtualData: { [tableName: string]: any[] } = {};
 
 /**
  * Get data for a specific table

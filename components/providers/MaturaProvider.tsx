@@ -1,9 +1,9 @@
 'use client'
 
 import React, { createContext, useContext, ReactNode, useMemo } from 'react'
-import { useMaturaState } from '@/hooks/useMaturaState'
-import { useMaturaHistory } from '@/hooks/useLocalStorage'
 import { useChatOptimized } from '@/hooks/useChatOptimized'
+import { useMaturaHistory } from '@/hooks/useLocalStorage'
+import { useMaturaState } from '@/hooks/useMaturaState'
 
 interface MaturaContextType {
   // State management
@@ -29,13 +29,14 @@ interface MaturaContextType {
     setUIAndNextPhase: any
     setUXAndNextPhase: any
     setCodeAndNextPhase: any
-    // Additional missing properties
-    userMessageCount?: number
-    assistantMessageCount?: number
-    phaseMessages?: any[]
-    hasCompletedPhase?: boolean[]
-    generateUnifiedUX?: () => Promise<any>
+    generateUnifiedUX: () => Promise<any>
   }
+  
+  // Additional context properties
+  userMessageCount: number
+  assistantMessageCount: number
+  phaseMessages: any[]
+  hasCompletedPhase: boolean[]
   
   // History management
   history: ReturnType<typeof useMaturaHistory>
@@ -89,13 +90,13 @@ export function MaturaProvider({ children }: { children: ReactNode }) {
         setUIAndNextPhase: maturaState.setUIAndNextPhase,
         setUXAndNextPhase: maturaState.setUXAndNextPhase,
         setCodeAndNextPhase: maturaState.setCodeAndNextPhase,
-        // Missing properties for compatibility
-        userMessageCount: 0,
-        assistantMessageCount: 0,
-        phaseMessages: [],
-        hasCompletedPhase: [false, false, false, false, false, false],
         generateUnifiedUX: async () => ({})
       },
+      // Additional context properties
+      userMessageCount: 0,
+      assistantMessageCount: 0,
+      phaseMessages: [],
+      hasCompletedPhase: [false, false, false, false, false, false],
       history,
       chat,
     }

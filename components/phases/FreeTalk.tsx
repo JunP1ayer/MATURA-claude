@@ -1,17 +1,17 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, ArrowRight, Sparkles, Wand2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ChatMessage, { WelcomeMessage } from '@/components/shared/ChatMessage'
-import PreviewButton from '@/components/shared/PreviewButton'
-import { ThinkingSpinner } from '@/components/shared/LoadingSpinner'
+import { Send, ArrowRight, Sparkles, Wand2 } from 'lucide-react'
 import { useMatura } from '@/components/providers/MaturaProvider'
-import { useChatOptimized } from '@/hooks/useChatOptimized'
-import { sanitizeInput } from '@/lib/utils'
 import { useThemedStyles } from '@/components/providers/ThemeProvider'
+import ChatMessage, { WelcomeMessage } from '@/components/shared/ChatMessage'
+import { ThinkingSpinner } from '@/components/shared/LoadingSpinner'
+import PreviewButton from '@/components/shared/PreviewButton'
 import { ThemedButton } from '@/components/ui/themed-button'
 import { ThemedCard, ThemedCardContent } from '@/components/ui/themed-card'
+import { useChatOptimized } from '@/hooks/useChatOptimized'
+import { sanitizeInput } from '@/lib/utils'
 
 export default function FreeTalk() {
   const { state, actions } = useMatura()

@@ -1,134 +1,1389 @@
+npm WARN config cache-min This option has been deprecated in favor of `--prefer-offline`.
 
 > matura-mvp@2.0.0 dev
-> next dev -H 0.0.0.0
+> npx next dev -H 0.0.0.0
 
-🔧 [next.config.js] Set OPENAI_API_KEY = sk-proj-_e...
-🔧 [next.config.js] Set GEMINI_API_KEY = AIzaSyCA7G...
-🔧 [next.config.js] Set FIGMA_API_KEY = figd_76CFC...
-🔧 [next.config.js] Set DEFAULT_FIGMA_FILE_ID = iBSG2tTkhY...
-🔧 [next.config.js] Set FIGMA_USE_SECURE_CLIENT = true...
-🔧 [next.config.js] Set FIGMA_TEAM_ID = matura-tea...
-🔧 [next.config.js] Set FIGMA_ENABLE_IP_RESTRICTION = false...
-🔧 [next.config.js] Set FIGMA_ALLOWED_IPS = 127.0.0.1,...
-🔧 [next.config.js] Set FIGMA_MAX_REQUESTS_PER_MINUTE = 30...
-🔧 [next.config.js] Set NODE_ENV = developmen...
-🔧 [next.config.js] Set NEXT_PUBLIC_SUPABASE_URL = https://de...
-🔧 [next.config.js] Set NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOi...
-🔧 [next.config.js] After manual loading - OPENAI_API_KEY exists: true
-🔧 [next.config.js] After manual loading - GEMINI_API_KEY exists: true
-🔧 [next.config.js] After manual loading - FIGMA_API_KEY exists: true
-🔧 [next.config.js] Loading configuration...
-🔧 [next.config.js] OPENAI_API_KEY exists: true
-🔧 [next.config.js] GEMINI_API_KEY exists: true
-🔧 [next.config.js] Set OPENAI_API_KEY = sk-proj-_e...
-🔧 [next.config.js] Set GEMINI_API_KEY = AIzaSyCA7G...
-🔧 [next.config.js] Set FIGMA_API_KEY = figd_76CFC...
-🔧 [next.config.js] Set DEFAULT_FIGMA_FILE_ID = iBSG2tTkhY...
-🔧 [next.config.js] Set FIGMA_USE_SECURE_CLIENT = true...
-🔧 [next.config.js] Set FIGMA_TEAM_ID = matura-tea...
-🔧 [next.config.js] Set FIGMA_ENABLE_IP_RESTRICTION = false...
-🔧 [next.config.js] Set FIGMA_ALLOWED_IPS = 127.0.0.1,...
-🔧 [next.config.js] Set FIGMA_MAX_REQUESTS_PER_MINUTE = 30...
-🔧 [next.config.js] Set NODE_ENV = developmen...
-🔧 [next.config.js] Set NEXT_PUBLIC_SUPABASE_URL = https://de...
-🔧 [next.config.js] Set NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOi...
-🔧 [next.config.js] After manual loading - OPENAI_API_KEY exists: true
-🔧 [next.config.js] After manual loading - GEMINI_API_KEY exists: true
-🔧 [next.config.js] After manual loading - FIGMA_API_KEY exists: true
-🔧 [next.config.js] Loading configuration...
-🔧 [next.config.js] OPENAI_API_KEY exists: true
-🔧 [next.config.js] GEMINI_API_KEY exists: true
+npm WARN config cache-min This option has been deprecated in favor of `--prefer-offline`.
+ ⚠ Port 3000 is in use, trying 3001 instead.
   ▲ Next.js 14.2.30
-  - Local:        http://localhost:3000
-  - Network:      http://0.0.0.0:3000
+  - Local:        http://localhost:3001
+  - Network:      http://0.0.0.0:3001
   - Environments: .env.local, .env
 
  ✓ Starting...
- ✓ Ready in 39.5s
- ○ Compiling /apps/[id] ...
- ✓ Compiled /apps/[id] in 47.9s (1399 modules)
- ✓ Compiled in 7.4s (702 modules)
- GET /apps/app6 200 in 77966ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 2.5s (1367 modules)
- GET /test-crud 404 in 3176ms
-   Reload env: .env.local
- ✓ Compiled in 3.4s (688 modules)
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 7.4s (1370 modules)
-Error: ENOENT: no such file or directory, open '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/middleware-manifest.json'
-    at Object.openSync (node:fs:596:3)
-    at Object.readFileSync (node:fs:464:35)
-    at Module._extensions..json (node:internal/modules/cjs/loader:1423:22)
-    at Module.load (node:internal/modules/cjs/loader:1197:32)
-    at Module._load (node:internal/modules/cjs/loader:1013:12)
-    at Module.require (node:internal/modules/cjs/loader:1225:19)
-    at mod.require (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require-hook.js:65:28)
-    at require (node:internal/modules/helpers:177:18)
-    at DevServer.getMiddlewareManifest (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/next-server.js:938:26)
-    at DevServer.getEdgeFunctionsPages (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/next-server.js:954:31)
-    at DevServer.renderErrorToResponseImpl (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/next-server.js:913:22)
-    at async pipe.req.req (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/base-server.js:2056:30)
-    at async DevServer.pipeImpl (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
-    at async /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
-    at async Span.traceAsyncFn (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
-    at async DevServer.handleRequest (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
-    at async invokeRender (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
-    at async handleRequest (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:374:24)
-    at async requestHandlerImpl (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
-    at async Server.requestListener (/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13) {
-  errno: -2,
-  syscall: 'open',
-  code: 'ENOENT',
-  path: '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/middleware-manifest.json'
-}
- ○ Compiling /_error ...
- ✓ Compiled /_error in 16.4s (1597 modules)
- POST /api/infer-schema 500 in 25585ms
- POST /api/infer-schema 500 in 18131ms
-<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages'
-<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/pages/_app' in /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages/_app.js', but to 'Error: Can't resolve '../../../../.next/server/pages/_app' in '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
-<w>  at resolve commonjs file ../../../../.next/server/pages/_app (expected /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages/_app.js)
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at resolve commonjs /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/pages/_error' in /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages/_error.js', but to 'Error: Can't resolve '../../../../.next/server/pages/_error' in '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
-<w>  at resolve commonjs file ../../../../.next/server/pages/_error (expected /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages/_error.js)
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at resolve commonjs /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/pages/_document' in /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages/_document.js', but to 'Error: Can't resolve '../../../../.next/server/pages/_document' in '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
-<w>  at resolve commonjs file ../../../../.next/server/pages/_document (expected /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/pages/_document.js)
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at resolve commonjs /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/apps/[id]/page' in /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/app/apps/[id]/page.js', but to 'Error: Can't resolve '../../../../.next/server/app/apps/[id]/page' in '/mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
-<w>  at resolve commonjs file ../../../../.next/server/app/apps/[id]/page (expected /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/.next/server/app/apps/[id]/page.js)
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/require.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/server/load-components.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/utils.js
-<w>  at file dependencies /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at file /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-<w>  at resolve commonjs /mnt/c/Users/rinta/OneDrive/デスクトップ/MATURA_claude/MATURA-claude/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
-[?25h
+ ✓ Ready in 2.2s
+ ○ Compiling /api/intelligent-generate ...
+ ✓ Compiled /api/intelligent-generate in 650ms (65 modules)
+🚀 Starting intelligent generation process...
+📝 User input: タスク管理アプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 5685ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: アプリを作りたい
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: タスク管理アプリを作りたい
+🔍 [PATTERN] Keywords found: [ 'real-estate' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.545 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.540 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/productivity-minimal-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+ ✓ Compiled /api/infer-schema in 233ms (69 modules)
+✅ Gemini API responded in 9130ms
+ POST /api/infer-schema 200 in 17590ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: tasks
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 24167ms
+ ✓ Compiled /api/generate-simple in 354ms (74 modules)
+🔧 [OPENAI-INIT] Initializing OpenAI client...
+🔧 [OPENAI-INIT] API Key exists: true
+🔧 [OPENAI-INIT] API Key length: 164
+🔧 [OPENAI-INIT] API Key starts with sk-: true
+✅ [OPENAI-INIT] OpenAI API key validation passed
+✅ [OPENAI-INIT] OpenAI client initialized successfully
+ POST /api/generate-simple 400 in 442ms
+ ○ Compiling /api/apps ...
+ ✓ Compiled /api/apps in 909ms (172 modules)
+💾 Saving new app to Supabase...
+ POST /api/apps 400 in 997ms
+🚀 Starting intelligent generation process...
+📝 User input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 4313ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🚨 [URGENT-FIX] Modified what for gaming: ゲーム攻略とエンターテイメントコンテンツの創作的管理
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🔍 [PATTERN] Keywords found: [ 'education' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.545 (industry=education)
+🔍 [PATTERN] school-administration: score=0.540 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: lms-platform (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Selected template: Creative Portfolio Showcase
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+🚨 [CONTEXT-FIX] Forced category to creative for gaming
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/creative-portfolio-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Template selected: Creative Portfolio Showcase
+🎨 Design reasoning: 「creative」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 10183ms
+Schema inference error: SyntaxError: Unexpected token , in JSON at position 889
+    at JSON.parse (<anonymous>)
+    at POST (webpack-internal:///(rsc)/./app/api/infer-schema/route.ts:770:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+Using fallback schema inference
+ POST /api/infer-schema 200 in 36108ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: custom_data
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 40532ms
+🔧 [OPENAI-INIT] Initializing OpenAI client...
+🔧 [OPENAI-INIT] API Key exists: true
+🔧 [OPENAI-INIT] API Key length: 164
+🔧 [OPENAI-INIT] API Key starts with sk-: true
+✅ [OPENAI-INIT] OpenAI API key validation passed
+✅ [OPENAI-INIT] OpenAI client initialized successfully
+ POST /api/generate-simple 400 in 45ms
+💾 Saving new app to Supabase...
+ POST /api/apps 400 in 17ms
+🚀 Starting intelligent generation process...
+📝 User input: タスク管理アプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 3471ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: アプリを作りたい
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: タスク管理アプリを作りたい
+🔍 [PATTERN] Keywords found: [ 'real-estate' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.545 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.540 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/productivity-minimal-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 6443ms
+ POST /api/infer-schema 200 in 14667ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: tasks
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 18204ms
+ POST /api/generate-simple 400 in 27ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 2cacc26e-ac9e-42d6-b7bc-bbf19c9194f7
+ POST /api/apps 200 in 1050ms
+ ✓ Compiled /api/apps/[id]/render in 254ms (176 modules)
+🎨 Rendering app: undefined
+ GET /api/apps/undefined/render 404 in 653ms
+🚀 Starting intelligent generation process...
+📝 User input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 4210ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🚨 [URGENT-FIX] Modified what for gaming: ゲーム攻略とエンターテイメントコンテンツの創作的管理
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🔍 [PATTERN] Keywords found: [ 'education' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.545 (industry=education)
+🔍 [PATTERN] school-administration: score=0.540 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: lms-platform (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Selected template: Creative Portfolio Showcase
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+🚨 [CONTEXT-FIX] Forced category to creative for gaming
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/creative-portfolio-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Template selected: Creative Portfolio Showcase
+🎨 Design reasoning: 「creative」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 7528ms
+Schema inference error: SyntaxError: Unexpected token , in JSON at position 889
+    at JSON.parse (<anonymous>)
+    at POST (webpack-internal:///(rsc)/./app/api/infer-schema/route.ts:770:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+Using fallback schema inference
+ POST /api/infer-schema 200 in 43990ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: custom_data
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 48295ms
+🔧 [OPENAI-INIT] Initializing OpenAI client...
+🔧 [OPENAI-INIT] API Key exists: true
+🔧 [OPENAI-INIT] API Key length: 164
+🔧 [OPENAI-INIT] API Key starts with sk-: true
+✅ [OPENAI-INIT] OpenAI API key validation passed
+✅ [OPENAI-INIT] OpenAI client initialized successfully
+ POST /api/generate-simple 400 in 70ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: fcd2ab9b-0c20-4800-a51e-056f5f7e987b
+ POST /api/apps 200 in 788ms
+🎨 Rendering app: undefined
+ GET /api/apps/undefined/render 404 in 33ms
+🚀 Starting intelligent generation process...
+📝 User input: シンプルなメモアプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 3098ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: シンプルなメモアプリを作りたい
+🔍 [PATTERN] Keywords found: []
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.059)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 5078ms
+ POST /api/infer-schema 200 in 9849ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: notes
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 13025ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: f22c2a1f-ba00-42b8-b2cc-8daeb8526486
+ POST /api/apps 200 in 964ms
+🚀 Starting intelligent generation process...
+📝 User input: シンプルなメモアプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 3002ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: シンプルなメモアプリを作りたい
+🔍 [PATTERN] Keywords found: []
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.059)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+💾 Using cached UI preparation
+✅ Gemini API responded in 2959ms
+ POST /api/infer-schema 200 in 11002ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: memos
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 14062ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 3f8ba79d-fe28-48da-a7e2-d658eaf3dd26
+ POST /api/apps 200 in 918ms
+🎨 Rendering app: 3f8ba79d-fe28-48da-a7e2-d658eaf3dd26
+ GET /api/apps/3f8ba79d-fe28-48da-a7e2-d658eaf3dd26/render 404 in 23ms
+ ✓ Compiled in 50ms
+ ✓ Compiled /api/intelligent-generate in 176ms (65 modules)
+🚀 Starting intelligent generation process...
+📝 User input: シンプルなメモアプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 3910ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: シンプルなメモアプリを作りたい
+🔍 [PATTERN] Keywords found: []
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.059)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+ ✓ Compiled /api/infer-schema in 127ms (69 modules)
+✅ Gemini API responded in 3615ms
+ POST /api/infer-schema 200 in 16361ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: notes
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 20534ms
+ ✓ Compiled /api/apps in 56ms (167 modules)
+💾 Saving new app to Supabase...
+✅ App saved successfully: 4374a8c7-f5d1-405d-ae61-b1f4783f9f7f
+ POST /api/apps 200 in 1032ms
+ ⚠ ./app/api/apps/[id]/render/route.ts
+Attempted import error: 'getGeneratedApp' is not exported from '@/lib/supabase' (imported as 'getGeneratedApp').
+
+Import trace for requested module:
+./app/api/apps/[id]/render/route.ts
+🎨 Rendering app: 4374a8c7-f5d1-405d-ae61-b1f4783f9f7f
+❌ Error rendering app 4374a8c7-f5d1-405d-ae61-b1f4783f9f7f: TypeError: (0 , _lib_supabase__WEBPACK_IMPORTED_MODULE_1__.getGeneratedApp) is not a function
+    at GET (webpack-internal:///(rsc)/./app/api/apps/[id]/render/route.ts:16:89)
+    at /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57234
+    at /home/rinta/MATURA-claude/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NoopTracer.startActiveSpan (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
+    at ProxyTracer.startActiveSpan (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
+    at /home/rinta/MATURA-claude/node_modules/next/dist/server/lib/trace/tracer.js:122:103
+    at NoopContextManager.with (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NextTracerImpl.trace (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/trace/tracer.js:122:28)
+    at /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:48896
+    at AsyncLocalStorage.run (node:async_hooks:338:14)
+    at Object.wrap (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:40958)
+    at /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47472
+    at AsyncLocalStorage.run (node:async_hooks:338:14)
+    at Object.wrap (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:38293)
+    at /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47434
+    at AsyncLocalStorage.run (node:async_hooks:338:14)
+    at eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46881)
+    at eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58771)
+    at doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:60)
+    at cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1576:46)
+    at ResponseCache.get (/home/rinta/MATURA-claude/node_modules/next/dist/server/response-cache/index.js:49:26)
+    at DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:53)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+ GET /api/apps/4374a8c7-f5d1-405d-ae61-b1f4783f9f7f/render 500 in 238ms
+ ○ Compiling /api/apps/[id]/render ...
+ ✓ Compiled /api/apps/[id]/render in 157ms (169 modules)
+🚀 Starting intelligent generation process...
+📝 User input: シンプルなメモアプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 4948ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: シンプルなメモアプリを作りたい
+🔍 [PATTERN] Keywords found: []
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.059)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー データの管理と操作 を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 3547ms
+ POST /api/infer-schema 200 in 11018ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: memos
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 16037ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 5c3b0d66-9fc8-48c7-8831-d6bc37508e5e
+ POST /api/apps 200 in 431ms
+🎨 Rendering app: 5c3b0d66-9fc8-48c7-8831-d6bc37508e5e
+✅ Successfully rendered app: 5c3b0d66-9fc8-48c7-8831-d6bc37508e5e
+ GET /api/apps/5c3b0d66-9fc8-48c7-8831-d6bc37508e5e/render 200 in 145ms
+🚀 Starting intelligent generation process...
+📝 User input: タスク管理アプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 3302ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: アプリを作りたい
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: タスク管理アプリを作りたい
+🔍 [PATTERN] Keywords found: [ 'real-estate' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.545 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.540 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/productivity-minimal-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 3925ms
+ POST /api/infer-schema 200 in 13920ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: tasks
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 17250ms
+ ✓ Compiled /api/generate-simple in 166ms (174 modules)
+🔧 [OPENAI-INIT] Initializing OpenAI client...
+🔧 [OPENAI-INIT] API Key exists: true
+🔧 [OPENAI-INIT] API Key length: 164
+🔧 [OPENAI-INIT] API Key starts with sk-: true
+✅ [OPENAI-INIT] OpenAI API key validation passed
+✅ [OPENAI-INIT] OpenAI client initialized successfully
+ POST /api/generate-simple 400 in 233ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 1d164748-f63f-4812-8677-1e5fffda33e2
+ POST /api/apps 200 in 1058ms
+🚀 Starting intelligent generation process...
+📝 User input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 4494ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🚨 [URGENT-FIX] Modified what for gaming: ゲーム攻略とエンターテイメントコンテンツの創作的管理
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🔍 [PATTERN] Keywords found: [ 'education' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.545 (industry=education)
+🔍 [PATTERN] school-administration: score=0.540 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: lms-platform (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Selected template: Creative Portfolio Showcase
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+🚨 [CONTEXT-FIX] Forced category to creative for gaming
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/creative-portfolio-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Template selected: Creative Portfolio Showcase
+🎨 Design reasoning: 「creative」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 9665ms
+Schema inference error: SyntaxError: Unexpected token , in JSON at position 586
+    at JSON.parse (<anonymous>)
+    at POST (webpack-internal:///(rsc)/./app/api/infer-schema/route.ts:770:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+Using fallback schema inference
+ POST /api/infer-schema 200 in 33595ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: custom_data
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 38129ms
+ POST /api/generate-simple 400 in 15ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 52bcbf79-0d26-4ec9-aa9e-e10341c78e9e
+ POST /api/apps 200 in 942ms
+🚀 Starting intelligent generation process...
+📝 User input: タスク管理アプリを作りたい
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 3249ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: アプリを作りたい
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: タスク管理アプリを作りたい
+🔍 [PATTERN] Keywords found: [ 'real-estate' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.045 (industry=education)
+🔍 [PATTERN] school-administration: score=0.040 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.545 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.540 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: property-listing (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Selected template: Clean Productivity App
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー アプリを作りたい を作りたい 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 4
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: productivity
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/productivity-minimal-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Clean Productivity App', score: 97.5 },
+  { name: 'Modern Analytics Dashboard', score: 86.5 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Professional SaaS Platform', score: 63 },
+  { name: 'Creative Portfolio Showcase', score: 59.5 },
+  { name: 'Gaming & Entertainment Hub', score: 59.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Culinary Recipe Collection', score: 53 }
+]
+✅ Template selected: Clean Productivity App
+🎨 Design reasoning: 「productivity」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+✅ Gemini API responded in 3798ms
+ POST /api/infer-schema 200 in 16524ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: tasks
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 19815ms
+ POST /api/generate-simple 400 in 10ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 7e20f47f-dfb1-4331-b183-502c4996486a
+ POST /api/apps 200 in 573ms
+🎨 Rendering app: 7e20f47f-dfb1-4331-b183-502c4996486a
+✅ Successfully rendered app: 7e20f47f-dfb1-4331-b183-502c4996486a
+ GET /api/apps/7e20f47f-dfb1-4331-b183-502c4996486a/render 200 in 172ms
+🚀 Starting intelligent generation process...
+📝 User input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🤖 Analyzing requirements with Gemini...
+🤖 Calling Gemini API...
+✅ Gemini API responded in 4387ms
+⚠️ Failed to parse Gemini analysis, proceeding with default options
+🎯 Selecting optimal template with enhanced analysis...
+🔍 Analyzing user input...
+🚨 [URGENT-FIX] Original what: データの管理と操作
+🚨 [URGENT-FIX] Modified what for gaming: ゲーム攻略とエンターテイメントコンテンツの創作的管理
+🏭 Checking industry-specific patterns...
+🔍 [PATTERN] Input: AR×教育×ゲーム×SNSを融合した革新的学習プラットフォーム
+🔍 [PATTERN] Keywords found: [ 'education' ]
+🔍 [PATTERN] medical-appointment: score=0.045 (industry=healthcare)
+🔍 [PATTERN] pharmacy-inventory: score=0.040 (industry=healthcare)
+🔍 [PATTERN] lms-platform: score=0.545 (industry=education)
+🔍 [PATTERN] school-administration: score=0.540 (industry=education)
+🔍 [PATTERN] expense-tracker: score=0.045 (industry=finance)
+🔍 [PATTERN] investment-portfolio: score=0.040 (industry=finance)
+🔍 [PATTERN] hotel-reservation: score=0.045 (industry=hospitality)
+🔍 [PATTERN] restaurant-pos: score=0.040 (industry=hospitality)
+🔍 [PATTERN] delivery-tracking: score=0.045 (industry=logistics)
+🔍 [PATTERN] warehouse-management: score=0.040 (industry=logistics)
+🔍 [PATTERN] property-listing: score=0.059 (industry=real-estate)
+🔍 [PATTERN] property-management: score=0.054 (industry=real-estate)
+🔍 [PATTERN] marketplace-platform: score=0.045 (industry=ecommerce)
+🔍 [PATTERN] subscription-commerce: score=0.040 (industry=ecommerce)
+🔍 [PATTERN] Best match: lms-platform (score=0.545)
+🔍 [PATTERN] Threshold check: FAIL
+📋 Using general pattern matching...
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+📊 Scoring templates...
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Selected template: Creative Portfolio Showcase
+🎨 Deriving design context...
+🔍 [CATEGORY-DEBUG] AllText: 効率性と利便性の向上 一般的なユーザー ゲーム攻略とエンターテイメントコンテンツの創作的管理 フォームに関連 生産性とユーザー満足度の向上
+🔍 [CATEGORY-DEBUG] Current bestCategory before override: productivity maxScore: 6
+🎮 [CATEGORY-OVERRIDE] Gaming/Database detected, forcing creative
+🔍 [CATEGORY-DEBUG] Final bestCategory after override: creative
+🚨 [CONTEXT-FIX] Forced category to creative for gaming
+🌈 Generating color personality...
+🔧 Customizing template...
+🔗 Fetching Figma design from: https://www.figma.com/design/creative-portfolio-template
+⚠️ Failed to fetch Figma design, using default customization: Error: Invalid Figma URL format
+    at FigmaDesignExtractor.fetchDesignFromUrl (webpack-internal:///(rsc)/./lib/figma-api.ts:433:19)
+    at IntelligentFigmaSelector.customizeTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:188:98)
+    at IntelligentFigmaSelector.selectOptimalTemplate (webpack-internal:///(rsc)/./lib/intelligent-figma-selector.ts:74:46)
+    at POST (webpack-internal:///(rsc)/./app/api/intelligent-generate/route.ts:56:130)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+📈 Template scores: [
+  { name: 'Creative Portfolio Showcase', score: 114.5 },
+  { name: 'Gaming & Entertainment Hub', score: 114.5 },
+  { name: 'Culinary Recipe Collection', score: 108 },
+  { name: 'Social Community Platform', score: 73 },
+  { name: 'Modern Analytics Dashboard', score: 66.5 },
+  { name: 'Clean Productivity App', score: 57.5 },
+  { name: 'Modern E-commerce Store', score: 53 },
+  { name: 'Professional SaaS Platform', score: 43 }
+]
+✅ Template selected: Creative Portfolio Showcase
+🎨 Design reasoning: 「creative」カテゴリーに最適化されたテンプレートを選択。modernな印象を与えるmodernレイアウトを採用。あなたのプロダクトの性格に合わせて配色をカスタマイズ。efficiencyを最大化する要素配置とユーザー導線を設計。
+🚀 Starting parallel processing for performance optimization...
+🤖 Calling Gemini API...
+⚡ Preparing UI generation in parallel...
+💾 Using cached UI preparation
+✅ Gemini API responded in 9845ms
+Schema inference error: SyntaxError: Unexpected token , in JSON at position 889
+    at JSON.parse (<anonymous>)
+    at POST (webpack-internal:///(rsc)/./app/api/infer-schema/route.ts:770:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/home/rinta/MATURA-claude/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/base-server.js:818:17)
+    at async /home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/home/rinta/MATURA-claude/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/home/rinta/MATURA-claude/node_modules/next/dist/server/lib/start-server.js:141:13)
+Using fallback schema inference
+ POST /api/infer-schema 200 in 40117ms
+⚠️ Failed to parse Gemini schema, trying fallback
+✅ Fallback schema generated: custom_data
+🎨 Generating ultra premium UI components...
+🎨 Starting dynamic UI customization...
+📐 Using pattern-based generation
+✅ Dynamic UI customization completed
+✅ Ultra premium UI generation completed with cinematic animations
+🎉 Intelligent generation completed successfully
+ POST /api/intelligent-generate 200 in 44532ms
+ POST /api/generate-simple 400 in 10ms
+💾 Saving new app to Supabase...
+✅ App saved successfully: 8ec2ab23-ee46-4263-846a-77845fadf7d6
+ POST /api/apps 200 in 1876ms
+🎨 Rendering app: 8ec2ab23-ee46-4263-846a-77845fadf7d6
+✅ Successfully rendered app: 8ec2ab23-ee46-4263-846a-77845fadf7d6
+ GET /api/apps/8ec2ab23-ee46-4263-846a-77845fadf7d6/render 200 in 218ms
+ ✓ Compiled in 105ms

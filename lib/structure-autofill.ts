@@ -94,7 +94,7 @@ function extractPurpose(input: string): string {
   }
   
   // 汎用的な場合
-  return input.includes('したい') ? input.replace('したい', '').trim() + 'を実現したい' : `${input}の目的を達成したい`
+  return input.includes('したい') ? `${input.replace('したい', '').trim()  }を実現したい` : `${input}の目的を達成したい`
 }
 
 function extractTargetUsers(input: string): string {

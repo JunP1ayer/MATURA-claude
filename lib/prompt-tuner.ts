@@ -288,7 +288,7 @@ export class PromptTuner {
    * 出力品質の予測
    */
   private predictOutputQuality(qualityCheck: QualityCheckResult, strategy: 'basic' | 'enhanced' | 'advanced'): number {
-    let baseQuality = qualityCheck.qualityScore
+    const baseQuality = qualityCheck.qualityScore
     
     // 戦略による品質ボーナス
     const strategyBonus = {

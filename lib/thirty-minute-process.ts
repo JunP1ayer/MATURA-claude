@@ -104,7 +104,7 @@ export class ThirtyMinuteProcess {
   ];
 
   private startTime: Date = new Date();
-  private currentPhase: number = 0;
+  private currentPhase = 0;
   private phaseResults: any[] = [];
   private progressCallbacks: ((progress: ProcessProgress) => void)[] = [];
 

@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { useGetItems, useDeleteItem } from '@/lib/dynamic-crud';
+import { Trash2, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useGetItems, useDeleteItem } from '@/lib/dynamic-crud';
 
 interface Column {
   name: string;
