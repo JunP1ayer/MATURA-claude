@@ -89,8 +89,7 @@ export class OpenAIOptimizedSystem {
           tool_choice: { type: "function", function: { name: functionName } },
           temperature: config.temperature,
           max_tokens: config.maxTokens,
-          response_format: { type: "text" },
-          timeout: config.timeoutMs
+          response_format: { type: "text" }
         });
       } catch (error: any) {
         // トークン制限エラーの場合、GPT-3.5-turboにフォールバック
@@ -115,8 +114,7 @@ export class OpenAIOptimizedSystem {
             tool_choice: { type: "function", function: { name: functionName } },
             temperature: config.temperature,
             max_tokens: Math.min(config.maxTokens, 3000),
-            response_format: { type: "text" },
-            timeout: config.timeoutMs
+            response_format: { type: "text" }
           });
         } else {
           throw error;
@@ -277,8 +275,7 @@ export class OpenAIOptimizedSystem {
           temperature: config.temperature,
           max_tokens: config.maxTokens,
           presence_penalty: typeOptimization.presencePenalty,
-          frequency_penalty: typeOptimization.frequencyPenalty,
-          timeout: config.timeoutMs
+          frequency_penalty: typeOptimization.frequencyPenalty
         });
       } catch (error: any) {
         // トークン制限エラーの場合、GPT-3.5-turboにフォールバック
@@ -293,8 +290,7 @@ export class OpenAIOptimizedSystem {
             temperature: config.temperature,
             max_tokens: Math.min(config.maxTokens, 3000),
             presence_penalty: typeOptimization.presencePenalty,
-            frequency_penalty: typeOptimization.frequencyPenalty,
-            timeout: config.timeoutMs
+            frequency_penalty: typeOptimization.frequencyPenalty
           });
         } else {
           throw error;

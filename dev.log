@@ -1548,3 +1548,4 @@ Request body: { idea: '社員管理アプリ', mode: 'balanced' }
 🎉 [HYBRID] Multi-AI generation completed successfully
 ✅ [GENERATE-API] Generation completed with category: null
  POST /api/generate 200 in 11902ms
+ ✓ Compiled in 45ms
