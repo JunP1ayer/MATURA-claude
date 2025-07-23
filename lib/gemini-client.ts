@@ -436,7 +436,58 @@ ${this.getCreativityPrompt(creativityLevel)}
   }
 
   /**
-   * 高品質なコード生成に特化したメソッド
+   * 包括的要件に基づくコード生成 - Gemini→GPTパイプライン用
+   */
+  async generateCodeFromRequirements(
+    appRequirements: any
+  ): Promise<GeminiResponse> {
+    const prompt = `
+あなたは優秀なReact/TypeScript開発者です。包括的なアプリ要件から、完全に動作するReactアプリケーションを生成してください。
+
+## 包括的アプリ要件
+${JSON.stringify(appRequirements, null, 2)}
+
+## 生成指針
+1. **要件の完全実装**: 全ての機能要件を実装
+2. **UI/UX要件の反映**: 指定された用語とデザインを使用
+3. **データモデルの正確な実装**: スキーマ通りのデータ構造
+4. **ビジネスロジックの実装**: 指定されたルールを含む
+
+## 技術仕様
+- React 18+ with TypeScript
+- 関数型コンポーネント + Hooks
+- Tailwind CSS for styling
+- shadcn/ui components
+- Lucide React icons
+- 完全なCRUD機能
+- エラーハンドリング
+- レスポンシブデザイン
+
+## 出力要件
+以下の構造で完全なReactコンポーネントを生成してください：
+
+1. **型定義**: データモデルに基づく厳密な型
+2. **状態管理**: useState, useEffectを適切に使用
+3. **API通信**: fetch APIを使用したCRUD操作
+4. **UI実装**: 要件で指定された用語を使用
+5. **エラーハンドリング**: ユーザーフレンドリーなエラー表示
+
+コンポーネント名: ${appRequirements.dataModel?.tableName ? 
+  `${this.toPascalCase(appRequirements.dataModel.tableName.replace(/s$/, ''))}App` : 'GeneratedApp'}
+
+**重要**: 完全なReactコンポーネントコードのみを出力してください。説明文は不要です。
+`;
+
+    return this.generateText({
+      prompt,
+      temperature: 0.2, // 正確な実装のため低温度
+      maxTokens: 4000,
+      context: 'Requirements-based code generation'
+    });
+  }
+
+  /**
+   * 高品質なコード生成に特化したメソッド（従来版も保持）
    */
   async generateHighQualityCode(
     userRequirement: string,
@@ -529,7 +580,75 @@ JSONのみを出力してください。他の文章は不要です。
   }
 
   /**
-   * スキーマ推論に特化したメソッド
+   * 理想的アプリ要件分析 - GPT実装指向
+   */
+  async analyzeAppRequirements(userInput: string): Promise<GeminiResponse> {
+    const prompt = `
+あなたはアプリ開発の要件分析専門家です。ユーザーの自然言語入力から、GPTがReactコンポーネントを実装するのに最適な要件を抽出してください。
+
+## ユーザー入力
+${userInput}
+
+## 分析ルール
+1. **シンプルで実装指向**: GPTが迷わない明確な指示
+2. **具体的なUI要求**: レイアウト、文言、UX動作を明示
+3. **最小限の情報**: 実装に必要十分な要素のみ
+4. **日本語対応**: ユーザー表示は適切な日本語
+
+## 以下の理想的JSON形式で回答してください
+{
+  "appOverview": {
+    "purpose": "アプリの目的を1文で簡潔に",
+    "domain": "アプリのドメイン（family_management, recipe_collection, task_management, inventory_management, customer_management, health_tracking, etc.）"
+  },
+  "dataModel": {
+    "tableName": "テーブル名（英語、複数形）",
+    "columns": [
+      {
+        "name": "カラム名（英語）",
+        "type": "text|number|date|boolean",
+        "required": true|false,
+        "userFriendlyLabel": "日本語の表示名"
+      }
+    ]
+  },
+  "uiRequirements": {
+    "layout": {
+      "pageTitle": "アプリのタイトル",
+      "listSectionTitle": "一覧セクションのタイトル", 
+      "addFormPosition": "sidebar|top|modal"
+    },
+    "terminology": {
+      "addAction": "追加ボタンの文言",
+      "updateAction": "更新ボタンの文言",
+      "deleteAction": "削除ボタンの文言",
+      "emptyState": "データが無い時のメッセージ"
+    },
+    "uxRequirements": {
+      "loadingState": "ローディング時の表示方法",
+      "errorState": "エラー時の表示方法",
+      "successState": "成功時の表示方法（あれば）"
+    }
+  }
+}
+
+**重要**: 
+- JSONのみを出力（説明文不要）
+- userFriendlyLabelは必ず日本語
+- 実装に必要な最小限の情報のみ
+- GPTが理解しやすい構造
+`;
+
+    return this.generateText({
+      prompt,
+      temperature: 0.2, // より一貫した出力のため低温度
+      maxTokens: 1500,
+      context: 'Ideal app requirements for GPT implementation'
+    });
+  }
+
+  /**
+   * スキーマ推論に特化したメソッド（従来版も保持）
    */
   async inferDatabaseSchema(userInput: string): Promise<GeminiResponse> {
     const prompt = `

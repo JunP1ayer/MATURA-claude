@@ -51,7 +51,7 @@ export const PREMIUM_DESIGN_PATTERNS: UIDesignPattern[] = [
     components: ['forms', 'lists', 'buttons', 'cards'],
     layout: 'minimal',
     mvpScore: 8,
-    figmaUrl: 'https://www.figma.com/design/productivity-minimal-template'
+    figmaUrl: 'https://www.figma.com/file/iBSG2tTkhYM9Ucvi04u5sx/Figma-Basics'
   },
   {
     id: 'creative-portfolio',
@@ -198,6 +198,135 @@ export function selectOptimalDesignPattern(userIdea: string): UIDesignPattern {
 // Import Figma UI generator
 import { figmaUIGenerator } from './figma-ui-generator';
 
+// Context-aware UI terminology generator
+function getContextualTerminology(tableName: string, userIdea: string) {
+  const tableMap: Record<string, {
+    singular: string;
+    plural: string;
+    addAction: string;
+    addingAction: string;
+    listTitle: string;
+    emptyMessage: string;
+    fieldLabels: Record<string, string>;
+  }> = {
+    dependents: {
+      singular: 'Dependent',
+      plural: 'Dependents',
+      addAction: 'Add New Dependent',
+      addingAction: 'Adding Dependent',
+      listTitle: 'Family Dependents',
+      emptyMessage: 'No dependents registered yet. Add your first dependent to get started!',
+      fieldLabels: {
+        name: 'Full Name',
+        relationship: 'Relationship',
+        birth_date: 'Date of Birth',
+        support_start_date: 'Support Start Date',
+        support_end_date: 'Support End Date',
+        address: 'Address',
+        phone: 'Phone Number',
+        notes: 'Additional Notes'
+      }
+    },
+    recipes: {
+      singular: 'Recipe',
+      plural: 'Recipes',
+      addAction: 'Add New Recipe',
+      addingAction: 'Adding Recipe',
+      listTitle: 'Recipe Collection',
+      emptyMessage: 'No recipes yet. Add your first recipe to start building your collection!',
+      fieldLabels: {
+        name: 'Recipe Name',
+        description: 'Description',
+        ingredients: 'Ingredients',
+        instructions: 'Cooking Instructions',
+        prep_time: 'Prep Time (minutes)',
+        cook_time: 'Cook Time (minutes)',
+        servings: 'Number of Servings'
+      }
+    },
+    games: {
+      singular: 'Game',
+      plural: 'Games',
+      addAction: 'Add New Game',
+      addingAction: 'Adding Game',
+      listTitle: 'Game Collection',
+      emptyMessage: 'No games yet. Add games to track your collection and progress!',
+      fieldLabels: {
+        title: 'Game Title',
+        platform: 'Platform',
+        genre: 'Genre',
+        rating: 'Rating (1-10)',
+        completion_status: 'Completion Status',
+        notes: 'Notes & Tips'
+      }
+    },
+    events: {
+      singular: 'Event',
+      plural: 'Events',
+      addAction: 'Add New Event',
+      addingAction: 'Adding Event',
+      listTitle: 'Upcoming Events',
+      emptyMessage: 'No events scheduled yet. Add your first event to get started!',
+      fieldLabels: {
+        title: 'Event Title',
+        description: 'Description',
+        start_date: 'Start Date & Time',
+        end_date: 'End Date & Time',
+        location: 'Location'
+      }
+    },
+    customers: {
+      singular: 'Customer',
+      plural: 'Customers',
+      addAction: 'Add New Customer',
+      addingAction: 'Adding Customer',
+      listTitle: 'Customer Database',
+      emptyMessage: 'No customers yet. Add your first customer to start building your database!',
+      fieldLabels: {
+        name: 'Customer Name',
+        email: 'Email Address',
+        phone: 'Phone Number',
+        company: 'Company',
+        status: 'Status'
+      }
+    },
+    tasks: {
+      singular: 'Task',
+      plural: 'Tasks',
+      addAction: 'Add New Task',
+      addingAction: 'Adding Task',
+      listTitle: 'Task Management',
+      emptyMessage: 'No tasks yet. Add your first task to get started!',
+      fieldLabels: {
+        title: 'Task Title',
+        description: 'Description',
+        status: 'Status',
+        priority: 'Priority',
+        due_date: 'Due Date'
+      }
+    }
+  };
+
+  // Return specific terminology or create dynamic fallback
+  if (tableMap[tableName]) {
+    return tableMap[tableName];
+  }
+
+  // Dynamic fallback based on table name and user idea
+  const singular = tableName.replace(/s$/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  const plural = singular + 's';
+  
+  return {
+    singular,
+    plural,
+    addAction: `Add New ${singular}`,
+    addingAction: `Adding ${singular}`,
+    listTitle: `${plural} Management`,
+    emptyMessage: `No ${plural.toLowerCase()} yet. Add your first ${singular.toLowerCase()} to get started!`,
+    fieldLabels: {} as Record<string, string>
+  };
+}
+
 // Generate optimized UI code with selected pattern
 export function generateOptimizedUI(pattern: UIDesignPattern, userIdea: string, schema: any, figmaDesign?: any): string {
   // If Figma design is provided, use the Figma UI generator
@@ -212,6 +341,9 @@ export function generateOptimizedUI(pattern: UIDesignPattern, userIdea: string, 
     !col.name.includes('created_at') && 
     !col.name.includes('updated_at')
   );
+
+  // Get contextual terminology
+  const terminology = getContextualTerminology(tableName, userIdea);
 
   return `'use client';
 
@@ -345,14 +477,14 @@ ${columns.map((col: any) => `          ${col.name}: ${getDefaultValue(col.type)}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5 text-green-600" />
-                  Add New Item
+                  ${terminology.addAction}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
 ${columns.map((col: any) => `                  <div>
                     <label className="block text-sm font-medium mb-1">
-                      ${col.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      ${terminology.fieldLabels[col.name] || col.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </label>
                     <Input
                       type="${getInputType(col.type)}"
@@ -367,7 +499,7 @@ ${columns.map((col: any) => `                  <div>
                     disabled={isLoading}
                     className="w-full bg-green-600 hover:bg-green-700 text-white"
                   >
-                    {isLoading ? 'Adding...' : 'Add Item'}
+                    {isLoading ? '${terminology.addingAction}...' : '${terminology.addAction}'}
                   </Button>
                 </form>
               </CardContent>
@@ -379,14 +511,14 @@ ${columns.map((col: any) => `                  <div>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <List className="h-5 w-5 text-green-600" />
-                  Items ({items.length})
+                  ${terminology.listTitle} ({items.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {items.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
-                      No items yet. Add your first item to get started!
+                      ${terminology.emptyMessage}
                     </div>
                   ) : (
                     items.map((item) => (
@@ -395,7 +527,7 @@ ${columns.map((col: any) => `                  <div>
                           <div className="space-y-1">
 ${columns.map((col: any) => `                            <div>
                               <span className="text-sm font-medium text-gray-600">
-                                ${col.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                                ${terminology.fieldLabels[col.name] || col.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
                               </span>
                               <span className="ml-2">{item.${col.name}}</span>
                             </div>`).join('\n')}

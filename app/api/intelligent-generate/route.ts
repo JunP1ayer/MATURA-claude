@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { dynamicCustomizationEngine } from '@/lib/dynamic-customization-engine';
 import { geminiClient } from '@/lib/gemini-client';
+import { openaiCodeGenerator } from '@/lib/openai-code-generator';
 import { intelligentFigmaSelector } from '@/lib/intelligent-figma-selector';
 import { ultraPremiumUISystem } from '@/lib/ultra-premium-ui-system';
 
@@ -18,10 +19,11 @@ export async function POST(request: Request) {
     console.log('🚀 Starting intelligent generation process...');
     console.log('📝 User input:', userInput);
 
-    // Step 1: Gemini分析による高度なデザイン要件分析
-    console.log('🤖 Analyzing requirements with Gemini...');
-    const geminiAnalysis = await geminiClient.analyzeDesignRequirements(userInput);
+    // Step 1: Gemini包括的要件分析
+    console.log('🧠 Comprehensive requirements analysis with Gemini...');
+    const appRequirementsAnalysis = await geminiClient.analyzeAppRequirements(userInput);
     
+    let appRequirements = null;
     let enhancedCustomizationOptions = customizationOptions || {
       adaptColors: true,
       adaptLayout: true,
@@ -29,25 +31,46 @@ export async function POST(request: Request) {
       adaptComponents: true
     };
 
-    // Gemini分析結果を統合
-    if (geminiAnalysis.success) {
+    // Gemini包括的分析結果を統合
+    if (appRequirementsAnalysis.success) {
       try {
-        const analysisData = typeof geminiAnalysis.data === 'string' 
-          ? JSON.parse(geminiAnalysis.data) 
-          : geminiAnalysis.data;
+        appRequirements = typeof appRequirementsAnalysis.data === 'string' 
+          ? JSON.parse(appRequirementsAnalysis.data) 
+          : appRequirementsAnalysis.data;
         
-        console.log('✅ Gemini analysis completed:', analysisData);
+        console.log('✅ Comprehensive app requirements analyzed:', appRequirements);
         
         // 分析結果をカスタマイズオプションに統合
         enhancedCustomizationOptions = {
           ...enhancedCustomizationOptions,
-          geminiInsights: analysisData,
-          preferredColors: analysisData.recommendedColors,
-          targetComplexity: analysisData.complexity,
-          designCategory: analysisData.category
+          appRequirements: appRequirements,
+          preferredColors: appRequirements.designGuidance?.colorScheme,
+          targetComplexity: appRequirements.designGuidance?.complexity,
+          designCategory: appRequirements.designGuidance?.category,
+          uiTerminology: appRequirements.uiRequirements?.terminology
         };
       } catch (parseError) {
-        console.warn('⚠️ Failed to parse Gemini analysis, proceeding with default options');
+        console.warn('⚠️ Failed to parse Gemini app requirements, proceeding with fallback analysis');
+        
+        // フォールバック: 従来のデザイン分析
+        const fallbackAnalysis = await geminiClient.analyzeDesignRequirements(userInput);
+        if (fallbackAnalysis.success) {
+          try {
+            const analysisData = typeof fallbackAnalysis.data === 'string' 
+              ? JSON.parse(fallbackAnalysis.data) 
+              : fallbackAnalysis.data;
+            
+            enhancedCustomizationOptions = {
+              ...enhancedCustomizationOptions,
+              geminiInsights: analysisData,
+              preferredColors: analysisData.recommendedColors,
+              targetComplexity: analysisData.complexity,
+              designCategory: analysisData.category
+            };
+          } catch (fallbackError) {
+            console.warn('⚠️ Fallback analysis also failed, using default options');
+          }
+        }
       }
     }
 
@@ -69,46 +92,53 @@ export async function POST(request: Request) {
       console.log('🚀 Starting parallel processing for performance optimization...');
       
       try {
-        // 並列処理: Geminiスキーマ生成、フォールバックスキーマ生成、UI準備を同時実行
-        const [geminiSchemaPromise, fallbackSchemaPromise, preUIPromise] = await Promise.allSettled([
-          // Gemini高品質スキーマ生成
-          geminiClient.inferDatabaseSchema(userInput),
-          
-          // フォールバック: 従来のスキーマ生成
-          fetch(`${request.url.replace('/intelligent-generate', '/infer-schema')}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userInput }),
-          }).then(res => res.ok ? res.json() : null),
-          
-          // UI準備処理（スキーマ不要な部分）
-          dynamicCustomizationEngine.prepareUIGeneration(intelligentSelection, userInput)
-        ]);
+        // Step 2A: スキーマ生成 - appRequirementsを優先使用
+        if (appRequirements && appRequirements.dataModel) {
+          // Gemini包括分析からスキーマを取得
+          schema = appRequirements.dataModel;
+          console.log('✅ Schema from comprehensive app requirements:', schema?.tableName);
+        } else {
+          // 従来の並列処理フォールバック
+          const [geminiSchemaPromise, fallbackSchemaPromise, preUIPromise] = await Promise.allSettled([
+            // Gemini高品質スキーマ生成
+            geminiClient.inferDatabaseSchema(userInput),
+            
+            // フォールバック: 従来のスキーマ生成
+            fetch(`${request.url.replace('/intelligent-generate', '/infer-schema')}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userInput }),
+            }).then(res => res.ok ? res.json() : null),
+            
+            // UI準備処理（スキーマ不要な部分）
+            dynamicCustomizationEngine.prepareUIGeneration(intelligentSelection, userInput)
+          ]);
 
-        // スキーマ結果の処理 - Geminiを優先、フォールバックを次点
-        if (geminiSchemaPromise.status === 'fulfilled' && geminiSchemaPromise.value?.success) {
-          try {
-            const geminiSchema = typeof geminiSchemaPromise.value.data === 'string' 
-              ? JSON.parse(geminiSchemaPromise.value.data) 
-              : geminiSchemaPromise.value.data;
-            schema = geminiSchema;
-            console.log('✅ High-quality Gemini schema generated:', schema?.tableName);
-          } catch (parseError) {
-            console.warn('⚠️ Failed to parse Gemini schema, trying fallback');
-            schema = null;
+          // スキーマ結果の処理 - Geminiを優先、フォールバックを次点
+          if (geminiSchemaPromise.status === 'fulfilled' && geminiSchemaPromise.value?.success) {
+            try {
+              const geminiSchema = typeof geminiSchemaPromise.value.data === 'string' 
+                ? JSON.parse(geminiSchemaPromise.value.data) 
+                : geminiSchemaPromise.value.data;
+              schema = geminiSchema;
+              console.log('✅ High-quality Gemini schema generated:', schema?.tableName);
+            } catch (parseError) {
+              console.warn('⚠️ Failed to parse Gemini schema, trying fallback');
+              schema = null;
+            }
           }
-        }
-        
-        // Geminiスキーマが失敗した場合のフォールバック
-        if (!schema && fallbackSchemaPromise.status === 'fulfilled' && fallbackSchemaPromise.value) {
-          schema = fallbackSchemaPromise.value.schema;
-          console.log('✅ Fallback schema generated:', schema?.tableName);
-        }
-        
-        // 最終フォールバック：基本スキーマ生成
-        if (!schema) {
-          console.warn('⚠️ All schema generation failed, using basic fallback');
-          schema = generateFallbackSchema(userInput);
+          
+          // Geminiスキーマが失敗した場合のフォールバック
+          if (!schema && fallbackSchemaPromise.status === 'fulfilled' && fallbackSchemaPromise.value) {
+            schema = fallbackSchemaPromise.value.schema;
+            console.log('✅ Fallback schema generated:', schema?.tableName);
+          }
+          
+          // 最終フォールバック：基本スキーマ生成
+          if (!schema) {
+            console.warn('⚠️ All schema generation failed, using basic fallback');
+            schema = generateFallbackSchema(userInput);
+          }
         }
 
         // Ultra Premium UI生成の統合
@@ -121,18 +151,65 @@ export async function POST(request: Request) {
           targetEmotion: enhancedCustomizationOptions.geminiInsights?.targetEmotion || 'trust' as const
         };
         
-        const [customizationPromise, premiumUIPromise] = await Promise.allSettled([
-          dynamicCustomizationEngine.generateCustomizedUI(
-            intelligentSelection,
-            schema,
-            userInput,
-            preUIPromise.status === 'fulfilled' ? preUIPromise.value : null
-          ),
-          ultraPremiumUISystem.generateUltraPremiumComponent('card', premiumUIConfig)
-        ]);
+        // Step 2B: GPT-4コード生成 - Gemini要件を使用
+        if (appRequirements) {
+          console.log('🎯 Generating code with GPT-4 from Gemini requirements...');
+          const gptCodeGeneration = await openaiCodeGenerator.generateFromRequirements({
+            appRequirements,
+            style: 'professional',
+            framework: 'react'
+          });
+          
+          if (gptCodeGeneration.success) {
+            customizationResult = {
+              generatedCode: gptCodeGeneration.generatedCode,
+              customStyles: null,
+              componentVariations: [],
+              personalizedElements: appRequirements.uiRequirements || {},
+              designExplanation: `Generated by GPT-4 from Gemini-analyzed requirements`,
+              performanceOptimizations: appRequirements.technicalConsiderations || {},
+              codeGeneration: {
+                model: 'gpt-4',
+                tokensUsed: gptCodeGeneration.metadata?.tokensUsed || 0,
+                processingTime: gptCodeGeneration.metadata?.processingTime || 0
+              }
+            };
+            console.log('✅ GPT-4 code generation completed successfully');
+          } else {
+            console.warn('⚠️ GPT-4 code generation failed, trying Gemini fallback');
+            
+            // フォールバック: Geminiでコード生成
+            const geminiCodeGeneration = await geminiClient.generateCodeFromRequirements(appRequirements);
+            if (geminiCodeGeneration.success) {
+              customizationResult = {
+                generatedCode: geminiCodeGeneration.data,
+                customStyles: null,
+                componentVariations: [],
+                personalizedElements: appRequirements.uiRequirements || {},
+                designExplanation: `Generated by Gemini (GPT-4 fallback)`,
+                performanceOptimizations: appRequirements.technicalConsiderations || {}
+              };
+              console.log('✅ Gemini fallback code generation completed');
+            }
+          }
+        }
         
-        customizationResult = customizationPromise.status === 'fulfilled' ? customizationPromise.value : null;
-        const premiumComponents = premiumUIPromise.status === 'fulfilled' ? premiumUIPromise.value : null;
+        // フォールバック: 従来のUI生成
+        if (!customizationResult) {
+          const [customizationPromise, premiumUIPromise] = await Promise.allSettled([
+            dynamicCustomizationEngine.generateCustomizedUI(
+              intelligentSelection,
+              schema,
+              userInput,
+              null // preUIPromise is not available in fallback path
+            ),
+            ultraPremiumUISystem.generateUltraPremiumComponent('card', premiumUIConfig)
+          ]);
+          
+          customizationResult = customizationPromise.status === 'fulfilled' ? customizationPromise.value : null;
+        }
+        
+        const premiumComponents = null; // Will be generated separately if needed
         
         // プレミアムコンポーネントを統合
         if (customizationResult && premiumComponents) {
@@ -161,18 +238,125 @@ export async function POST(request: Request) {
       }
     }
 
-    // Simple fallback schema generator
+    // Intelligent fallback schema generator
     function generateFallbackSchema(input: string) {
-      const tableName = input.toLowerCase().includes('task') ? 'tasks' : 
-                       input.toLowerCase().includes('user') ? 'users' : 
-                       input.toLowerCase().includes('product') ? 'products' : 'items';
+      const inputLower = input.toLowerCase();
+      
+      // Context-aware schema generation based on user input
+      if (inputLower.includes('扶養') || inputLower.includes('家族') || inputLower.includes('dependent')) {
+        return {
+          tableName: 'dependents',
+          columns: [
+            { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+            { name: 'name', type: 'text', nullable: false },
+            { name: 'relationship', type: 'text', nullable: false },
+            { name: 'birth_date', type: 'date', nullable: false },
+            { name: 'support_start_date', type: 'date', nullable: false },
+            { name: 'support_end_date', type: 'date', nullable: true },
+            { name: 'notes', type: 'text', nullable: true },
+            { name: 'created_at', type: 'timestamp', nullable: false },
+            { name: 'updated_at', type: 'timestamp', nullable: false }
+          ]
+        };
+      }
+      
+      if (inputLower.includes('レシピ') || inputLower.includes('料理') || inputLower.includes('recipe')) {
+        return {
+          tableName: 'recipes',
+          columns: [
+            { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+            { name: 'name', type: 'text', nullable: false },
+            { name: 'description', type: 'text', nullable: true },
+            { name: 'ingredients', type: 'text', nullable: false },
+            { name: 'instructions', type: 'text', nullable: false },
+            { name: 'prep_time', type: 'number', nullable: true },
+            { name: 'cook_time', type: 'number', nullable: true },
+            { name: 'servings', type: 'number', nullable: true },
+            { name: 'created_at', type: 'timestamp', nullable: false },
+            { name: 'updated_at', type: 'timestamp', nullable: false }
+          ]
+        };
+      }
+      
+      if (inputLower.includes('ゲーム') || inputLower.includes('攻略') || inputLower.includes('game')) {
+        return {
+          tableName: 'games',
+          columns: [
+            { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+            { name: 'title', type: 'text', nullable: false },
+            { name: 'platform', type: 'text', nullable: false },
+            { name: 'genre', type: 'text', nullable: true },
+            { name: 'rating', type: 'number', nullable: true },
+            { name: 'completion_status', type: 'text', nullable: false, defaultValue: 'not_started' },
+            { name: 'notes', type: 'text', nullable: true },
+            { name: 'created_at', type: 'timestamp', nullable: false },
+            { name: 'updated_at', type: 'timestamp', nullable: false }
+          ]
+        };
+      }
+      
+      if (inputLower.includes('イベント') || inputLower.includes('予定') || inputLower.includes('event')) {
+        return {
+          tableName: 'events',
+          columns: [
+            { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+            { name: 'title', type: 'text', nullable: false },
+            { name: 'description', type: 'text', nullable: true },
+            { name: 'start_date', type: 'datetime', nullable: false },
+            { name: 'end_date', type: 'datetime', nullable: true },
+            { name: 'location', type: 'text', nullable: true },
+            { name: 'created_at', type: 'timestamp', nullable: false },
+            { name: 'updated_at', type: 'timestamp', nullable: false }
+          ]
+        };
+      }
+      
+      if (inputLower.includes('顧客') || inputLower.includes('お客様') || inputLower.includes('customer')) {
+        return {
+          tableName: 'customers',
+          columns: [
+            { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+            { name: 'name', type: 'text', nullable: false },
+            { name: 'email', type: 'email', nullable: false },
+            { name: 'phone', type: 'text', nullable: true },
+            { name: 'company', type: 'text', nullable: true },
+            { name: 'status', type: 'text', nullable: false, defaultValue: 'active' },
+            { name: 'created_at', type: 'timestamp', nullable: false },
+            { name: 'updated_at', type: 'timestamp', nullable: false }
+          ]
+        };
+      }
+      
+      // Only fall back to generic task management if it explicitly mentions tasks
+      if (inputLower.includes('task') || inputLower.includes('タスク') || inputLower.includes('todo')) {
+        return {
+          tableName: 'tasks',
+          columns: [
+            { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+            { name: 'title', type: 'text', nullable: false },
+            { name: 'description', type: 'text', nullable: true },
+            { name: 'status', type: 'text', nullable: false, defaultValue: 'pending' },
+            { name: 'priority', type: 'text', nullable: false, defaultValue: 'medium' },
+            { name: 'due_date', type: 'date', nullable: true },
+            { name: 'created_at', type: 'timestamp', nullable: false },
+            { name: 'updated_at', type: 'timestamp', nullable: false }
+          ]
+        };
+      }
+      
+      // More intelligent default based on context
+      const tableName = inputLower.includes('user') ? 'users' : 
+                       inputLower.includes('product') ? 'products' : 
+                       inputLower.includes('記録') ? 'records' :
+                       inputLower.includes('情報') ? 'information' : 'custom_items';
       
       return {
         tableName,
         columns: [
           { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
-          { name: 'title', type: 'text', nullable: false },
+          { name: 'name', type: 'text', nullable: false },
           { name: 'description', type: 'text', nullable: true },
+          { name: 'category', type: 'text', nullable: true },
           { name: 'status', type: 'text', nullable: false, defaultValue: 'active' },
           { name: 'created_at', type: 'timestamp', nullable: false },
           { name: 'updated_at', type: 'timestamp', nullable: false }
@@ -195,8 +379,9 @@ export async function POST(request: Request) {
           industryMatch: intelligentSelection.industryMatch
         },
         
-        // Analysis insights
+        // Analysis insights - 包括的要件分析を含む
         analysis: {
+          comprehensiveRequirements: appRequirements,
           structuredData: intelligentSelection.structuredData,
           designContext: intelligentSelection.designContext,
           colorPersonality: intelligentSelection.colorPersonality
@@ -235,7 +420,7 @@ export async function POST(request: Request) {
           figmaUsed: !!(intelligentSelection.customizedPattern as any).figmaDesign,
           // Gemini統合情報
           geminiEnhanced: {
-            designAnalysisUsed: geminiAnalysis.success,
+            designAnalysisUsed: !!appRequirementsAnalysis?.success,
             schemaGenerationUsed: false, // Will be updated in the processing section
             totalGeminiCalls: 1, // Will be updated based on successful calls
             performanceBoost: 'Gemini並列処理により約50%高速化'

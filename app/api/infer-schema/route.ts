@@ -8,6 +8,25 @@ function inferSchemaFromKeywords(userInput: string) {
   // キーワードベースのパターンマッチング（拡張版）
   const patterns = [
     {
+      keywords: ['扶養家族', '扶養対象者', '扶養', '家族情報', '扶養者', 'dependent', 'family member', '関係性', '生年月日', '扶養期間', '家族管理'],
+      schema: {
+        tableName: 'dependents',
+        columns: [
+          { name: 'id', type: 'uuid', nullable: false, primaryKey: true },
+          { name: 'name', type: 'text', nullable: false, primaryKey: false },
+          { name: 'relationship', type: 'text', nullable: false, primaryKey: false },
+          { name: 'birth_date', type: 'date', nullable: false, primaryKey: false },
+          { name: 'support_start_date', type: 'date', nullable: false, primaryKey: false },
+          { name: 'support_end_date', type: 'date', nullable: true, primaryKey: false },
+          { name: 'address', type: 'text', nullable: true, primaryKey: false },
+          { name: 'phone', type: 'text', nullable: true, primaryKey: false },
+          { name: 'notes', type: 'text', nullable: true, primaryKey: false },
+          { name: 'created_at', type: 'timestamp', nullable: false, primaryKey: false },
+          { name: 'updated_at', type: 'timestamp', nullable: false, primaryKey: false }
+        ]
+      }
+    },
+    {
       keywords: ['扶養', '収入', '年収', '103万', '130万', '扶養控除', '所得制限', '扶養ライン'],
       schema: {
         tableName: 'income_records',

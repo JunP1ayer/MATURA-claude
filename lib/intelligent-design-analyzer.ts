@@ -91,6 +91,23 @@ export class IntelligentDesignAnalyzer {
       /(?:効率化|改善|最適化|解決)([^。]+)/g
     ];
     
+    // Domain-specific motivation inference
+    if (input.includes('扶養') || input.includes('家族')) {
+      return '扶養家族の情報を整理し、税制面での管理を効率化したい';
+    }
+    if (input.includes('レシピ') || input.includes('料理')) {
+      return 'お気に入りのレシピを整理し、料理の計画と準備を効率化したい';
+    }
+    if (input.includes('ゲーム') || input.includes('攻略')) {
+      return 'ゲームコレクションを管理し、プレイ履歴や攻略情報を整理したい';
+    }
+    if (input.includes('顧客') || input.includes('お客様')) {
+      return '顧客情報を一元管理し、営業活動の効率化を図りたい';
+    }
+    if (input.includes('イベント') || input.includes('予定')) {
+      return 'イベントの計画と管理を効率化し、参加者との連携を改善したい';
+    }
+    
     return this.extractByPatterns(input, whyPatterns) || 
            this.inferFromContext(input, 'why') ||
            '効率性と利便性の向上';
@@ -100,8 +117,22 @@ export class IntelligentDesignAnalyzer {
     const whoPatterns = [
       /(?:ユーザーは|対象は|利用者は|ターゲットは)([^。]+)/g,
       /(?:users|customers|clients|target|audience)([^.]+)/gi,
-      /(?:個人|企業|チーム|開発者|デザイナー|学生|ビジネス)([^。]*)/g
+      /(?:個人|企業|チーム|開発者|デザイナー|学生|ビジネス|家族|扶養者)([^。]*)/g
     ];
+    
+    // Domain-specific user inference
+    if (input.includes('扶養') || input.includes('家族')) {
+      return '扶養者とその家族メンバー';
+    }
+    if (input.includes('レシピ') || input.includes('料理')) {
+      return '料理愛好家とシェフ';
+    }
+    if (input.includes('ゲーム') || input.includes('攻略')) {
+      return 'ゲーマーとコレクター';
+    }
+    if (input.includes('顧客') || input.includes('お客様')) {
+      return 'ビジネス担当者と営業チーム';
+    }
     
     return this.extractByPatterns(input, whoPatterns) || 
            this.inferFromContext(input, 'who') ||
@@ -112,8 +143,25 @@ export class IntelligentDesignAnalyzer {
     const whatPatterns = [
       /(?:機能は|提供するのは|できることは)([^。]+)/g,
       /(?:features|functionality|capabilities|provides)([^.]+)/gi,
-      /(?:管理|作成|編集|共有|分析|表示)([^。]*)/g
+      /(?:管理|作成|編集|共有|分析|表示|登録|確認|削除)([^。]*)/g
     ];
+    
+    // Domain-specific feature inference
+    if (input.includes('扶養') || input.includes('家族')) {
+      return '扶養対象者の登録・管理・期間追跡・関係性確認';
+    }
+    if (input.includes('レシピ') || input.includes('料理')) {
+      return 'レシピの保存・検索・カテゴリ分類・調理手順管理';
+    }
+    if (input.includes('ゲーム') || input.includes('攻略')) {
+      return 'ゲーム情報の記録・進捗管理・評価・攻略メモ';
+    }
+    if (input.includes('顧客') || input.includes('お客様')) {
+      return '顧客情報の管理・連絡先保存・履歴追跡・ステータス管理';
+    }
+    if (input.includes('イベント') || input.includes('予定')) {
+      return 'イベントの作成・スケジュール管理・参加者管理・通知';
+    }
     
     return this.extractByPatterns(input, whatPatterns) || 
            this.inferFromContext(input, 'what') ||
