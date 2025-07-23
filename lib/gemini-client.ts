@@ -132,9 +132,9 @@ export class GeminiClient {
    * 創造的アイデア生成 - Geminiの強みを活用
    */
   /**
-   * 柔軟なアイデア分析 - カテゴリ制約なし
+   * 機能抽出特化分析 - カテゴリ分類完全廃止
    */
-  async analyzeIdeaFlexibly(
+  async extractFeaturesDirectly(
     userInput: string,
     options: Partial<GeminiRequest> = {}
   ): Promise<GeminiCreativeResponse> {
@@ -142,42 +142,54 @@ export class GeminiClient {
     
     const creativityConfig = this.getCreativityConfig(options.creativityMode || 'balanced');
     
-    const prompt = `🌟 自由創造的AI分析モード 🌟
+    const prompt = `🎯 高精度機能抽出システム - 安定性重視版 🎯
 
-ユーザーの入力: "${userInput}"
+【分析対象】: "${userInput}"
 
-あなたは制約のない創造的思考AIです。このアイデアをありのままに分析し、可能性を最大限に広げてください。
+あなたは機能分析の専門家です。どのようなユーザーアイデアでも一貫して高品質な機能抽出を行ってください。
 
-分析アプローチ:
-1. 🔍 本質理解: アイデアの核心と真の価値を抽出
-2. 🚀 自由発想: 既存の枠組みにとらわれない視点
-3. 🎨 多面分析: 複数の角度からの可能性探求
-4. 💡 革新提案: 新しい価値創造の方向性
-5. 🌈 融合思考: 異なる領域の組み合わせ
+📋 【必須実行手順】:
+STEP 1: ユーザーの言葉から「動詞」を抽出（何をしたいか）
+STEP 2: 「対象データ」を特定（何を扱うか）
+STEP 3: 「ユーザーの目的」を明確化（なぜ必要か）
+STEP 4: 上記を基に具体的機能リストを生成
 
-以下のJSON形式で、自由で創造的な分析を提供してください：
+🎯 【出力必須要件】:
+- keyFeatures: 必ず6個の具体的機能（「〜機能」「〜システム」「〜管理」などの形式）
+- specificComponents: 必ず4個のUIコンポーネント（「〜フォーム」「〜リスト」「〜カード」など）
+- dataStructure: 必ず3個のデータエンティティ（実際に保存するデータの名前）
+- businessLogic: 必ず3個のビジネスルール（「〜の計算」「〜の検証」など）
+
+以下のJSON形式で必ず回答してください（フィールドの欠落は厳禁です）：
 
 {
-  "enhancedDescription": "アイデアの魅力的で詳細な説明（50-100文字）",
-  "coreEssence": "アイデアの本質的価値",
-  "naturalTags": ["自然に浮かぶ特徴タグ1", "タグ2", "タグ3", "タグ4", "タグ5"],
-  "targetUsers": ["具体的ユーザー1", "ユーザー2", "ユーザー3"],
-  "keyFeatures": ["核心機能1", "機能2", "機能3", "機能4"],
-  "uniqueValue": "独自価値提案",
-  "innovationAreas": ["革新領域1", "領域2", "領域3"],
-  "crossDomainPotential": ["異分野融合の可能性1", "可能性2"],
-  "userExperienceVision": "目指すユーザー体験の描写",
+  "enhancedDescription": "ユーザーのアイデアを機能面で具体化した説明（60-80文字）",
+  "coreEssence": "このアプリが解決する核心的価値（30-50文字）",
+  "targetUsers": ["主要ユーザー", "副次ユーザー", "管理者"],
+  "keyFeatures": ["機能1", "機能2", "機能3", "機能4", "機能5", "機能6"],
+  "specificComponents": ["UIコンポーネント1", "UIコンポーネント2", "UIコンポーネント3", "UIコンポーネント4"],
+  "dataStructure": ["データエンティティ1", "データエンティティ2", "データエンティティ3"],
+  "userInteractions": ["操作1", "操作2", "操作3"],
+  "businessLogic": ["ビジネスルール1", "ビジネスルール2", "ビジネスルール3"],
+  "uniqueValue": "他にない独自の価値提案（40-60文字）",
   "businessPotential": "high|medium|low",
-  "marketOpportunity": "市場機会の説明",
-  "technicalConsiderations": ["技術的考慮点1", "考慮点2"],
-  "futureEvolution": "将来的な進化の方向性",
-  "inspiration": "このアイデアから得られるインスピレーション"
+  "technicalConsiderations": ["技術的考慮点1", "技術的考慮点2"],
+  "inspiration": "実装時のインスピレーション（30-50文字）"
 }
-
 
 ${this.getCreativityPrompt(options.creativityMode || 'balanced')}
 
-重要: カテゴリに無理に当てはめず、アイデアの本来の可能性を自由に探求してください。`;
+🚨 【重要な一貫性ルール】:
+1. カテゴリ分類は絶対に行わない
+2. 汎用的な「管理」「一覧」ではなく、具体的な機能名を使用
+3. ユーザーが明示していない機能は推測で追加しない
+4. 全フィールドを必ず埋める（空配列や空文字列は禁止）
+5. 実装可能で具体的な内容のみ記載
+
+📝 【実例ガイド】:
+入力: "家計簿アプリ" 
+→ keyFeatures: ["収支記録機能", "カテゴリ別集計機能", "月次レポート生成機能", "予算設定機能", "レシート撮影機能", "グラフ表示機能"]
+→ dataStructure: ["expense_records", "budget_settings", "receipt_images"]`;
 
     const result = await this.generateText({
       prompt,

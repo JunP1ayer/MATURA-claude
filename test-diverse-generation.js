@@ -49,13 +49,8 @@ async function testGeneration(testCase) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        userIdea: testCase.idea,
-        config: {
-          mode: 'balanced',
-          useDesignSystem: true,
-          creativityLevel: 'medium',
-          qualityPriority: 'quality'
-        }
+        idea: testCase.idea,
+        mode: 'balanced'
       })
     });
 

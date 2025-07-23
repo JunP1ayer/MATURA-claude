@@ -37,8 +37,8 @@ export class OpenAIOptimizedSystem {
     this.config = {
       model: 'gpt-4', // デフォルトでGPT-4を使用
       temperature: 0.7,
-      maxTokens: 4000,
-      timeoutMs: 60000,
+      maxTokens: 3000, // トークン制限を削減
+      timeoutMs: 45000, // タイムアウトを45秒に短縮
       enableReasoningMode: true,
       ...config
     };
@@ -89,7 +89,8 @@ export class OpenAIOptimizedSystem {
           tool_choice: { type: "function", function: { name: functionName } },
           temperature: config.temperature,
           max_tokens: config.maxTokens,
-          response_format: { type: "text" }
+          response_format: { type: "text" },
+          timeout: config.timeoutMs
         });
       } catch (error: any) {
         // トークン制限エラーの場合、GPT-3.5-turboにフォールバック
@@ -113,8 +114,9 @@ export class OpenAIOptimizedSystem {
             ],
             tool_choice: { type: "function", function: { name: functionName } },
             temperature: config.temperature,
-            max_tokens: Math.min(config.maxTokens, 4000),
-            response_format: { type: "text" }
+            max_tokens: Math.min(config.maxTokens, 3000),
+            response_format: { type: "text" },
+            timeout: config.timeoutMs
           });
         } else {
           throw error;
@@ -127,9 +129,88 @@ export class OpenAIOptimizedSystem {
         throw new Error('No valid function call response');
       }
 
-      // JSON引数をパース
+      // JSON引数をパース（堅牢な解析処理）
       console.log('📥 [OPENAI-OPTIMIZED] Parsing function arguments');
-      const parsedData = JSON.parse(toolCall.function.arguments);
+      
+      let rawArguments = toolCall.function.arguments;
+      console.log('🔍 [OPENAI-OPTIMIZED] Raw arguments length:', rawArguments.length);
+      
+      let parsedData: T;
+      
+      try {
+        // 直接解析を試行
+        parsedData = JSON.parse(rawArguments);
+        console.log('✅ [OPENAI-OPTIMIZED] Direct JSON parse successful');
+      } catch (directError) {
+        console.log('⚠️ [OPENAI-OPTIMIZED] Direct parse failed, trying cleanup');
+        console.log('🔍 [OPENAI-OPTIMIZED] Raw arguments length:', rawArguments.length);
+        
+        // より堅牢なクリーンアップ処理
+        let cleanedArguments = rawArguments
+          // バッククォートの問題を根本的に解決
+          .replace(/`+/g, '"')                  // 全てのバッククォートを"に置換
+          .replace(/```[\w]*\n?/g, '')          // コードブロックマーカー除去
+          .replace(/'/g, '"')                   // シングルクォートをダブルクォートに
+          .replace(/[\r\n\t]/g, ' ')            // 改行とタブを空白に
+          .replace(/\s+/g, ' ')                 // 連続する空白を1つに
+          .replace(/,(\s*[}\]])/g, '$1')        // trailing comma削除（より正確）
+          .replace(/([{,]\s*)"([^"]*)"(\s*:)/g, '$1"$2"$3') // キーの正規化
+          .trim();
+        
+        console.log('🔧 [OPENAI-OPTIMIZED] Cleaned arguments length:', cleanedArguments.length);
+        
+        try {
+          parsedData = JSON.parse(cleanedArguments);
+          console.log('✅ [OPENAI-OPTIMIZED] Cleaned JSON parse successful');
+        } catch (cleanError) {
+          console.log('⚠️ [OPENAI-OPTIMIZED] Cleanup failed, trying advanced extraction');
+          
+          // より強力なJSON抽出パターン
+          const jsonPatterns = [
+            // パターン1: 最も外側の{}をキャプチャ
+            /^[^{]*(\{[\s\S]*\})[^}]*$/,
+            // パターン2: コードブロック内のJSON
+            /```(?:json)?\s*(\{[\s\S]*?\})\s*```/i,
+            // パターン3: 基本的な{}ブロック
+            /(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/,
+            // パターン4: シンプルな単一レベルオブジェクト
+            /\{[^{}]*\}/
+          ];
+          
+          let extracted: string | null = null;
+          for (let i = 0; i < jsonPatterns.length; i++) {
+            const pattern = jsonPatterns[i];
+            const match = rawArguments.match(pattern);
+            if (match) {
+              extracted = match[1] || match[0];
+              // 同じクリーンアップを適用
+              extracted = extracted
+                .replace(/`+/g, '"')
+                .replace(/'/g, '"')
+                .replace(/[\r\n\t]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .replace(/,(\s*[}\]])/g, '$1')
+                .trim();
+              
+              try {
+                parsedData = JSON.parse(extracted);
+                console.log(`✅ [OPENAI-OPTIMIZED] Pattern ${i+1} extraction successful`);
+                break;
+              } catch (e) {
+                console.log(`⚠️ [OPENAI-OPTIMIZED] Pattern ${i+1} failed:`, (e as Error).message);
+                continue;
+              }
+            }
+          }
+          
+          if (!parsedData) {
+            console.error('❌ [OPENAI-OPTIMIZED] All parsing attempts failed');
+            console.error('Raw arguments sample:', rawArguments.substring(0, 500));
+            console.error('Cleaned sample:', cleanedArguments.substring(0, 500));
+            throw new Error(`JSON parsing failed: ${(cleanError as Error).message}`);
+          }
+        }
+      }
       
       // 品質評価
       const quality = this.evaluateResponseQuality(parsedData, functionSchema);
@@ -196,7 +277,8 @@ export class OpenAIOptimizedSystem {
           temperature: config.temperature,
           max_tokens: config.maxTokens,
           presence_penalty: typeOptimization.presencePenalty,
-          frequency_penalty: typeOptimization.frequencyPenalty
+          frequency_penalty: typeOptimization.frequencyPenalty,
+          timeout: config.timeoutMs
         });
       } catch (error: any) {
         // トークン制限エラーの場合、GPT-3.5-turboにフォールバック
@@ -209,9 +291,10 @@ export class OpenAIOptimizedSystem {
               { role: "user", content: prompt }
             ],
             temperature: config.temperature,
-            max_tokens: Math.min(config.maxTokens, 4000),
+            max_tokens: Math.min(config.maxTokens, 3000),
             presence_penalty: typeOptimization.presencePenalty,
-            frequency_penalty: typeOptimization.frequencyPenalty
+            frequency_penalty: typeOptimization.frequencyPenalty,
+            timeout: config.timeoutMs
           });
         } else {
           throw error;

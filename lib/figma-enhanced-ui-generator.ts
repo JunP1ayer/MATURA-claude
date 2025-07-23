@@ -404,30 +404,309 @@ ${designPattern.name} - ${designPattern.config.emphasis}
   }
 
   private extractColorsFromFigma(figmaData: any, category: string): any {
-    // Figmaファイルからカラーを抽出（実装省略）
-    return {
-      primary: '#1e40af',
-      secondary: '#3b82f6',
-      accent: '#60a5fa',
-      background: '#ffffff',
-      surface: '#f8fafc',
-      text: '#1e293b'
+    console.log('🎨 [FIGMA-COLORS] 高精度カラー抽出を開始');
+    
+    try {
+      const document = figmaData?.document;
+      if (!document) {
+        console.log('⚠️ [FIGMA-COLORS] Document not found, using enhanced fallback');
+        return this.getEnhancedFallbackColors(category);
+      }
+
+      const extractedColors: any = {
+        primary: '#6366f1',
+        secondary: '#8b5cf6', 
+        accent: '#06b6d4',
+        background: '#ffffff',
+        surface: '#f8fafc',
+        text: '#1e293b'
+      };
+
+      // Figmaの塗りスタイルを再帰的に検索
+      const findPaintStyles = (node: any, colors: string[] = []): string[] => {
+        if (node.fills && Array.isArray(node.fills)) {
+          node.fills.forEach((fill: any) => {
+            if (fill.type === 'SOLID' && fill.color) {
+              const { r, g, b } = fill.color;
+              const hex = `#${Math.round(r * 255).toString(16).padStart(2, '0')}${Math.round(g * 255).toString(16).padStart(2, '0')}${Math.round(b * 255).toString(16).padStart(2, '0')}`;
+              if (!colors.includes(hex) && hex !== '#000000' && hex !== '#ffffff') {
+                colors.push(hex);
+              }
+            }
+          });
+        }
+
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child: any) => {
+            findPaintStyles(child, colors);
+          });
+        }
+
+        return colors;
+      };
+
+      const discoveredColors = findPaintStyles(document);
+      console.log('🎨 [FIGMA-COLORS] 発見されたカラー:', discoveredColors.slice(0, 5));
+
+      // 発見されたカラーを適用
+      if (discoveredColors.length >= 3) {
+        extractedColors.primary = discoveredColors[0];
+        extractedColors.secondary = discoveredColors[1];
+        extractedColors.accent = discoveredColors[2];
+      }
+
+      console.log('✅ [FIGMA-COLORS] カラー抽出完了:', extractedColors.primary);
+      return extractedColors;
+
+    } catch (error) {
+      console.log('⚠️ [FIGMA-COLORS] 抽出エラー、フォールバックを使用:', (error as Error)?.message);
+      return this.getEnhancedFallbackColors(category);
+    }
+  }
+
+  private getEnhancedFallbackColors(category: string): any {
+    const categoryColorSets = {
+      finance: {
+        primary: '#1e40af', secondary: '#3b82f6', accent: '#60a5fa',
+        background: '#fafbff', surface: '#f1f5f9', text: '#0f172a'
+      },
+      health: {
+        primary: '#059669', secondary: '#10b981', accent: '#34d399', 
+        background: '#f0fdf4', surface: '#ecfdf5', text: '#064e3b'
+      },
+      creative: {
+        primary: '#8b5cf6', secondary: '#a855f7', accent: '#c084fc',
+        background: '#faf5ff', surface: '#f3e8ff', text: '#581c87'
+      },
+      education: {
+        primary: '#3b82f6', secondary: '#1d4ed8', accent: '#93c5fd',
+        background: '#eff6ff', surface: '#dbeafe', text: '#1e3a8a'
+      },
+      social: {
+        primary: '#ec4899', secondary: '#f472b6', accent: '#f9a8d4',
+        background: '#fdf2f8', surface: '#fce7f3', text: '#9d174d'
+      }
     };
+
+    return categoryColorSets[category as keyof typeof categoryColorSets] || categoryColorSets.creative;
   }
 
   private extractTypographyFromFigma(figmaData: any): any {
+    console.log('📝 [FIGMA-TYPOGRAPHY] 高精度タイポグラフィ抽出を開始');
+    
+    try {
+      const document = figmaData?.document;
+      if (!document) {
+        console.log('⚠️ [FIGMA-TYPOGRAPHY] Document not found, using enhanced fallback');
+        return this.getEnhancedFallbackTypography();
+      }
+
+      const typographyStyles: any = {
+        fontFamily: 'Inter, system-ui, sans-serif',
+        headingSizes: [],
+        bodySize: '1rem',
+        lineHeight: 1.6,
+        fontWeights: {}
+      };
+
+      // Figmaのテキストスタイルを再帰的に検索
+      const findTextStyles = (node: any): void => {
+        if (node.type === 'TEXT' && node.style) {
+          const style = node.style;
+          
+          // フォントファミリーの抽出
+          if (style.fontFamily && !typographyStyles.fontFamily.includes(style.fontFamily)) {
+            typographyStyles.fontFamily = `${style.fontFamily}, ${typographyStyles.fontFamily}`;
+          }
+
+          // フォントサイズの抽出
+          if (style.fontSize) {
+            const sizeRem = `${(style.fontSize / 16).toFixed(2)}rem`;
+            if (!typographyStyles.headingSizes.includes(sizeRem)) {
+              if (style.fontSize >= 24) {
+                typographyStyles.headingSizes.push(sizeRem);
+              } else if (style.fontSize >= 14 && style.fontSize <= 18) {
+                typographyStyles.bodySize = sizeRem;
+              }
+            }
+          }
+
+          // ラインハイトの抽出
+          if (style.lineHeightPx && style.fontSize) {
+            const lineHeight = style.lineHeightPx / style.fontSize;
+            if (lineHeight > 1 && lineHeight < 3) {
+              typographyStyles.lineHeight = Number(lineHeight.toFixed(2));
+            }
+          }
+
+          // フォントウェイトの抽出
+          if (style.fontWeight) {
+            const weight = style.fontWeight;
+            if (weight >= 700) {
+              typographyStyles.fontWeights.bold = weight;
+            } else if (weight >= 500) {
+              typographyStyles.fontWeights.medium = weight;
+            } else {
+              typographyStyles.fontWeights.normal = weight;
+            }
+          }
+        }
+
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child: any) => {
+            findTextStyles(child);
+          });
+        }
+      };
+
+      findTextStyles(document);
+
+      // 見出しサイズをソート（大きい順）
+      typographyStyles.headingSizes.sort((a: string, b: string) => {
+        return parseFloat(b) - parseFloat(a);
+      });
+
+      // 最低限の見出しサイズを保証
+      if (typographyStyles.headingSizes.length < 4) {
+        typographyStyles.headingSizes = ['2.5rem', '2rem', '1.5rem', '1.25rem'];
+      }
+
+      console.log('✅ [FIGMA-TYPOGRAPHY] タイポグラフィ抽出完了');
+      console.log('📝 [FIGMA-TYPOGRAPHY] Font:', typographyStyles.fontFamily.split(',')[0]);
+      console.log('📝 [FIGMA-TYPOGRAPHY] Sizes:', typographyStyles.headingSizes.length);
+      
+      return typographyStyles;
+
+    } catch (error) {
+      console.log('⚠️ [FIGMA-TYPOGRAPHY] 抽出エラー、フォールバックを使用:', (error as Error)?.message);
+      return this.getEnhancedFallbackTypography();
+    }
+  }
+
+  private getEnhancedFallbackTypography(): any {
     return {
-      fontFamily: 'Inter, system-ui, sans-serif',
+      fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
       headingSizes: ['2.5rem', '2rem', '1.5rem', '1.25rem'],
       bodySize: '1rem',
-      lineHeight: 1.6
+      lineHeight: 1.6,
+      fontWeights: {
+        normal: 400,
+        medium: 500,
+        bold: 700
+      }
     };
   }
 
   private extractSpacingFromFigma(figmaData: any): any {
+    console.log('📏 [FIGMA-SPACING] 高精度スペーシング抽出を開始');
+    
+    try {
+      const document = figmaData?.document;
+      if (!document) {
+        console.log('⚠️ [FIGMA-SPACING] Document not found, using enhanced fallback');
+        return this.getEnhancedFallbackSpacing();
+      }
+
+      const spacingValues = new Set<number>();
+      const paddingValues = new Set<number>();
+      const marginValues = new Set<number>();
+
+      // Figmaのスペーシング情報を再帰的に検索
+      const findSpacingStyles = (node: any): void => {
+        // パディング情報の抽出
+        if (node.paddingLeft !== undefined) paddingValues.add(node.paddingLeft);
+        if (node.paddingRight !== undefined) paddingValues.add(node.paddingRight);
+        if (node.paddingTop !== undefined) paddingValues.add(node.paddingTop);
+        if (node.paddingBottom !== undefined) paddingValues.add(node.paddingBottom);
+
+        // 要素間のスペーシング（Auto Layoutの間隔）
+        if (node.itemSpacing !== undefined && node.itemSpacing > 0) {
+          spacingValues.add(node.itemSpacing);
+        }
+
+        // コンポーネント間の距離
+        if (node.absoluteBoundingBox && node.parent?.children) {
+          const siblings = node.parent.children;
+          const currentIndex = siblings.findIndex((child: any) => child.id === node.id);
+          
+          if (currentIndex > 0) {
+            const prevSibling = siblings[currentIndex - 1];
+            if (prevSibling.absoluteBoundingBox) {
+              const gap = node.absoluteBoundingBox.y - (prevSibling.absoluteBoundingBox.y + prevSibling.absoluteBoundingBox.height);
+              if (gap > 0 && gap < 200) { // 合理的な範囲のみ
+                spacingValues.add(Math.round(gap));
+              }
+            }
+          }
+        }
+
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child: any) => {
+            findSpacingStyles(child);
+          });
+        }
+      };
+
+      findSpacingStyles(document);
+
+      // 0とbase値を追加
+      spacingValues.add(0);
+      spacingValues.add(4);
+      spacingValues.add(8);
+
+      // パディング値も統合
+      paddingValues.forEach(value => {
+        if (value >= 0 && value <= 64) {
+          spacingValues.add(Math.round(value));
+        }
+      });
+
+      // スペーシングスケールを生成（ソート済み）
+      const spacingScale = Array.from(spacingValues)
+        .filter(value => value >= 0 && value <= 128) // 妥当な範囲のみ
+        .sort((a, b) => a - b)
+        .slice(0, 12); // 最大12個
+
+      // 最低限のスペーシング値を保証
+      const minimalSpacing = [0, 4, 8, 12, 16, 20, 24, 32, 40, 48];
+      const finalSpacing = [...new Set([...spacingScale, ...minimalSpacing])].sort((a, b) => a - b);
+
+      const spacingSystem = {
+        base: 4,
+        scale: finalSpacing.slice(0, 10),
+        semantic: {
+          xs: finalSpacing[1] || 4,
+          sm: finalSpacing[2] || 8, 
+          md: finalSpacing[3] || 16,
+          lg: finalSpacing[4] || 24,
+          xl: finalSpacing[5] || 32,
+          xxl: finalSpacing[6] || 48
+        }
+      };
+
+      console.log('✅ [FIGMA-SPACING] スペーシング抽出完了');
+      console.log('📏 [FIGMA-SPACING] Scale:', spacingSystem.scale.slice(0, 6));
+      
+      return spacingSystem;
+
+    } catch (error) {
+      console.log('⚠️ [FIGMA-SPACING] 抽出エラー、フォールバックを使用:', (error as Error)?.message);
+      return this.getEnhancedFallbackSpacing();
+    }
+  }
+
+  private getEnhancedFallbackSpacing(): any {
     return {
       base: 4,
-      scale: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48]
+      scale: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80],
+      semantic: {
+        xs: 4,
+        sm: 8,
+        md: 16,
+        lg: 24,
+        xl: 32,
+        xxl: 48
+      }
     };
   }
 
